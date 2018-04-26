@@ -1,0 +1,213 @@
+<!---Incoherent Feedforward Loop System-->
+<model>
+    
+    <reaction text = "in+DA--C1" after = "--">
+    <propensity type = "massaction" k="k1f" species="in*DA" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C1--in+DA" after = "--">
+    <propensity type = "massaction" k="k1r" species="C1" />
+    <delay type = "none"/>
+    </reaction>
+    
+    <reaction text = "C1--C1+mA" after = "--">
+    <propensity type = "massaction" k="k2f" species="C1" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mA--mA+pA" after = "--">
+    <propensity type = "massaction" k="k3f" species="mA" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mA--" after = "--">
+    <propensity type = "massaction" k="k4f" species="mA" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "pA--" after = "--">
+    <propensity type = "massaction" k="k5f" species="pA" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "pA+DB--C2" after = "--">
+    <propensity type = "massaction" k="k6f" species="pA*DB" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C2--pA+DB" after = "--">
+    <propensity type = "massaction" k="k6r" species="C2" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C2--C2+mB" after = "--">
+    <propensity type = "massaction" k="k7f" species="C2" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mB--mB+pB" after = "--">
+    <propensity type = "massaction" k="k8f" species="mB" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mB--" after = "--">
+    <propensity type = "massaction" k="k9f" species="mB" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "pB--" after = "--">
+    <propensity type = "massaction" k="k10f" species="pB" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "pB+DC--C3" after = "--">
+    <propensity type = "massaction" k="k11f" species="pB*DC" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C3--pB+DC" after = "--">
+    <propensity type = "massaction" k="k11r" species="C3" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "pA+DC--C4" after = "--">
+    <propensity type = "massaction" k="k12f" species="pA*DC" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C4--pA+DC" after = "--">
+    <propensity type = "massaction" k="k12r" species="C4" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C3+pA--C5" after = "--">
+    <propensity type = "massaction" k="k13f" species="C3*pA" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C5--C3+pA" after = "--">
+    <propensity type = "massaction" k="k13r" species="C5" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C4+pB--C6" after = "--">
+    <propensity type = "massaction" k="k14f" species="C4*pB" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C6--pB+C4" after = "--">
+    <propensity type = "massaction" k="k14r" species="C6" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "C4--C4+mC" after = "--">
+    <propensity type = "massaction" k="k15f" species="C4" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mC--mC+out" after = "--">
+    <propensity type = "massaction" k="k16f" species="mC" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "mC--" after = "--">
+    <propensity type = "massaction" k="k17f" species="mC" />
+    <delay type = "none"/>
+    </reaction>
+
+    <reaction text = "out--" after = "--">
+    <propensity type = "massaction" k="k18f" species="out" />
+    <delay type = "none"/>
+    </reaction>
+
+    <!-- Parameters -->
+    <!-- Reaction 1 -->
+    <parameter name = "k1f" value = "1">
+    <parameter name = "k1r" value = "1">
+
+    <!-- Reaction 2 -->
+    <parameter name = "k2f" value = "1">
+
+    <!-- Reaction 3 -->
+    <parameter name = "k3f" value = "1">
+
+    <!-- Reaction 4 -->
+    <parameter name = "k4f" value = "1">
+
+    <!-- Reaction 5 -->
+    <parameter name = "k5f" value = "1">
+
+    <!-- Reaction 6 -->
+    <parameter name = "k6f" value = "1">
+    <parameter name = "k6r" value = "1">
+
+    <!-- Reaction 7 -->
+    <parameter name = "k7f" value = "1">
+
+    <!-- Reaction 8 -->
+    <parameter name = "k8f" value = "1">
+
+    <!-- Reaction 9 -->
+    <parameter name = "k9f" value = "1">
+
+    <!-- Reaction 10 -->
+    <parameter name = "k10f" value = "1">
+
+    <!-- Reaction 11 -->
+    <parameter name = "k11f" value = "1">
+    <parameter name = "k11r" value = "1">
+
+    <!-- Reaction 12-->
+    <parameter name = "k12f" value = "1">
+    <parameter name = "k12r" value = "1">
+
+    <!-- Reaction 13 -->
+    <parameter name = "k13f" value = "1">
+    <parameter name = "k13r" value = "1">
+
+    <!-- Reaction 14 -->
+    <parameter name = "k14f" value = "1">
+    <parameter name = "k14r" value = "1">
+
+    <!-- Reaction 15 -->
+    <parameter name = "k15f" value = "1">
+
+    <!-- Reaction 16 -->
+    <parameter name = "k16f" value = "1">
+
+    <!-- Reaction 17 -->
+    <parameter name = "k17f" value = "1">
+
+    <!-- Reaction 18 -->
+    <parameter name = "k18f" value = "1">
+
+    <!-- Species  -->
+    <species name = "in" value = "50">
+    <species name = "DA" value = "50">
+    <species name = "C1" value = "0">
+
+    <species name = "mA" value = "0">
+
+    <species name = "pA" value = "0">
+
+    <species name = "DB" value = "50">
+    <species name = "C2" value = "0">
+
+    <species name = "mB" value = "0">
+    <species name = "pB" value = "0">
+
+    <species name = "DC" value = "50">
+    <species name = "C3" value = "0">
+
+    <species name = "C4" value = "0">
+
+    <species name = "C5" value = "0">
+
+    <species name = "C6" value = "0">
+
+    <species name = "mC" value = "0">
+    
+    <species name = "out" value = "0">
+
+</model>
