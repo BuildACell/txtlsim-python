@@ -64,6 +64,7 @@ check(unit.setScale(0), 'set unit scale')
 check(unit.setMultiplier(1), 'set unit multiplier')
 
 comp = createNewCompartment(model,'cell','cell',1,'litre',True)
+comp = createNewCompartment(model,'cell1','cell1',1,'litre',True)
 
 inp_IFFL = createNewSpecies(model,'inp_IFFL','inp_IFFL','cell',50,False,False,'count',False)
 DA_IFFL = createNewSpecies(model,'DA_IFFL','DA_IFFL','cell',50,False,False,'count',False)
