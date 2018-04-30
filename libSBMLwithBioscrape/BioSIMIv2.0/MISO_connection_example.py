@@ -1,8 +1,7 @@
 from libsbml import *
-from ayushCode import modules
 
 reader = SBMLReader()
-doc_DP1 = reader.readSBML('DP1.sbml')
+doc_DP1 = reader.readSBML('DP1.xml')
 model_DP1 = doc_DP1.getModel()
 DP1_subsystem = Subsystem(model_DP1)
 
@@ -14,9 +13,15 @@ doc_IFFL = reader.readSBML('IFFL.sbml')
 model_IFFL = doc_IFFL.getModel()
 IFFL_Subsystem = Subsystem(model_IFFL)
 
-Final_sbml_doc = SBMLDocument(3,1)
-final_model = Final_sbml_doc.createModel()
-Final_subsystem = Subsystem(final_model)
+# final_sbml_doc = SBMLDocument(3,1)
+try:
+   final_sbml_doc = SBMLDocument(3, 1)
+except ValueError:
+   print('Could not create SBMLDocument object')
+   sys.exit(1)
+ 
+final_subsystem = Subsystem(final_sbml_doc)
+final_model = final_subsystem.createNewModel("seconds","mole","count")
 
 connection_logic = {}
 connection_logic['DP1_out'] = 'IFFL_pA'

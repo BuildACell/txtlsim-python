@@ -1,44 +1,61 @@
 from libsbml import * 
 import libsbml
 
+def check(value, message):
+    """If 'value' is None, prints an error message constructed using
+    'message' and then exits with status code 1.  If 'value' is an integer,
+    it assumes it is a libSBML return status code.  If the code value is
+    LIBSBML_OPERATION_SUCCESS, returns without further action; if it is not,
+    prints an error message constructed using 'message' along with text from
+    libSBML explaining the meaning of the code, and exits with status code 1.
+    """
+    if value == None:
+            raise SystemExit('LibSBML returned a null value trying to ' + message + '.')
+    elif type(value) is int:
+        if value == LIBSBML_OPERATION_SUCCESS:
+            return
+        else:
+            err_msg = 'Error encountered trying to ' + message + '.' \
+                        + 'LibSBML returned error code ' + str(value) + ': "' \
+                        + OperationReturnValue_toString(value).strip() + '"'
+            raise SystemExit(err_msg)
+    else:
+        return
+
+
 class Subsystem(object):
     """
         Attributes:
-            model: A subsystem model object   
+            SBMLDocument: A subsystem SBML document object   
     """
 
-    def __init__(self, model):
+    def __init__(self, document):
         """Return a Subsystem object whose model is "model".""" 
-        self.model = model
+        self.document = document
 
-    def getModel():
+    def createNewModel(self, timeUnits, extentUnits, substanceUnits):
+        model = self.createModel()
+        if model == None:
+            # Do something to handle the error here.
+            print('Unable to create Model object.')
+            sys.exit(1)
+        status = model.setId('EnzymaticRxnModel')
+        if status != LIBSBML_OPERATION_SUCCESS:
+            # Do something to handle the error here.
+            print('Unable to set identifier on the Model object')
+            sys.exit(1)
+        check(model.setTimeUnits(timeUnits), 'set model-wide time units')
+        check(model.setExtentUnits(extentUnits), 'set model units of extent')
+        check(model.setSubstanceUnits(substanceUnits), 'set model substance units')
+        return model
+       
+    def getModel(self):
         """Return the model of the subsystem"""
         return self.model
 
     def setModel(self, model):
         """Set the subsystem's model"""
         self.model = model
-
-    def check(value, message):
-        """If 'value' is None, prints an error message constructed using
-        'message' and then exits with status code 1.  If 'value' is an integer,
-        it assumes it is a libSBML return status code.  If the code value is
-        LIBSBML_OPERATION_SUCCESS, returns without further action; if it is not,
-        prints an error message constructed using 'message' along with text from
-        libSBML explaining the meaning of the code, and exits with status code 1.
-        """
-        if value == None:
-             raise SystemExit('LibSBML returned a null value trying to ' + message + '.')
-        elif type(value) is int:
-            if value == LIBSBML_OPERATION_SUCCESS:
-               return
-            else:
-               err_msg = 'Error encountered trying to ' + message + '.' \
-                         + 'LibSBML returned error code ' + str(value) + ': "' \
-                         + OperationReturnValue_toString(value).strip() + '"'
-               raise SystemExit(err_msg)
-        else:
-            return
 
     def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant ):
         """"Return the new compartment of the model"""
@@ -76,6 +93,18 @@ class Subsystem(object):
         check(r_obj.setReversible(rReversible),'set r_obj reversible')
         check(r_obj.setFast(rFast),'set r_obj Fast')
         return r_obj
+
+    def createNewParameter(self,pId,pName,pValue,pConstant,pUnit):
+        model = self.getModel()
+        p_obj = model.createParameter()
+        check(p_obj,'created p_obj species')
+        check(p_obj.setId(pId),'set p_obj ID')
+        check(p_obj.setName(pName),'set p_obj name')
+        check(p_obj.setValue(pValue),'set p_obj value')
+        check(p_obj.setConstant(pConstant),'set p_obj constant')
+        check(p_obj.setUnits(pUnit),'set p_obj units')
+        return p_obj
+
 
     def connect(self, InputSubsystem, OutputSubsystem, connectionLogic): 
         # The final species hash map is a dictionary for all the species that will be 
@@ -141,8 +170,3 @@ class Subsystem(object):
             # Rename the new id, so that it takes effect in the species in the new model
             self.getModel().getSpecies(species_id).renameUnitSIdRefs(species_id, z.getId) #try replacing by x and see if it works
             self.getModel().getSpecies(connectionLogic[species_id]).renameUnitSIdRefs(connectionLogic[species_id], z.getId) # try replacing by y and see if it works       #copy the code here
-
-
-
-
-
