@@ -26,15 +26,21 @@ def check(value, message):
 class Subsystem(object):
     """
         Attributes:
-            SBMLDocument: A subsystem SBML document object   
+            document : SBMLDocument: A subsystem SBML document object   
     """
+    def __init__(self, newDocument):
+        self.newDocument = newDocument
 
-    def __init__(self, document):
-        """Return a Subsystem object whose model is "model".""" 
-        self.document = document
+    def getNewDocument(self):
+       """Return the model of the subsystem"""
+       return self.newDocument
+
+    def setNewDocument(self, newDocument):
+       """Set the subsystem's model"""
+       self.newDocument = newDocument
 
     def createNewModel(self, timeUnits, extentUnits, substanceUnits):
-        model = self.createModel()
+        model = self.getNewDocument().createModel()
         if model == None:
             # Do something to handle the error here.
             print('Unable to create Model object.')
@@ -49,17 +55,9 @@ class Subsystem(object):
         check(model.setSubstanceUnits(substanceUnits), 'set model substance units')
         return model
        
-    def getModel(self):
-        """Return the model of the subsystem"""
-        return self.model
-
-    def setModel(self, model):
-        """Set the subsystem's model"""
-        self.model = model
-
     def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant ):
         """"Return the new compartment of the model"""
-        model = self.getModel()
+        model = self.getNewDocument().getModel()
         comp_obj = model.createCompartment()
         check(comp_obj,'Create comp_obj compartment')
         check(comp_obj.setId(cId), 'Set comp_obj id')
@@ -71,7 +69,7 @@ class Subsystem(object):
 
     def createNewSpecies(self,sId,sName,sComp,sInitial,sConstant,sBoundary,sSubstance,sHasOnlySubstance):
         """Return the new species of the model"""
-        model = self.getModel()
+        model = self.getNewDocument().getModel()
         s_obj = model.createSpecies()
         check(s_obj,'created s_obj species')
         check(s_obj.setId(sId),'set s_obj ID')
@@ -86,7 +84,7 @@ class Subsystem(object):
 
     def createNewReaction(self,rId,rReversible,rFast):
         """Return new reaction object"""
-        model = self.getModel()
+        model = self.getNewDocument().getModel()
         r_obj = model.createReaction()
         check(r_obj,'created r_obj reaction')
         check(r_obj.setId(rId),'set r_obj ID')
@@ -95,7 +93,7 @@ class Subsystem(object):
         return r_obj
 
     def createNewParameter(self,pId,pName,pValue,pConstant,pUnit):
-        model = self.getModel()
+        model = self.getNewDocument().getModel()
         p_obj = model.createParameter()
         check(p_obj,'created p_obj species')
         check(p_obj.setId(pId),'set p_obj ID')
@@ -107,15 +105,24 @@ class Subsystem(object):
 
 
     def connect(self, InputSubsystem, OutputSubsystem, connectionLogic): 
+
+        for subsystem in InputSubsystem:
+            mod = subsystem.getNewDocument().getModel()
+            # print(mod)
+            for each_reaction in mod.getListOfReactions():
+                self.getNewDocument().getModel().addReaction(each_reaction)
+        for subsystem in OutputSubsystem:
+            for each_reaction in subsystem.getNewDocument().getModel().getListOfReactions():
+                self.getNewDocument().getModel().addReaction(each_reaction)
+
         # The final species hash map is a dictionary for all the species that will be 
         # in the final subsystem.
         final_species_hash_map = {}
         for subsystem in InputSubsystem:
             # Set the list of reactions in the final subsystem. Get the list of
             # reactions in the input subsystem and set it to final subsystem
-            self.getModel().setListOfReaction(subsystem.getModel().getListOfReaction())
             species_hash_map = {} 
-            for species in subsystem.getModel().getListOfSpecies():
+            for species in subsystem.getNewDocument().getModel().getListOfSpecies():
                 # Maintain the dictionary for all species in the input subsystems by their name
                 species_hash_map[species.getName()] = species
             for species_name in species_hash_map: 
@@ -129,10 +136,9 @@ class Subsystem(object):
                     final_species_hash_map[species_name] = [species_hash_map[species_name]]
         # Do the same for output subsystem
         for subsystem in OutputSubsystem:
-            self.getModel().setListOfReaction(subsystem.getModel().getListOfReaction())
             species_hash_map = {}
-            for species in subsystem.getModel().getListOfSpecies():
-                species_hash_map[species.getName] = species
+            for species in subsystem.getNewDocument().getModel().getListOfSpecies():
+                species_hash_map[species.getName()] = species
             for species_name in species_hash_map:
                 if final_species_hash_map.get(species_name):
                     final_species_hash_map[species_name].append(species_hash_map[species_name])
@@ -151,22 +157,22 @@ class Subsystem(object):
                     uni_sp = final_species_hash_map[unique_species_name][0]
                 # Create and add the new species which is created to take into account
                 # the multiple occurences of the common species(s) 
-                s = self.createNewSpecies(s_id, unique_species_name, uni_sp.getCompartment(), s_initial_amount, uni_sp.getConstant(), uni_sp.getBoundaryCondition(), uni_sp.getSubstanceUnits(), uni_sp.getHasOnlySubstanceUnits())
+                s = self.getNewDocument().createNewSpecies(s_id, unique_species_name, uni_sp.getCompartment(), s_initial_amount, uni_sp.getConstant(), uni_sp.getBoundaryCondition(), uni_sp.getSubstanceUnits(), uni_sp.getHasOnlySubstanceUnits())
             else:
                 # If there are no species with multiple occurence in different subsystems
                 # then just add the list of all species maintained in the final hash map
                 # to our new subsystem's list of species.
-                self.getModel().getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
+                self.getNewDocument().getModel().getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
 
     # The connection logic given by user species two or more different species
     # but that are bound to each other.
     #  A new species z is created to account for this species interaction.
         for species_id in connectionLogic.keys():
             # Get the ids of the concerned species from the connection logic given by the user
-            x = self.getModel().getSpecies(species_id)
-            y = self.getModel().getSpecies(connectionLogic[species_id])
+            x = self.getNewDocument().getModel().getSpecies(species_id)
+            y = self.getNewDocument().getModel().getSpecies(connectionLogic[species_id])
             # Create new combined species, caused due to interaction of x and y
-            z = self.createNewSpecies(x.getId + y.getId, x.getName, x.getCompartment(), sum(x.getInitial_amount, y.getInitial_amount), x.getConstant(), x.getBoundaryCondition(), x.getSubstanceUnits(), x.getHasOnlySubstanceUnits())
+            z = self.createNewSpecies(x.getId() + y.getId(), x.getName(), x.getCompartment(), sum([x.getInitialAmount(), y.getInitialAmount()]), x.getConstant(), x.getBoundaryCondition(), x.getSubstanceUnits(), x.getHasOnlySubstanceUnits())
             # Rename the new id, so that it takes effect in the species in the new model
-            self.getModel().getSpecies(species_id).renameUnitSIdRefs(species_id, z.getId) #try replacing by x and see if it works
-            self.getModel().getSpecies(connectionLogic[species_id]).renameUnitSIdRefs(connectionLogic[species_id], z.getId) # try replacing by y and see if it works       #copy the code here
+            self.getNewDocument().getModel().getSpecies(species_id).renameUnitSIdRefs(species_id, z.getId()) #try replacing by x and see if it works
+            self.getNewDocument().getModel().getSpecies(connectionLogic[species_id]).renameUnitSIdRefs(connectionLogic[species_id], z.getId()) # try replacing by y and see if it works       #copy the code here

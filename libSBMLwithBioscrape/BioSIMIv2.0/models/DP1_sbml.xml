@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
-  <model id="EnzymaticRxnModel" substanceUnits="count" timeUnits="second" extentUnits="mole">
+  <model id="EnzymaticRxnModel" substanceUnits="count" timeUnits="seconds" extentUnits="mole">
     <listOfUnitDefinitions>
       <unitDefinition id="per_second">
         <listOfUnits>
@@ -10,17 +10,18 @@
     </listOfUnitDefinitions>
     <listOfCompartments>
       <compartment id="cell" name="cell" size="1" units="litre" constant="true"/>
+      <compartment id="cell1" name="cell1" size="1" units="litre" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
-      <species id="inp" name="inp" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="X" name="X" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C1" name="C1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="Xp" name="Xp" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="E" name="E" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C2" name="C2" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C3" name="C3" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="out" name="out" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C4" name="C4" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="inp_DP1" name="inp_DP1" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="X_DP1" name="X_DP1" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C1_DP1" name="C1_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="Xp_DP1" name="Xp_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="E_DP1" name="E_DP1" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C2_DP1" name="C2_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C3_DP1" name="C3_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="out_DP1" name="out_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C4_DP1" name="C4_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
       <parameter id="k1f" name="k1f" value="1" units="per_second" constant="false"/>
@@ -39,11 +40,11 @@
     <listOfReactions>
       <reaction id="r1" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference species="X" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="X_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C1" stoichiometry="1" constant="false"/>
+          <speciesReference species="C1_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -52,13 +53,13 @@
               <apply>
                 <times/>
                 <ci> k1f </ci>
-                <ci> inp </ci>
-                <ci> X </ci>
+                <ci> inp_DP1 </ci>
+                <ci> X_DP1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k1r </ci>
-                <ci> C1 </ci>
+                <ci> C1_DP1 </ci>
               </apply>
             </apply>
           </math>
@@ -66,29 +67,29 @@
       </reaction>
       <reaction id="r2" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="C1" stoichiometry="1" constant="false"/>
+          <speciesReference species="C1_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
               <ci> k2f </ci>
-              <ci> C1 </ci>
+              <ci> C1_DP1 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
       <reaction id="r3" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference species="E" stoichiometry="1" constant="false"/>
-          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="E_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C2" stoichiometry="1" constant="false"/>
+          <speciesReference species="C2_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -97,13 +98,13 @@
               <apply>
                 <times/>
                 <ci> k3f </ci>
-                <ci> E </ci>
-                <ci> Xp </ci>
+                <ci> E_DP1 </ci>
+                <ci> Xp_DP1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k3r </ci>
-                <ci> C2 </ci>
+                <ci> C2_DP1 </ci>
               </apply>
             </apply>
           </math>
@@ -111,29 +112,29 @@
       </reaction>
       <reaction id="r4" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="C2" stoichiometry="1" constant="false"/>
+          <speciesReference species="C2_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="E" stoichiometry="1" constant="false"/>
-          <speciesReference species="X" stoichiometry="1" constant="false"/>
+          <speciesReference species="E_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="X_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
               <ci> k4f </ci>
-              <ci> C2 </ci>
+              <ci> C2_DP1 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
       <reaction id="r5" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C3" stoichiometry="1" constant="false"/>
+          <speciesReference species="C3_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -142,13 +143,13 @@
               <apply>
                 <times/>
                 <ci> k5f </ci>
-                <ci> inp </ci>
-                <ci> Xp </ci>
+                <ci> inp_DP1 </ci>
+                <ci> Xp_DP1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k5r </ci>
-                <ci> C3 </ci>
+                <ci> C3_DP1 </ci>
               </apply>
             </apply>
           </math>
@@ -156,29 +157,29 @@
       </reaction>
       <reaction id="r6" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="C3" stoichiometry="1" constant="false"/>
+          <speciesReference species="C3_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="out" stoichiometry="1" constant="false"/>
-          <speciesReference species="inp" stoichiometry="1" constant="false"/>
+          <speciesReference species="out_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
               <ci> k6f </ci>
-              <ci> C3 </ci>
+              <ci> C3_DP1 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
       <reaction id="r7" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference species="E" stoichiometry="1" constant="false"/>
-          <speciesReference species="out" stoichiometry="1" constant="false"/>
+          <speciesReference species="E_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="out_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C4" stoichiometry="1" constant="false"/>
+          <speciesReference species="C4_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -187,13 +188,13 @@
               <apply>
                 <times/>
                 <ci> k7f </ci>
-                <ci> E </ci>
-                <ci> out </ci>
+                <ci> E_DP1 </ci>
+                <ci> out_DP1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k7r </ci>
-                <ci> C4 </ci>
+                <ci> C4_DP1 </ci>
               </apply>
             </apply>
           </math>
@@ -201,18 +202,18 @@
       </reaction>
       <reaction id="r8" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference species="C4" stoichiometry="1" constant="false"/>
+          <speciesReference species="C4_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
-          <speciesReference species="E" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="E_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
               <ci> k8f </ci>
-              <ci> C4 </ci>
+              <ci> C4_DP1 </ci>
             </apply>
           </math>
         </kineticLaw>
