@@ -39,33 +39,35 @@ connection_logic["out_DP1"] = "pA_IFFL"
 connection_logic["out_DP2"] = "pB_IFFL"
 
 
-Final_subsystem.connect([DP1_subsystem, DP2_subsystem],[IFFL_Subsystem], connection_logic)
+# Final_subsystem.connect([DP1_subsystem, DP2_subsystem],[IFFL_Subsystem], connection_logic)
 # Final_subsystem.connect(DP1_subsystem,IFFL_Subsystem, connection_logic)
 
 #add simulate and plot 
 
 # Write SBML file in XML
-writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected.xml')
+# writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected.xml')
 
 # Simulate 
 import bioscrape
-m = bioscrape.types.read_model_from_sbml('models/DP_IFFL_connected.xml')
+m = bioscrape.types.read_model_from_sbml('models/DP_IFFL_connected_hardcoded.xml')
 s = bioscrape.simulator.ModelCSimInterface(m)
 s.py_prep_deterministic_simulation()
 s.py_set_initial_time(0)
 
-inp_IFFL_ind = m.get_species_index('inp_IFFL')
+inp_DP1_ind = m.get_species_index('inp_DP1')
+inp_DP2_ind = m.get_species_index('inp_DP2')
 out_IFFL_ind = m.get_species_index('out_IFFL')
 sim = bioscrape.simulator.DeterministicSimulator()
-timepoints = np.linspace(0,100,1000)
+timepoints = np.linspace(0,10,1000)
 result = sim.py_simulate(s,timepoints)
 # print(result.py_get_result()[1])
 plt.xlabel('Time')
-plt.ylabel('out_IFFL/inp_IFFL species')
-# plt.plot(timepoints,result.py_get_result()[:,inp_IFFL_ind])
-# plt.plot(timepoints,result.py_get_result()[:,out_IFFL_ind])
-plt.legend([m.get_species_list()[inp_IFFL_ind],m.get_species_list()[out_IFFL_ind]])
+plt.ylabel('input/output species')
+plt.plot(timepoints,result.py_get_result()[:,inp_DP1_ind])
+plt.plot(timepoints,result.py_get_result()[:,inp_DP2_ind])
+plt.plot(timepoints,result.py_get_result()[:,out_IFFL_ind])
+plt.legend([m.get_species_list()[inp_DP1_ind],m.get_species_list()[inp_DP2_ind],m.get_species_list()[out_IFFL_ind]])
 
-plt.plot(timepoints,result.py_get_result())
-plt.plot(timepoints,result.py_get_result())
+# plt.plot(timepoints,result.py_get_result())
+# plt.plot(timepoints,result.py_get_result())
 plt.show()

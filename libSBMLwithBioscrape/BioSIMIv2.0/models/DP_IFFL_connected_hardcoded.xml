@@ -9,7 +9,7 @@
       <species id="E_DP1" name="E_DP1" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C2_DP1" name="C2_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C3_DP1" name="C3_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="out_DP1" name="pA_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="pA_IFFL" name="pA_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C4_DP1" name="C4_DP1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="inp_DP2" name="inp_DP2" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="X_DP2" name="X_DP2" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -18,9 +18,9 @@
       <species id="E_DP2" name="E_DP2" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C2_DP2" name="C2_DP2" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C3_DP2" name="C3_DP2" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="out_DP2" name="pB_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="pB_IFFL" name="pB_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C4_DP2" name="C4_DP2" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="inp_IFFL" name="inp_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="inp_IFFL" name="inp_IFFL" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="DA_IFFL" name="DA_IFFL" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="C1_IFFL" name="C1_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mA_IFFL" name="mA_IFFL" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -210,7 +210,7 @@
           <speciesReference species="C3_DP1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="out_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="pA_IFFL" stoichiometry="1" constant="false"/>
           <speciesReference species="inp_DP1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
@@ -226,7 +226,7 @@
       <reaction id="r7" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="E_DP1" stoichiometry="1" constant="false"/>
-          <speciesReference species="out_DP1" stoichiometry="1" constant="false"/>
+          <speciesReference species="pA_IFFL" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
           <speciesReference species="C4_DP1" stoichiometry="1" constant="false"/>
@@ -239,7 +239,7 @@
                 <times/>
                 <ci> k7f </ci>
                 <ci> E_DP1 </ci>
-                <ci> out_DP1 </ci>
+                <ci> pA_IFFL </ci>
               </apply>
               <apply>
                 <times/>
@@ -390,7 +390,7 @@
           <speciesReference species="C3_DP2" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="out_DP2" stoichiometry="1" constant="false"/>
+          <speciesReference species="pB_IFFL" stoichiometry="1" constant="false"/>
           <speciesReference species="inp_DP2" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
@@ -406,7 +406,7 @@
       <reaction id="DP2_r7" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="E_DP2" stoichiometry="1" constant="false"/>
-          <speciesReference species="out_DP2" stoichiometry="1" constant="false"/>
+          <speciesReference species="pB_IFFL" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
           <speciesReference species="C4_DP2" stoichiometry="1" constant="false"/>
@@ -419,7 +419,7 @@
                 <times/>
                 <ci> DP2_k7f </ci>
                 <ci> E_DP2 </ci>
-                <ci> out_DP2 </ci>
+                <ci> pB_IFFL </ci>
               </apply>
               <apply>
                 <times/>

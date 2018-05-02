@@ -24,21 +24,21 @@
       <species id="C4_DP2" name="C4_DP2" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
-      <parameter id="k1f" name="k1f" value="1" units="per_second" constant="false"/>
-      <parameter id="k1r" name="k1r" value="1" units="per_second" constant="false"/>
-      <parameter id="k2f" name="k2f" value="1" units="per_second" constant="false"/>
-      <parameter id="k3f" name="k3f" value="1" units="per_second" constant="false"/>
-      <parameter id="k3r" name="k3r" value="1" units="per_second" constant="false"/>
-      <parameter id="k4f" name="k4f" value="1" units="per_second" constant="false"/>
-      <parameter id="k5f" name="k5f" value="1" units="per_second" constant="false"/>
-      <parameter id="k5r" name="k5r" value="1" units="per_second" constant="false"/>
-      <parameter id="k6f" name="k6f" value="1" units="per_second" constant="false"/>
-      <parameter id="k7f" name="k7f" value="1" units="per_second" constant="false"/>
-      <parameter id="k7r" name="k7r" value="1" units="per_second" constant="false"/>
-      <parameter id="k8f" name="k8f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k1f" name="DP2_k1f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k1r" name="DP2_k1r" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k2f" name="DP2_k2f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k3f" name="DP2_k3f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k3r" name="DP2_k3r" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k4f" name="DP2_k4f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k5f" name="DP2_k5f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k5r" name="DP2_k5r" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k6f" name="DP2_k6f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k7f" name="DP2_k7f" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k7r" name="DP2_k7r" value="1" units="per_second" constant="false"/>
+      <parameter id="DP2_k8f" name="DP2_k8f" value="1" units="per_second" constant="false"/>
     </listOfParameters>
     <listOfReactions>
-      <reaction id="r1" reversible="true" fast="false">
+      <reaction id="DP2_r1" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="inp_DP2" stoichiometry="1" constant="false"/>
           <speciesReference species="X_DP2" stoichiometry="1" constant="false"/>
@@ -52,20 +52,20 @@
               <minus/>
               <apply>
                 <times/>
-                <ci> k1f </ci>
+                <ci> DP2_k1f </ci>
                 <ci> inp_DP2 </ci>
                 <ci> X_DP2 </ci>
               </apply>
               <apply>
                 <times/>
-                <ci> k1r </ci>
+                <ci> DP2_k1r </ci>
                 <ci> C1_DP2 </ci>
               </apply>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r2" reversible="false" fast="false">
+      <reaction id="DP2_r2" reversible="false" fast="false">
         <listOfReactants>
           <speciesReference species="C1_DP2" stoichiometry="1" constant="false"/>
         </listOfReactants>
@@ -77,13 +77,13 @@
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
-              <ci> k2f </ci>
+              <ci> DP2_k2f </ci>
               <ci> C1_DP2 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r3" reversible="true" fast="false">
+      <reaction id="DP2_r3" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="E_DP2" stoichiometry="1" constant="false"/>
           <speciesReference species="Xp_DP2" stoichiometry="1" constant="false"/>
@@ -97,20 +97,20 @@
               <minus/>
               <apply>
                 <times/>
-                <ci> k3f </ci>
+                <ci> DP2_k3f </ci>
                 <ci> E_DP2 </ci>
                 <ci> Xp_DP2 </ci>
               </apply>
               <apply>
                 <times/>
-                <ci> k3r </ci>
+                <ci> DP2_k3r </ci>
                 <ci> C2_DP2 </ci>
               </apply>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r4" reversible="false" fast="false">
+      <reaction id="DP2_r4" reversible="false" fast="false">
         <listOfReactants>
           <speciesReference species="C2_DP2" stoichiometry="1" constant="false"/>
         </listOfReactants>
@@ -122,13 +122,13 @@
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
-              <ci> k4f </ci>
+              <ci> DP2_k4f </ci>
               <ci> C2_DP2 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r5" reversible="true" fast="false">
+      <reaction id="DP2_r5" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="inp_DP2" stoichiometry="1" constant="false"/>
           <speciesReference species="Xp_DP2" stoichiometry="1" constant="false"/>
@@ -142,20 +142,20 @@
               <minus/>
               <apply>
                 <times/>
-                <ci> k5f </ci>
+                <ci> DP2_k5f </ci>
                 <ci> inp_DP2 </ci>
                 <ci> Xp_DP2 </ci>
               </apply>
               <apply>
                 <times/>
-                <ci> k5r </ci>
+                <ci> DP2_k5r </ci>
                 <ci> C3_DP2 </ci>
               </apply>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r6" reversible="false" fast="false">
+      <reaction id="DP2_r6" reversible="false" fast="false">
         <listOfReactants>
           <speciesReference species="C3_DP2" stoichiometry="1" constant="false"/>
         </listOfReactants>
@@ -167,13 +167,13 @@
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
-              <ci> k6f </ci>
+              <ci> DP2_k6f </ci>
               <ci> C3_DP2 </ci>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r7" reversible="true" fast="false">
+      <reaction id="DP2_r7" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="E_DP2" stoichiometry="1" constant="false"/>
           <speciesReference species="out_DP2" stoichiometry="1" constant="false"/>
@@ -187,20 +187,20 @@
               <minus/>
               <apply>
                 <times/>
-                <ci> k7f </ci>
+                <ci> DP2_k7f </ci>
                 <ci> E_DP2 </ci>
                 <ci> out_DP2 </ci>
               </apply>
               <apply>
                 <times/>
-                <ci> k7r </ci>
+                <ci> DP2_k7r </ci>
                 <ci> C4_DP2 </ci>
               </apply>
             </apply>
           </math>
         </kineticLaw>
       </reaction>
-      <reaction id="r8" reversible="false" fast="false">
+      <reaction id="DP2_r8" reversible="false" fast="false">
         <listOfReactants>
           <speciesReference species="C4_DP2" stoichiometry="1" constant="false"/>
         </listOfReactants>
@@ -212,7 +212,7 @@
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
-              <ci> k8f </ci>
+              <ci> DP2_k8f </ci>
               <ci> C4_DP2 </ci>
             </apply>
           </math>

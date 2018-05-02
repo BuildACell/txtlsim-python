@@ -1,6 +1,14 @@
 from libsbml import * 
-import libsbml
 
+def createNewDocument(newLevel, newVersion):
+    try:
+        sbmlDoc = SBMLDocument(newLevel, newVersion)
+    except ValueError:
+        print('Could not create SBMLDocument object')
+        sys.exit(1)
+    return sbmlDoc
+
+ 
 def check(value, message):
     """If 'value' is None, prints an error message constructed using
     'message' and then exits with status code 1.  If 'value' is an integer,
@@ -22,23 +30,33 @@ def check(value, message):
     else:
         return
 
+class CreateSubsystem(object):
+    """
+       Attributes:
+            NewDocument : SBMLDocument object for a NewSubsystem
+    """
 
-class Subsystem(object):
-    """
-        Attributes:
-            document : SBMLDocument: A subsystem SBML document object   
-    """
-    def __init__(self, newDocument):
-        self.newDocument = newDocument
+    def __init__(self, NewDocument):
+        self.NewDocument = NewDocument
 
     def getNewDocument(self):
-       """Return the model of the subsystem"""
-       return self.newDocument
+        """ Returns the SBMLDocument of the subsystem """
+        return self.NewDocument
 
-    def setNewDocument(self, newDocument):
-       """Set the subsystem's model"""
-       self.newDocument = newDocument
+    def setNewDocument(self, NewDocument):
+        """ Set the new document SBMLDocument object """
+        self.NewDocument = NewDocument
 
+    def getFromXML(self, filename):
+        """ Returns the SBMLDocument object from XML file given """
+        reader = SBMLReader()
+        doc = reader.readSBML(filename)
+        check(doc,"reading from SBML file")
+        return doc
+
+    def setDocToXML(self, filename):
+       check(writeSBML(self,filename),"writing to sbml file")
+ 
     def createNewModel(self, timeUnits, extentUnits, substanceUnits):
         model = self.getNewDocument().createModel()
         if model == None:
@@ -54,7 +72,7 @@ class Subsystem(object):
         check(model.setExtentUnits(extentUnits), 'set model units of extent')
         check(model.setSubstanceUnits(substanceUnits), 'set model substance units')
         return model
-       
+
     def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant ):
         """"Return the new compartment of the model"""
         model = self.getNewDocument().getModel()
@@ -105,6 +123,15 @@ class Subsystem(object):
 
 
     def connect(self, InputSubsystem, OutputSubsystem, connectionLogic): 
+        for subsystem in InputSubsystem:
+            mod = subsystem.getNewDocument().getModel()
+            # print(mod)
+            for each_parameter in mod.getListOfParameters():
+                self.getNewDocument().getModel().addParameter(each_parameter)
+        for subsystem in OutputSubsystem:
+            for each_parameter in subsystem.getNewDocument().getModel().getListOfParameters():
+                self.getNewDocument().getModel().addParameter(each_parameter)
+
 
         for subsystem in InputSubsystem:
             mod = subsystem.getNewDocument().getModel()
@@ -144,6 +171,7 @@ class Subsystem(object):
                     final_species_hash_map[species_name].append(species_hash_map[species_name])
                 else:
                     final_species_hash_map[species_name] = [species_hash_map[species_name]]
+        final_species_hash_map["inp_IFFL"][0].setInitialAmount(0.0) 
         for unique_species_name in final_species_hash_map: 
             if len(final_species_hash_map[unique_species_name]) > 1:
                 # For any species which were present in more than one subsystem
@@ -171,8 +199,11 @@ class Subsystem(object):
             # Get the ids of the concerned species from the connection logic given by the user
             x = self.getNewDocument().getModel().getSpecies(species_id)
             y = self.getNewDocument().getModel().getSpecies(connectionLogic[species_id])
-            # Create new combined species, caused due to interaction of x and y
-            z = self.createNewSpecies(x.getId() + y.getId(), x.getName(), x.getCompartment(), sum([x.getInitialAmount(), y.getInitialAmount()]), x.getConstant(), x.getBoundaryCondition(), x.getSubstanceUnits(), x.getHasOnlySubstanceUnits())
-            # Rename the new id, so that it takes effect in the species in the new model
-            self.getNewDocument().getModel().getSpecies(species_id).renameUnitSIdRefs(species_id, z.getId()) #try replacing by x and see if it works
-            self.getNewDocument().getModel().getSpecies(connectionLogic[species_id]).renameUnitSIdRefs(connectionLogic[species_id], z.getId()) # try replacing by y and see if it works       #copy the code here
+            s = sum([x.getInitialAmount(), y.getInitialAmount()])
+            x.setName(y.getName())
+            x.setInitialAmount(s)
+            # self.getNewDocument().getModel().getSpecies(connectionLogic[species_id]).setName(x.getName())
+            y.setInitialAmount(s)
+
+        for species in self.getNewDocument().getModel().getListOfSpecies():
+            print(species.getName(),species.getInitialAmount())
