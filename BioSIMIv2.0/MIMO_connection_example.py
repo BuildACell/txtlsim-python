@@ -25,32 +25,40 @@ DP_doc2 =  getFromXML('models/DP.xml')
 DPcopy2  = NewSubsystem(DP_doc2)
 DP2_doc = DPcopy2.createNewSubsystem('2')
 # writeSBML(DP2_doc,'models/DP2.xml')
-IFFL_doc = getFromXML('models/IFFL_sbmlNew.xml')
+IFFL_doc1 = getFromXML('models/IFFL_sbmlNew.xml')
+IFFLcopy1 = NewSubsystem(IFFL_doc1)
+IFFL_doc2 = IFFLcopy1.createNewSubsystem('1')
+
+IFFL_doc1 = getFromXML('models/IFFL_sbmlNew.xml')
+
+writeSBML(IFFL_doc1,'models/IFFL1.xml')
+writeSBML(IFFL_doc2,'models/IFFL2.xml')
 
 DP1_Subsystem = CreateSubsystem(DP1_doc)
 DP2_Subsystem = CreateSubsystem(DP2_doc)
-IFFL_Subsystem = CreateSubsystem(IFFL_doc)
+IFFL1_Subsystem = CreateSubsystem(IFFL_doc1)
+IFFL2_Subsystem = CreateSubsystem(IFFL_doc2)
 
 # create a blank document for the final connected system
-final_sbml_doc = createNewDocument(IFFL_doc.getLevel(),IFFL_doc.getVersion())
+final_sbml_doc = createNewDocument(IFFL_doc1.getLevel(),IFFL_doc1.getVersion())
 check(final_sbml_doc.createModel(),'creating model of final doc')
 Final_subsystem = CreateSubsystem(final_sbml_doc)
 
 # user specifies how the systems interact by defining the following map
 connection_logic = {}
 connection_logic['out_DP1'] = 'pA_IFFL'
-# connection_logic['out_DP2'] = 'pB_IFFL'
+connection_logic['out_DP2'] = 'pA_IFFL1'
 
 # Call the connect function by specifying the input and output subsystems and the logic map
-Final_subsystem.connectInteraction([DP1_Subsystem, DP2_Subsystem],[IFFL_Subsystem], connection_logic)
+Final_subsystem.connectInteraction([DP1_Subsystem, DP2_Subsystem],[IFFL1_Subsystem, IFFL2_Subsystem], connection_logic)
 
 # Write the connected document to SBML file
 
-writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected.xml')
+writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected_MIMO.xml')
 
 
 # Simulate 
 timepoints = np.linspace(0,50,1000)
-plotSbmlWithBioscrape('models/DP_IFFL_connected.xml',0,
-timepoints,['inp_DP1','inp_DP2','out_IFFL'],'Time',
+plotSbmlWithBioscrape('models/DP_IFFL_connected_MIMO.xml',0,
+timepoints,['inp_DP1','inp_DP2','out_IFFL','out_IFFL1'],'Time',
 'Input and Output Species',14,14)
