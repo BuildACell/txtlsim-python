@@ -6,7 +6,12 @@ import numpy as np
 
     #%config InlineBackend.figure_f.ormats=['svg']
 
-
+def getFromXML(filename):
+    """ Returns the SBMLDocument object from XML file given """
+    reader = SBMLReader()
+    doc = reader.readSBML(filename)
+    check(doc, "reading from SBML file")
+    return doc
 
 def createNewDocument(newLevel, newVersion):
     try:
@@ -81,16 +86,6 @@ class CreateSubsystem(object):
     def setNewDocument(self, NewDocument):
         """ Set the new document SBMLDocument object """
         self.NewDocument = NewDocument
-
-    def getFromXML(self, filename):
-        """ Returns the SBMLDocument object from XML file given """
-        reader = SBMLReader()
-        doc = reader.readSBML(filename)
-        check(doc, "reading from SBML file")
-        return doc
-
-    def setDocToXML(self, filename):
-       check(writeSBML(self, filename), "writing to sbml file")
 
     def createNewModel(self, timeUnits, extentUnits, substanceUnits):
         model = self.getNewDocument().createModel()

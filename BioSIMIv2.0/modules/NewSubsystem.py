@@ -33,11 +33,10 @@ class NewSubsystem(object):
         model = self.getSubsystem().getModel()
         check(model, 'retreived old model')
         NewDocument = createNewDocument(model.getLevel(),model.getVersion())
-        # model = NewDocument.createModel()
-        # check(model, 'created new model in the new document')
         status = model.setId(model.getId() + NewName)
         check(status,'set id of the new model')
-        # check(model.setName(model.getName() + NewName), 'set new model name')
+
+        # Rename all math formula. 
         for reaction in model.getListOfReactions():
             astnode = reaction.getKineticLaw().getMath()
 
@@ -49,30 +48,27 @@ class NewSubsystem(object):
                 if species.isSetId():
                     oldid = species.getId()
                     astnode.renameSIdRefs(oldid, oldid + NewName)
-                    # newFormula = formulaToL3String(astnode)
             reaction.getKineticLaw().setMath(astnode)
 
+        # Rename all other IDs 
         elements = model.getListOfAllElements()
-        newListOfElements = [] 
+        # for parameter in model.getListOfParameters():
         for element in elements:
+            # change the ID for the units. The units remain the same
+            # the ids need to be updated. 
+            try:
+                if element.isSetUnits():
+                    oldid = element.getUnits()
+                    element.renameUnitSIdRefs(oldid, oldid + NewName)
+            except:
+                pass
+            # Change the ids by appending the suffix given in NewName
+            # if not element.isSetUnits():
             if element.isSetId():
                 oldid = element.getId()
-                # print(oldid)
                 newid = oldid + NewName
                 element.renameSIdRefs(oldid,newid)
                 element.setId(newid)
-            # try:    
-            #     if element.isSetUnits():
-            #         oldid = element.getUnits()
-            #         newid = oldid + NewName
-            #         element.setUnits(newid)
-            #         element.renameUnitSIdRefs(oldid,newid)
-            # except:
-            #     continue
-            # if element.isSetName():
-            #     oldid = element.getName()
-            #     element.setName(oldid + NewName)
-            newListOfElements.append(element)
-        model = newListOfElements[0].getModel()
+        model = elements[0].getModel()
         NewDocument.setModel(model)
         return NewDocument
