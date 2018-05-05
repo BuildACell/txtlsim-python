@@ -1,4 +1,5 @@
 from libsbml import *
+from modules.NewSubsystem import *
 import bioscrape
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -169,23 +170,27 @@ class CreateSubsystem(object):
         return p_obj
 
     def connectInteraction(self, InputSubsystem, OutputSubsystem, connectionLogic):
-        for subsystem in InputSubsystem:
-            mod = subsystem.getNewDocument().getModel()
-            # print(mod)
-            for each_parameter in mod.getListOfParameters():
-                self.getNewDocument().getModel().addParameter(each_parameter)
-        for subsystem in OutputSubsystem:
-            for each_parameter in subsystem.getNewDocument().getModel().getListOfParameters():
-                self.getNewDocument().getModel().addParameter(each_parameter)
+        document = self.getNewDocument()
+        doc_obj = NewSubsystem(document)
+        doc_create_obj = CreateSubsystem(document)
+        model = document.getModel()
 
         for subsystem in InputSubsystem:
             mod = subsystem.getNewDocument().getModel()
             # print(mod)
+            for each_parameter in mod.getListOfParameters():
+                model.addParameter(each_parameter)
+        for subsystem in OutputSubsystem:
+            for each_parameter in subsystem.getNewDocument().getModel().getListOfParameters():
+                model.addParameter(each_parameter)
+
+        for subsystem in InputSubsystem:
+            mod = subsystem.getNewDocument().getModel()
             for each_reaction in mod.getListOfReactions():
-                self.getNewDocument().getModel().addReaction(each_reaction)
+                model.addReaction(each_reaction)
         for subsystem in OutputSubsystem:
             for each_reaction in subsystem.getNewDocument().getModel().getListOfReactions():
-                self.getNewDocument().getModel().addReaction(each_reaction)
+                model.addReaction(each_reaction)
 
         # The final species hash map is a dictionary for all the species that will be
         # in the final subsystem.
@@ -232,27 +237,34 @@ class CreateSubsystem(object):
                 s_initial_amount = 0
                 for i in final_species_hash_map[unique_species_name]:
                     s_id += i.getId()
-                    s_initial_amount += i.getInitial_amount()
+                    s_initial_amount += i.getInitialAmount()
                     uni_sp = final_species_hash_map[unique_species_name][0]
                 # Create and add the new species which is created to take into account
                 # the multiple occurences of the common species(s)
-                s = self.getNewDocument().createNewSpecies(s_id, unique_species_name, uni_sp.getCompartment(), s_initial_amount,
+                s = doc_create_obj.createNewSpecies(s_id, unique_species_name, uni_sp.getCompartment(), s_initial_amount,
                                                            uni_sp.getConstant(), uni_sp.getBoundaryCondition(), uni_sp.getSubstanceUnits(), uni_sp.getHasOnlySubstanceUnits())
             else:
                 # If there are no species with multiple occurence in different subsystems
                 # then just add the list of all species maintained in the final hash map
                 # to our new subsystem's list of species.
-                self.getNewDocument().getModel().getListOfSpecies().append(
-                    final_species_hash_map[unique_species_name][0])
-
+                model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
     # The connection logic given by user species two or more different species
     # but that are bound to each other.
         for species_id in connectionLogic.keys():
             # Get the ids of the concerned species from the connection logic given by the user
-            x = self.getNewDocument().getModel().getSpecies(species_id)
-            y = self.getNewDocument().getModel().getSpecies(
-                connectionLogic[species_id])
+            x = model.getSpecies(species_id)
+            y = model.getSpecies(connectionLogic[species_id])
             s = sum([x.getInitialAmount(), y.getInitialAmount()])
+            # Rename the species so that x and y have the same name. 
+            # x and y should also have the same id so that they go into reactions as one.
+            # Also, set the initial amount of the species to be equal to the
+            # sum of their individual amounts
+
             x.setName(y.getName())
             x.setInitialAmount(s)
             y.setInitialAmount(s)
+            
+            # Rename ID of x by that of y
+            oldid = x.getId()
+            newid = y.getId()
+            doc_obj.renameSId(oldid, newid)

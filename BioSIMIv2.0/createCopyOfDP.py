@@ -1,6 +1,7 @@
 from modules.CreateSubsystem import *
 from modules.NewSubsystem import *
 from modules.NewReaction import *
+from modules.renameSId import *
 
 # Read the original DP model 
 DP_doc =  getFromXML('models/DP.xml')
