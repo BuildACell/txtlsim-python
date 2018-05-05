@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
+  <model id="EnzymaticRxnModelnew" substanceUnits="count" timeUnits="seconds" extentUnits="mole">
+    <listOfUnitDefinitions>
+      <unitDefinition id="per_secondnew">
+        <listOfUnits>
+          <unit kind="second" exponent="-1" scale="0" multiplier="1"/>
+        </listOfUnits>
+      </unitDefinition>
+    </listOfUnitDefinitions>
+    <listOfCompartments>
+      <compartment id="cellnew" name="cell" size="1" units="litre" constant="true"/>
+    </listOfCompartments>
+    <listOfSpecies>
+      <species id="inp_DPnew" name="inp_DP" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="X_DPnew" name="X_DP" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C1_DPnew" name="C1_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="Xp_DPnew" name="Xp_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="E_DPnew" name="E_DP" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C2_DPnew" name="C2_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C3_DPnew" name="C3_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="out_DPnew" name="out_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="C4_DPnew" name="C4_DP" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+    </listOfSpecies>
+    <listOfParameters>
+      <parameter id="k1fnew" name="k1f" value="1" units="per_second" constant="false"/>
+      <parameter id="k1rnew" name="k1r" value="1" units="per_second" constant="false"/>
+      <parameter id="k2fnew" name="k2f" value="1" units="per_second" constant="false"/>
+      <parameter id="k3fnew" name="k3f" value="1" units="per_second" constant="false"/>
+      <parameter id="k3rnew" name="k3r" value="1" units="per_second" constant="false"/>
+      <parameter id="k4fnew" name="k4f" value="1" units="per_second" constant="false"/>
+      <parameter id="k5fnew" name="k5f" value="1" units="per_second" constant="false"/>
+      <parameter id="k5rnew" name="k5r" value="1" units="per_second" constant="false"/>
+      <parameter id="k6fnew" name="k6f" value="1" units="per_second" constant="false"/>
+      <parameter id="k7fnew" name="k7f" value="1" units="per_second" constant="false"/>
+      <parameter id="k7rnew" name="k7r" value="1" units="per_second" constant="false"/>
+      <parameter id="k8fnew" name="k8f" value="1" units="per_second" constant="false"/>
+    </listOfParameters>
+    <listOfReactions>
+      <reaction id="r1new" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference id="inp_DPnew" species="inp_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="X_DPnew" species="X_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="C1_DPnew" species="C1_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> k1fnew </ci>
+                <ci> inp_DPnew </ci>
+                <ci> X_DPnew </ci>
+              </apply>
+              <apply>
+                <times/>
+                <ci> k1rnew </ci>
+                <ci> C1_DPnew </ci>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r2new" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference id="C1_DPnew" species="C1_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="inp_DPnew" species="inp_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="Xp_DPnew" species="Xp_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k2fnew </ci>
+              <ci> C1_DPnew </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r3new" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference id="E_DPnew" species="E_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="Xp_DPnew" species="Xp_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="C2_DPnew" species="C2_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> k3fnew </ci>
+                <ci> E_DPnew </ci>
+                <ci> Xp_DPnew </ci>
+              </apply>
+              <apply>
+                <times/>
+                <ci> k3rnew </ci>
+                <ci> C2_DPnew </ci>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r4new" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference id="C2_DPnew" species="C2_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="E_DPnew" species="E_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="X_DPnew" species="X_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k4fnew </ci>
+              <ci> C2_DPnew </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r5new" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference id="inp_DPnew" species="inp_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="Xp_DPnew" species="Xp_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="C3_DPnew" species="C3_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> k5fnew </ci>
+                <ci> inp_DPnew </ci>
+                <ci> Xp_DPnew </ci>
+              </apply>
+              <apply>
+                <times/>
+                <ci> k5rnew </ci>
+                <ci> C3_DPnew </ci>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r6new" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference id="C3_DPnew" species="C3_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="out_DPnew" species="out_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="inp_DPnew" species="inp_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k6fnew </ci>
+              <ci> C3_DPnew </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r7new" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference id="E_DPnew" species="E_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="out_DPnew" species="out_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="C4_DPnew" species="C4_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> k7fnew </ci>
+                <ci> E_DPnew </ci>
+                <ci> out_DPnew </ci>
+              </apply>
+              <apply>
+                <times/>
+                <ci> k7rnew </ci>
+                <ci> C4_DPnew </ci>
+              </apply>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+      <reaction id="r8new" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference id="C4_DPnew" species="C4_DPnew" stoichiometry="1" constant="false"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference id="Xp_DPnew" species="Xp_DPnew" stoichiometry="1" constant="false"/>
+          <speciesReference id="E_DPnew" species="E_DPnew" stoichiometry="1" constant="false"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> k8fnew </ci>
+              <ci> C4_DPnew </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
+    </listOfReactions>
+  </model>
+</sbml>

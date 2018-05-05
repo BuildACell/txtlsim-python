@@ -34,6 +34,6 @@ writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected.xml')
 
 # Simulate 
 timepoints = np.linspace(0,100,1000)
-plotSbmlWithBioscrape('models/DP_IFFL_connected.xml',0,
+plotSbmlWithBioscrape('models/DP_IFFL_connected_2.xml',0,
 timepoints,['inp_DP1','inp_DP2','out_IFFL'],'Time',
 'Input and Output Species',14,14)
