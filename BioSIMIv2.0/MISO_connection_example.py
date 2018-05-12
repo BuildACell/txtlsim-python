@@ -1,56 +1,83 @@
 import numpy as np
 from libsbml import *
-from modules.CreateSubsystem import *
-from modules.NewReaction import *
+from modules.Subsystem import *
+from modules.SimpleModel import *
+from modules.System import *
+# Create a system. Example - A cell system which acts as a container for 
+# all the different subsystems 
+cell = System('cell')
+# ListOfSharedResources = ['RNAP','Ribo','ATP']
+ListOfSharedResources = ['inp','Xp']
+cell.setSharedResources(ListOfSharedResources)
+# Steps to create a subsystem: 
+DP1 = cell.createSubsystem('models/DP.xml','DP1')
 
-# Read the original DP model 
-DP_doc1 =  getFromXML('models/DP.xml')
+# Two optional steps -
+# 3. Give a string to suffix all components of the model. 
+# By default, the names are suffixed by the keyword given to make the Subsystem object.
+# 4. Give a compartment to add the subsystem to. 
+# By default, the subsystem is kept in a compartment called "cell"
 
-# Create a new subsystem object to store the copy of the model
-# The argument take
-DPcopy1  = NewSubsystem(DP_doc1)
-
-# Call the createNewSubsystem model with the object created 
-# In the arguments, any string can be given. 
+# (Optional) Step 3 - 
 # This string will be used to suffix the model elements
-# In this case, it's just "1" and "2", so a DP 1 and DP 2 will be created 
-DP1_doc = DPcopy1.createNewSubsystem('1')
-#
-# writeSBML(DP1_doc,'models/DP1.xml')
-# Read the original DP model 
-DP_doc2 =  getFromXML('models/DP.xml')
+# DP1_doc = DP1.suffixAllElementIds('DPx')
+DP1_doc = DP1.getSubsystemDoc()
+# (Optional) Step 4 -
+# Which compartment do you want to put the subsystem in?
+# newCompartmnet = []
+# newCompartment = ['cell_new']
+# DP1.setSubsystemCompartments(newCompartment)
 
-# Create a new subsystem object to store the copy of the model
-# The argument take
-DPcopy2  = NewSubsystem(DP_doc2)
-DP2_doc = DPcopy2.createNewSubsystem('2')
-# writeSBML(DP2_doc,'models/DP2.xml')
-IFFL_doc = getFromXML('models/IFFL_sbmlNew.xml')
+# (Optional) Write the Subsystem model created to output an SBML file
+writeSBML(DP1_doc,'models/DP1.xml')
 
-DP1_Subsystem = CreateSubsystem(DP1_doc)
-DP2_Subsystem = CreateSubsystem(DP2_doc)
-IFFL_Subsystem = CreateSubsystem(IFFL_doc)
+# Creating another Double Phosphorylation subsystem, DP2 (with same steps)
+DP2 = cell.createSubsystem('models/DP.xml','DP2')
 
+# newCompartment = ['cell_new']
+# DP2.setSubsystemCompartments(newCompartment)
+writeSBML(DP2.getSubsystemDoc(),'models/DP2.xml')
+
+# Creating an Incoherent Feedforward Loop subsystem 
+IFFL = cell.createSubsystem('models/IFFL_sbmlNew.xml','IFFL')
+
+# newCompartment = ['cell_new']
+# IFFL.setSubsystemCompartments(newCompartment)
+IFFL_doc = IFFL.getSubsystemDoc()
+writeSBML(IFFL_doc,'models/IFFL.xml')
 # create a blank document for the final connected system
-final_sbml_doc = createNewDocument(IFFL_doc.getLevel(),IFFL_doc.getVersion())
-check(final_sbml_doc.createModel(),'creating model of final doc')
-Final_subsystem = CreateSubsystem(final_sbml_doc)
+final_sbml_doc = createSubsystemDoc(IFFL_doc.getLevel(),IFFL_doc.getVersion())
+Final_subsystem = Subsystem(final_sbml_doc)
+
+# Final_subsystem.shareSubsystems([DP1, DP2, IFFL], ListOfSharedResources)
+# Final_subsystem.combineSubsystems([DP1, DP2, IFFL], True)
 
 # user specifies how the systems interact by defining the following map
 connection_logic = {}
-connection_logic['out_DP1'] = 'pA_IFFL'
+connection_logic['out'] = 'pA_IFFL'
 # connection_logic['out_DP2'] = 'pB_IFFL'
 
 # Call the connect function by specifying the input and output subsystems and the logic map
-Final_subsystem.connectInteraction([DP1_Subsystem, DP2_Subsystem],[IFFL_Subsystem], connection_logic)
+inputSpecies = 'inp_IFFL' #The species which is invalid in the connected model
 
-# Write the connected document to SBML file
+# Call connectInteraction function for the final subsystem object
+# to connect various subsystems.
+# The subsystem list to be connected together is given as an argument
+# along with the connection map and input species
 
-writeSBML(Final_subsystem.getNewDocument(),'models/DP_IFFL_connected.xml')
+Final_subsystem.connectSubsystems([DP1, DP2, IFFL], True, connection_logic, inputSpecies)
 
+
+# (Optional) Write the connected document to SBML file
+writeSBML(Final_subsystem.getSubsystemDoc(),'models/DP_IFFL_connected.xml')
 
 # Simulate 
 timepoints = np.linspace(0,50,1000)
 plotSbmlWithBioscrape('models/DP_IFFL_connected.xml',0,
-timepoints,['inp_DP1','inp_DP2','out_IFFL'],'Time',
+timepoints,['inp','pA_IFFL','pB_IFFL','out_IFFL'],'Time',
 'Input and Output Species',14,14)
+
+
+# Add the option of globally common species
+# add to init - maintain the combine in same compartments, 
+# add cell compartment to every subsystem
