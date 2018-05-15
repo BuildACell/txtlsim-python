@@ -34,19 +34,29 @@ def plotSbmlWithBioscrape(filename, initialTime, timepoints, ListOfSpeciesToPlot
     s.py_prep_deterministic_simulation()
     s.py_set_initial_time(initialTime)
     species_ind = []
-    # print(ListOfSpeciesToPlot[1])
+    SpeciesToPlot = ListOfSpeciesToPlot[:]
     for i in range(len(ListOfSpeciesToPlot)):
         species_name = ListOfSpeciesToPlot[i]
-        species_id = mod_obj.getSpeciesByName(species_name).getId()
-        species_ind.append(m.get_species_index(species_id))
+        species = mod_obj.getSpeciesByName(species_name)
+        if type(species) is list:
+            print('There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
+            for species_i in species:
+                species_ind.append(m.get_species_index(species_i.getId()))
+            key_ind = ListOfSpeciesToPlot.index(species_name)
+            insert_new = []
+            for i in range(len(species)-1):
+                insert_new.append(species_name + str(i+1))
+            SpeciesToPlot[key_ind+1:key_ind+1] = insert_new 
+            print(SpeciesToPlot)
+        else:
+            species_ind.append(m.get_species_index(species.getId()))
     sim = bioscrape.simulator.DeterministicSimulator()
     result = sim.py_simulate(s, timepoints)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     for i in range(len(species_ind)):
         plt.plot(timepoints, result.py_get_result()[:, species_ind[i]])
-        # plt.legend(m.get_species_list()[species_ind[i]])
-        plt.legend(ListOfSpeciesToPlot)
+        plt.legend(SpeciesToPlot)
     plt.show()
 
 class Subsystem(object):
@@ -57,7 +67,15 @@ class Subsystem(object):
     def getSubsystemDoc(self):
         return self.SubsystemDoc
 
-    # def renameSId (document, oldSId, newSId): 
+    def renameSName(self, old_name, new_name):
+        model = self.getSubsystemDoc().getModel()
+        mod_obj = SimpleModel(model)
+        species = mod_obj.getSpeciesByName(old_name)
+        if species == None:
+            print('No species named' + old_name + 'found.')
+            return
+        check(species.setName(new_name), 'setting new name from rename function call')
+
     def renameSId(self, oldSId, newSId): 
         # 
         # @file    renameSId.py
@@ -148,7 +166,7 @@ class Subsystem(object):
         for oldid in allids:
             self.renameSId(oldid, oldid + '_' + name)
 
-        # Use if want to rename all names too
+#        # Use if want to rename all names too
         # elements = document.getListOfAllElements()
         # for element in elements:
         #     if element.isSetName():
@@ -243,7 +261,62 @@ class Subsystem(object):
             model.setTimeUnits(mod.getTimeUnits())
             model.setVolumeUnits(mod.getVolumeUnits())
 
+    def shareSubsystems(self, ListOfSubsystems, ListOfSharedResources):
+        self.mergeSubsystemModels(ListOfSubsystems)
+        model = self.getSubsystemDoc().getModel()
+        model_obj = SimpleModel(model)
+        final_species_hash_map = {}
+        for subsystem in ListOfSubsystems:
+            mod = subsystem.getSubsystemDoc().getModel()
+            # Set the list of reactions in the final subsystem. Get the list of
+            # reactions in the input subsystem and set it to final subsystem
+            species_hash_map = {}
+            for species in mod.getListOfSpecies():
+                species_name = species.getName()
+                if species_name in ListOfSharedResources:
+                # Maintain the dictionary for all species in the input subsystems by their name
+                    species_hash_map[species_name] = species
+                else:
+                    model.getListOfSpecies().append(species)
+            for species_name in species_hash_map:
+                if final_species_hash_map.get(species_name):
+                    #If the final hash map already has that species then append to
+                    # the same instead of duplicating
+                    final_species_hash_map[species_name].append(
+                        species_hash_map[species_name])
+                else:
+                    # For all the species in the dictionary not already in the final
+                    # hash map, save them to the final hash map dictionary.
+                    final_species_hash_map[species_name] = [
+                        species_hash_map[species_name]]
+
+        for unique_species_name in final_species_hash_map:
+            cumulative_amount = 0
+            if len(final_species_hash_map[unique_species_name]) > 1: 
+                uni_sp = final_species_hash_map[unique_species_name][0]
+                    # For any species with same name 
+                    # which were present in more than one subsystem
+                model.getListOfSpecies().append(uni_sp)
+                for i in final_species_hash_map[unique_species_name]:
+                    cumulative_amount += i.getInitialAmount()
+                    oldid = i.getId()
+                    newid = i.getName() + '_shared'
+                    self.renameSId(oldid, newid)
+                sp = model_obj.getSpeciesByName(uni_sp.getName())
+                if not sp.isSetId():
+                    for sp_i in sp:
+                        sp_i.setInitialAmount(cumulative_amount)
+                sp.setInitialAmount(cumulative_amount)
+            else:
+                # If there are no species with multiple occurence in different subsystems
+                # then just add the list of all species maintained in the final hash map
+                # to our new subsystem's list of species.
+                model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
+        writeSBML(self.getSubsystemDoc(),'models/DP_IFFL_shared.xml')
+
+    # def combineSubsystems(self, ListOfSubsystems, ListOfSharedResources, combineNames):
     def combineSubsystems(self, ListOfSubsystems, combineNames):
+        # self.shareSubsystems(ListOfSubsystems, ListOfSharedResources)
         self.mergeSubsystemModels(ListOfSubsystems)
         model = self.getSubsystemDoc().getModel()
         for subsystem in ListOfSubsystems:
@@ -304,77 +377,22 @@ class Subsystem(object):
                     model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
 
 
-    def shareSubsystems(self, ListOfSubsystems, ListOfSharedResources):
-        self.mergeSubsystemModels(ListOfSubsystems)
-        model = self.getSubsystemDoc().getModel()
-        mod_obj = SimpleModel(model)
-       # subsystem and set it to final subsystem
-        final_species_hash_map = {}
-        for subsystem in ListOfSubsystems:
-            # Set the list of reactions in the final subsystem. Get the list of
-            # reactions in the input subsystem and set it to final subsystem
-            species_hash_map = {}
-            for species in subsystem.getSubsystemDoc().getModel().getListOfSpecies():
-                # Maintain the dictionary for all species in the input subsystems by their name
-                species_hash_map[species.getName()] = species
-            for species_name in species_hash_map:
-                if final_species_hash_map.get(species_name):
-                    #If the final hash map already has that species then append to
-                    # the same instead of duplicating
-                    final_species_hash_map[species_name].append(
-                        species_hash_map[species_name])
-                else:
-                    # For all the species in the dictionary not already in the final
-                    # hash map, save them to the final hash map dictionary.
-                    final_species_hash_map[species_name] = [
-                        species_hash_map[species_name]]
-
-        for unique_species_name in final_species_hash_map:
-            cumulative_amount = 0
-            count = 0
-            uni_sp = final_species_hash_map[unique_species_name][count]
-            if len(final_species_hash_map[unique_species_name]) > 1:
-                # For any species with same name 
-                # which were present in more than one subsystem
-                for i in final_species_hash_map[unique_species_name]:
-                    if count >= 1 and uni_sp.getName() in ListOfSharedResources:
-                        cumulative_amount += i.getInitialAmount()
-                        oldid = uni_sp.getId()
-                        model.getListOfSpecies().remove(uni_sp.getId())
-                        newid = oldid
-                    else:
-                        cumulative_amount = i.getInitialAmount()
-                        # uni_sp = final_species_hash_map[unique_species_name][count]
-                        model.getListOfSpecies().append(uni_sp)
-                        oldid_keep = uni_sp.getId()
-                        oldid = uni_sp.getId()
-                        newid = oldid
-                    if uni_sp.getName() in ListOfSharedResources:
-                        newid = oldid_keep + 'multiple'
-                        self.renameSId(oldid, newid )
-                    count += 1
-                model.getSpecies(newid).setInitialAmount(cumulative_amount)
-            else:
-                # If there are no species with multiple occurence in different subsystems
-                # then just add the list of all species maintained in the final hash map
-                # to our new subsystem's list of species.
-                model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
-
-   
-        writeSBML(self.getSubsystemDoc(),'models/DP_IFFL_connected.xml')
-
-
   
     def connectSubsystems(self, ListOfSubsystems, combineNames, connectionLogic, inputSpecies):
-
+    # def connectSubsystems(self, ListOfSubsystems, ListOfSharedResources, combineNames, connectionLogic, inputSpecies):
         self.combineSubsystems(ListOfSubsystems, combineNames)
+        # self.shareSubsystems(ListOfSubsystems, ListOfSharedResources)#, combineNames)
         model = self.getSubsystemDoc().getModel()
     # The connection logic given by user species two or more different species
     # but that are bound to each other.
         # Set the initial amount of the input in the output subsystem to zero since it's not
         # isolated anymore.
         model_obj = SimpleModel(model)
-        model_obj.getSpeciesByName(inputSpecies).setInitialAmount(0.0)
+        if type(inputSpecies) is list:
+            for inp_sp in inputSpecies:
+                model_obj.getSpeciesByName(inp_sp).setInitialAmount(0.0)
+        else:
+            model_obj.getSpeciesByName(inputSpecies).setInitialAmount(0.0)
         for species_name in connectionLogic.keys():
             # Get the ids of the concerned species from the
             # connection logic given by the user
@@ -385,7 +403,7 @@ class Subsystem(object):
                 # x and y should also have the same id so that they go into reactions as one.
                 # Also, set the initial amount of the species to be equal to the
                 # sum of their individual amounts
-                x.setName(y.getName())
+                # x.setName(y.getName())
                 x.setInitialAmount(s)
                 y.setInitialAmount(s)
                 # Rename ID of x by that of y

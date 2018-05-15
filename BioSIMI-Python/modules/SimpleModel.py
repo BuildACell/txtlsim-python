@@ -42,7 +42,7 @@ class SimpleModel(object):
         """ Set the new document SBMLDocument object """
         self.NewModel = NewModel
 
-    def createNewUnit(self, uid, ukind, exponent, scale, multiplier):
+    def createNewUnitDefinition(self, uid, ukind, exponent, scale, multiplier):
         model = self.getNewModel()
         unitdef = model.createUnitDefinition()
         check(unitdef, 'create unit definition')
@@ -108,8 +108,17 @@ class SimpleModel(object):
     
     def getSpeciesByName(self, name):
         model = self.getNewModel()
+        species_found =[]
         for species in model.getListOfSpecies():
             if species.getName() == name:
-                return species
-
+                species_found.append(species)
+        if len(species_found) == 1:
+            return species_found[0] 
+        elif not species_found:
+            print('WARNING -- The species ' + name + ' not found. The program not work')
+            return
+        else:
+            print('Multiple species with name ' + name + ' found. Returning a list')
+            return species_found
+    
 

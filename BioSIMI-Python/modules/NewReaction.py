@@ -1,5 +1,5 @@
 from libsbml import *
-from modules.CreateSubsystem import *
+from modules.SimpleModel import *
 
 class NewReaction(object):
     """
