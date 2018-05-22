@@ -7,12 +7,14 @@ DP_doc = createSubsystemDoc(3,1)
 DP = Subsystem(DP_doc)
 
 # Create a new model inside the document
-model = DP.createNewModel('DPmodel','seconds','mole','count')
+model = DP.createNewModel('DPmodel','second','mole','count')
 
 model_obj = SimpleModel(model)
 
 # Create a unit, arguments - id, unitKind, exponent, scale, multiplier
 per_second = model_obj.createNewUnitDefinition('per_second',UNIT_KIND_SECOND,-1,0,1)
+count = model_obj.createNewUnitDefinition('count',UNIT_KIND_DIMENSIONLESS, 1, 0, 1)
+
 
 # createNewcompartment arguments - compartment ID, Name, Size, Units, isConstant
 comp = model_obj.createNewCompartment('cell','cell',1,'litre',True)

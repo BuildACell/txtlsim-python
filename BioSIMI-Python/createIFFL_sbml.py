@@ -8,7 +8,7 @@ IFFL = Subsystem(IFFL_doc)
 # Create a Model object inside the Subsystem object 
 # Usage - self.createNewModel(modelID, modelTimeUnits, modelExtentUnits, modelSubstanceUnits)
 
-model = IFFL.createNewModel('IFFLmodel', 'seconds','mole','count')
+model = IFFL.createNewModel('IFFLmodel', 'second','mole','count')
 
 # Create the model_obj of the SimpleModel class to use the functions helpful in creating the model from scratch easily
 model_obj = SimpleModel(model)
@@ -17,6 +17,7 @@ model_obj = SimpleModel(model)
 # Usage - self.createNewUnitDefinition(unitId, unitKind, unitExponent, unitScale, unitMultiplier)
 # Returns a UnitDefinition object
 per_second = model_obj.createNewUnitDefinition('per_second',UNIT_KIND_SECOND, -1, 0, 1)
+count = model_obj.createNewUnitDefinition('count',UNIT_KIND_DIMENSIONLESS, 1, 0, 1)
 
 # Create a compartment for the species 
 # Usage - self.createNewCompartment(Id, Name, Size, Units, isConstant)

@@ -24,10 +24,6 @@ class NewReaction(object):
         species_ref_obj_reactant = self.getReaction().createReactant()
         check(species_ref_obj_reactant,
               'created species_ref_obj_reactant reactant')
-        check(species_ref_obj_reactant.setId(rtSpeciesId),
-              'set id species_ref_obj_reactant ID')
-        # check(species_ref_obj_reactant.setName(rtSpeciesId),
-            #   'set name species_ref_obj_reactant ID')
         check(species_ref_obj_reactant.setSpecies(
             rtSpeciesId), 'set species_ref_obj_reactant ID')
         check(species_ref_obj_reactant.setConstant(rtConstant),
@@ -40,10 +36,6 @@ class NewReaction(object):
         """Return new product"""
         species_ref_obj_product = self.getReaction().createProduct()
         check(species_ref_obj_product, 'created species_ref_obj_product produc')
-        check(species_ref_obj_product.setId(rtSpeciesId),
-              'set id species_ref_obj_product ID')
-        # check(species_ref_obj_product.setName(rtSpeciesId),
-            #   'set name species_ref_obj_product ID')
         check(species_ref_obj_product.setSpecies(rtSpeciesId), 'set species_ref_obj_product ID')
         check(species_ref_obj_product.setConstant(rtConstant),
               'set species_ref_obj_product constant')
@@ -63,5 +55,4 @@ class NewReaction(object):
         """Return math formula"""
         math_ast = parseL3Formula(formulaString)
         check(math_ast, 'create AST for rate expression')
-        # check(math_ast.setId(self.getReaction().getId()), 'set id AST for rate expression')
         return math_ast

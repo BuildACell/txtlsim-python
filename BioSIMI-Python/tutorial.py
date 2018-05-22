@@ -10,10 +10,10 @@ cell = System('cell')
 
 # The ListOfSharedResources is a list to name all the species that are shared
 # in the cell system. Usually, we would have something as follows - 
-# ListOfSharedResources = ['RNAP','Ribo','ATP']
+# system.ListOfSharedResources = ['RNAP','Ribo','ATP']
 
 # For our simple example of DP and IFFL subsystems, we use the following for a working demo
-ListOfSharedResources = ['inp','Xp']
+cell.ListOfSharedResources = ['inp','Xp']
 
 
 # Now, create a subsystem inside the cell as follows - 
@@ -69,9 +69,9 @@ IFFL = cell.createSubsystem('models/IFFL.xml','IFFL')
 # writeSBML(IFFL_doc,'models/IFFL.xml')
 
 # Set the list of shared resources to the cell using its member function. Example 1-A
-# Usage - system_obj.setSharedResources(ListOfSharedResources), returns a new Subsystem
-# object which has the resources sharing modeled.
-shared_subsystem = cell.setSharedResources(ListOfSharedResources)
+# Usage - system_obj.setSharedResources(), returns a new Subsystem
+# object (inside the same system object) which has the resources sharing modeled.
+shared_subsystem = cell.setSharedResources()
 
 # (Optional) Write the shared document model to SBML file
 writeSBML(shared_subsystem.getSubsystemDoc(),'models/DP_IFFL_shared.xml')
@@ -86,6 +86,7 @@ writeSBML(shared_subsystem.getSubsystemDoc(),'models/DP_IFFL_shared.xml')
 
 combined_subsystem_doc = createSubsystemDoc(3,1)
 combined_subsystem = Subsystem(combined_subsystem_doc)
+combined_subsystem.setSystem(cell)
 combined_subsystem.combineSubsystems([DP1, DP2, IFFL], False)
 
 # (Optional) Write the combined document model to SBML file
@@ -99,7 +100,7 @@ connection_logic['out'] = 'pA_IFFL'
 # DP2.renameSName('out','out_DP2')
 # connection_logic['out_DP2'] = 'pB_IFFL'
 
-# The following species was used in IFFL model for when its isolated.
+# (Optional) The following species was used in IFFL model for when its isolated.
 # But, now DP output activates the protein expressions so the input to IFFL should be invalid. 
 inputSpecies = 'inp_IFFL' #The species which is invalid in the connected model
 
@@ -109,6 +110,7 @@ inputSpecies = 'inp_IFFL' #The species which is invalid in the connected model
 
 connected_subsystem_doc = createSubsystemDoc(3,1)
 connected_subsystem = Subsystem(connected_subsystem_doc)
+connected_subsystem.setSystem(cell)
 connected_subsystem.connectSubsystems([DP1, DP2, IFFL], True, connection_logic, inputSpecies)
 
 # All of 1-A, 1-B and 1-C are exclusive as of now. 

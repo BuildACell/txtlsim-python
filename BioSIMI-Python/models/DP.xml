@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
-  <model id="DPmodel" substanceUnits="count" timeUnits="seconds" extentUnits="mole">
+  <model id="DPmodel" substanceUnits="count" timeUnits="second" extentUnits="mole">
     <listOfUnitDefinitions>
       <unitDefinition id="per_second">
         <listOfUnits>
           <unit kind="second" exponent="-1" scale="0" multiplier="1"/>
+        </listOfUnits>
+      </unitDefinition>
+      <unitDefinition id="count">
+        <listOfUnits>
+          <unit kind="dimensionless" exponent="1" scale="0" multiplier="1"/>
         </listOfUnits>
       </unitDefinition>
     </listOfUnitDefinitions>
@@ -39,11 +44,11 @@
     <listOfReactions>
       <reaction id="r1" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference id="inp" species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference id="X" species="X" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp" stoichiometry="1" constant="false"/>
+          <speciesReference species="X" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="C1" species="C1" stoichiometry="1" constant="false"/>
+          <speciesReference species="C1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -66,11 +71,11 @@
       </reaction>
       <reaction id="r2" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference id="C1" species="C1" stoichiometry="1" constant="false"/>
+          <speciesReference species="C1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="inp" species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference id="Xp" species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -84,11 +89,11 @@
       </reaction>
       <reaction id="r3" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference id="E" species="E" stoichiometry="1" constant="false"/>
-          <speciesReference id="Xp" species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="E" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="C2" species="C2" stoichiometry="1" constant="false"/>
+          <speciesReference species="C2" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -111,11 +116,11 @@
       </reaction>
       <reaction id="r4" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference id="C2" species="C2" stoichiometry="1" constant="false"/>
+          <speciesReference species="C2" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="E" species="E" stoichiometry="1" constant="false"/>
-          <speciesReference id="X" species="X" stoichiometry="1" constant="false"/>
+          <speciesReference species="E" stoichiometry="1" constant="false"/>
+          <speciesReference species="X" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -129,11 +134,11 @@
       </reaction>
       <reaction id="r5" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference id="inp" species="inp" stoichiometry="1" constant="false"/>
-          <speciesReference id="Xp" species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="C3" species="C3" stoichiometry="1" constant="false"/>
+          <speciesReference species="C3" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -156,11 +161,11 @@
       </reaction>
       <reaction id="r6" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference id="C3" species="C3" stoichiometry="1" constant="false"/>
+          <speciesReference species="C3" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="out" species="out" stoichiometry="1" constant="false"/>
-          <speciesReference id="inp" species="inp" stoichiometry="1" constant="false"/>
+          <speciesReference species="out" stoichiometry="1" constant="false"/>
+          <speciesReference species="inp" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -174,11 +179,11 @@
       </reaction>
       <reaction id="r7" reversible="true" fast="false">
         <listOfReactants>
-          <speciesReference id="E" species="E" stoichiometry="1" constant="false"/>
-          <speciesReference id="out" species="out" stoichiometry="1" constant="false"/>
+          <speciesReference species="E" stoichiometry="1" constant="false"/>
+          <speciesReference species="out" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="C4" species="C4" stoichiometry="1" constant="false"/>
+          <speciesReference species="C4" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -201,11 +206,11 @@
       </reaction>
       <reaction id="r8" reversible="false" fast="false">
         <listOfReactants>
-          <speciesReference id="C4" species="C4" stoichiometry="1" constant="false"/>
+          <speciesReference species="C4" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference id="Xp" species="Xp" stoichiometry="1" constant="false"/>
-          <speciesReference id="E" species="E" stoichiometry="1" constant="false"/>
+          <speciesReference species="Xp" stoichiometry="1" constant="false"/>
+          <speciesReference species="E" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
