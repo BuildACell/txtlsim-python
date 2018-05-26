@@ -1,62 +1,6 @@
-from libsbml import *
-import libsbml
-import bioscrape
-import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
+import libsbml 
 from modules.SimpleModel import *
 from modules.setIdFromNames import *
-
-def getFromXML(filename):
-    """ Returns the SBMLDocument object from XML file given """
-    reader = SBMLReader()
-    doc = reader.readSBML(filename)
-    check(doc, "reading from SBML file")
-    return doc
-
-def createSubsystemDoc(newLevel, newVersion):
-    try:
-        sbmlDoc = SBMLDocument(newLevel, newVersion)
-    except ValueError:
-        print('Could not create SBMLDocument object')
-        sys.exit(1)
-    return sbmlDoc
-
-def plotSbmlWithBioscrape(filename, initialTime, timepoints, ListOfSpeciesToPlot, xlabel, ylabel, sizeOfXLabels, sizeOfYLabels):
-    mpl.rc('axes', prop_cycle=(mpl.cycler('color', ['r', 'k', 'b','g','y','m','c']) ))
-    mpl.rc('xtick', labelsize=sizeOfXLabels) 
-    mpl.rc('ytick', labelsize=sizeOfYLabels)
-    doc = getFromXML(filename)
-    model = doc.getModel()
-    mod_obj = SimpleModel(model)
-    m = bioscrape.types.read_model_from_sbml(filename)
-    s = bioscrape.simulator.ModelCSimInterface(m)
-    s.py_prep_deterministic_simulation()
-    s.py_set_initial_time(initialTime)
-    species_ind = []
-    SpeciesToPlot = ListOfSpeciesToPlot[:]
-    for i in range(len(ListOfSpeciesToPlot)):
-        species_name = ListOfSpeciesToPlot[i]
-        species = mod_obj.getSpeciesByName(species_name)
-        if type(species) is list:
-            print('There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
-            for species_i in species:
-                species_ind.append(m.get_species_index(species_i.getId()))
-            key_ind = ListOfSpeciesToPlot.index(species_name)
-            insert_new = []
-            for i in range(len(species)-1):
-                insert_new.append(species_name + str(i+1))
-            SpeciesToPlot[key_ind+1:key_ind+1] = insert_new 
-        else:
-            species_ind.append(m.get_species_index(species.getId()))
-    sim = bioscrape.simulator.DeterministicSimulator()
-    result = sim.py_simulate(s, timepoints)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    for i in range(len(species_ind)):
-        plt.plot(timepoints, result.py_get_result()[:, species_ind[i]])
-        plt.legend(SpeciesToPlot)
-    plt.show()
 
 class Subsystem(object):
 
@@ -66,6 +10,9 @@ class Subsystem(object):
         
     def getSubsystemDoc(self):
         return self.SubsystemDoc
+
+    def setSubsystemDoc(self, doc):
+        self.SubsystemDoc = doc
 
     def setSystem(self,systemObj):
         self.System = systemObj
@@ -210,7 +157,7 @@ class Subsystem(object):
 
         return document
 
-    def setSubsystemCompartments(self, newCompartments):
+    def setCompartments(self, newCompartments):
         document = self.getSubsystemDoc()
         check(document,'retreiving document from subsystem in setSubsystemCompartments')
         compartments = document.getModel().getListOfCompartments()
@@ -315,7 +262,8 @@ class Subsystem(object):
             if not ListOfSharedResources:
                 species_list = mod.getListOfSpecies()
                 check(species_list,'retreiving list of species of susbsytem model in shareSubsystems')
-                check(model.getListOfSpecies().append(species_list),'appending list of species when ListOfSharedResources is empty, in shareSubsystems')
+                for species in species_list:
+                    check(model.getListOfSpecies().append(species),'appending list of species when ListOfSharedResources is empty, in shareSubsystems')
             else:
                 # Set the list of reactions in the final subsystem. Get the list of
                 # reactions in the input subsystem and set it to final subsystem
@@ -358,16 +306,17 @@ class Subsystem(object):
                         check(model.getListOfSpecies().remove(newid),'removing from list of species in shareSubsystems')
                     count += 1
                 sp = model_obj.getSpeciesByName(uni_sp.getName())
-                if type(sp) is list: 
-                    for sp_i in sp:
-                        check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in shareSubsystems')
-                else:
-                    check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in shareSubsystems')
+                # if type(sp) is list: 
+                    # for sp_i in sp:
+                        # check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in shareSubsystems')
+                # else:
+                    # check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in shareSubsystems')
             else:
                 # If there are no species with multiple occurence in different subsystems
                 # then just add the list of all species maintained in the final hash map
                 # to our new subsystem's list of species.
                 check(model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0]),'appending to list of species in shareSubsystems')
+                # model.getListOfSpecies().append(final_species_hash_map[unique_species_name][0])
         
         # Updating model id
         check(model.setId('shared_Subsystems_' + mod_id),'setting new model id for shared model')
@@ -436,16 +385,17 @@ class Subsystem(object):
                             check(model.removeSpecies(newid),'removing species in combineSubsystems')
                         count += 1
                     sp = model_obj.getSpeciesByName(uni_sp.getName())
-                    if type(sp) is list: 
-                        for sp_i in sp:
-                            check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
-                    else:
-                        check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
+                    # if type(sp) is list: 
+                        # for sp_i in sp:
+                            # check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
+                    # else:
+                        # check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
                 else:
                     # If there are no species with multiple occurence in different subsystems
                     # then just add the list of all species maintained in the final hash map
                     # to our new subsystem's list of species.
-                    check(model.addSpecies(final_species_hash_map[unique_species_name][0]),'adding species in combineSubsystems')
+                    model.addSpecies(final_species_hash_map[unique_species_name][0])
+                    # check(model.addSpecies(final_species_hash_map[unique_species_name][0]),'adding species in combineSubsystems')
       
        # Updating model id
         check(model.setId('combined_Subsystems_' + mod_id),'setting new model id for shared model')
@@ -488,3 +438,6 @@ class Subsystem(object):
                 newid = y.getId()
                 check(newid,'retreiving newid of y in connectSubsystem')
                 self.renameSId(oldid, newid)
+                # Remove x from species list to avoid duplication
+                id_to_remove = model_obj.getSpeciesByName(x.getName()).getId()
+                model.getListOfSpecies().remove(id_to_remove)

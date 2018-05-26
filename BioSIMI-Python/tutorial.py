@@ -63,6 +63,14 @@ DP2 = cell.createSubsystem('models/DP.xml','DP2')
 # Creating an Incoherent Feedforward Loop subsystem 
 IFFL = cell.createSubsystem('models/IFFL.xml','IFFL')
 
+# Other methods available - 
+# cell.getSystemName()
+# cell.setSystemName('cell2')
+# cell.getListOfSubsystems()
+# cell.getListOfSharedResources()
+# cell.appendSharedResources(['A','B'])
+# cell.removeSharedResource('A')
+
 # newCompartment = ['cell_new']
 # IFFL.setSubsystemCompartments(newCompartment)
 # IFFL_doc = IFFL.getSubsystemDoc()
@@ -84,9 +92,7 @@ writeSBML(shared_subsystem.getSubsystemDoc(),'models/DP_IFFL_shared.xml')
 # The second argument is Boolean which is True if all species with same 
 # names need to be merged and False otherwise. 
 
-combined_subsystem_doc = createSubsystemDoc(3,1)
-combined_subsystem = Subsystem(combined_subsystem_doc)
-combined_subsystem.setSystem(cell)
+combined_subsystem = cell.createNewSubsystem(3,1)
 combined_subsystem.combineSubsystems([DP1, DP2, IFFL], False)
 
 # (Optional) Write the combined document model to SBML file
@@ -95,6 +101,8 @@ writeSBML(combined_subsystem.getSubsystemDoc(),'models/DP_IFFL_combined.xml')
 # Now, for Example 1-C, the user needs to specify 
 # the map of the interaction modeling that is desired. This map uses species names.
 # User specifies how the systems interact by defining the following map
+# Usage - connection_logic is a dictionary specifying the map. 
+# The species in the key is replaced by the species given as the value 
 connection_logic = {}
 connection_logic['out'] = 'pA_IFFL'
 # DP2.renameSName('out','out_DP2')
@@ -108,15 +116,13 @@ inputSpecies = 'inp_IFFL' #The species which is invalid in the connected model
 # to connect various subsystems.
 # Usage - subsystem_object.self.connectSubsystems(ListOfSubsystems, combineAllWithSameNames, InteractionMap, InputSpecies)
 
-connected_subsystem_doc = createSubsystemDoc(3,1)
-connected_subsystem = Subsystem(connected_subsystem_doc)
-connected_subsystem.setSystem(cell)
+connected_subsystem = cell.createNewSubsystem(3,1)
 connected_subsystem.connectSubsystems([DP1, DP2, IFFL], True, connection_logic, inputSpecies)
 
 # All of 1-A, 1-B and 1-C are exclusive as of now. 
 
 # (Optional) Write the connected document to SBML file
-writeSBML(connected_subsystem.getSubsystemDoc(),'models/DP_IFFL_connected.xml')
+writeSBML(connected_subsystem.getSubsystemDoc(),'odels/DP_IFFL_connected.xml')
 
 # Simulate using bioscrape
 timepoints = np.linspace(0,50,1000)

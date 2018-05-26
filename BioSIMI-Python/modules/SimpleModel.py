@@ -115,7 +115,7 @@ class SimpleModel(object):
         if len(species_found) == 1:
             return species_found[0] 
         elif not species_found:
-            print('WARNING -- The species ' + name + ' not found. The program not work')
+            print('WARNING -- The species ' + name + ' not found. The program may not work')
             return
         else:
             print('Multiple species with name ' + name + ' found. Returning a list')
