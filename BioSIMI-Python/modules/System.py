@@ -1,9 +1,4 @@
 # Import all required libraries
-import bioscrape
-import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-
 from modules.Subsystem import * 
 
 class System(object):
@@ -68,7 +63,7 @@ class System(object):
         '''
         ListOfResources = self.ListOfSharedResources
         # Create a blank document for the final connected system and the subsystem object
-        final_sbml_doc = createSubsystemDoc(3,1)
+        final_sbml_doc = createSbmlDoc(3,1)
         Final_subsystem = Subsystem(final_sbml_doc)
         Final_subsystem.setSystem(self)
         # The shareSubsystems member function implements Example 1-A.
@@ -102,71 +97,12 @@ class System(object):
         return subsystem 
 
     def createNewSubsystem(self, level, version):
-        newDocument = createSubsystemDoc(level,version)
+        '''
+        Creates a new empty Subsystem object with SBMLDocument 
+        of given level and version
+        '''
+        newDocument = createSbmlDoc(level,version)
         subsystem = Subsystem(newDocument)
         subsystem.setSystem(self)
         return subsystem
-
-
-def getFromXML(filename):
-    """ 
-    Returns the SBMLDocument object from XML file given 
-    """
-
-    reader = SBMLReader()
-    doc = reader.readSBML(filename)
-    check(doc, "reading from SBML file")
-    return doc
-
-def createSubsystemDoc(newLevel, newVersion):
-    ''' 
-    Creates a new SBMLDocument ojbect of the given newLevel and newVersion
-    '''
-    try:
-        sbmlDoc = SBMLDocument(newLevel, newVersion)
-    except ValueError:
-        print('Could not create SBMLDocument object')
-        sys.exit(1)
-    return sbmlDoc
-
-def plotSbmlWithBioscrape(filename, initialTime, timepoints, ListOfSpeciesToPlot, xlabel = 'Time', ylabel = 'Concentration (AU)', sizeOfXLabels = 14, sizeOfYLabels = 14):
-    ''' 
-    Plots the amounts of ListOfSpeciesToPlot in the given SBML filename
-    starting at initialTime and for the timepoints given. 
-    The other arguments for axes labels and sizes are optional
-    '''
-    mpl.rc('axes', prop_cycle=(mpl.cycler('color', ['r', 'k', 'b','g','y','m','c']) ))
-    mpl.rc('xtick', labelsize=sizeOfXLabels) 
-    mpl.rc('ytick', labelsize=sizeOfYLabels)
-    doc = getFromXML(filename)
-    model = doc.getModel()
-    mod_obj = SimpleModel(model)
-    m = bioscrape.types.read_model_from_sbml(filename)
-    s = bioscrape.simulator.ModelCSimInterface(m)
-    s.py_prep_deterministic_simulation()
-    s.py_set_initial_time(initialTime)
-    species_ind = []
-    SpeciesToPlot = ListOfSpeciesToPlot[:]
-    for i in range(len(ListOfSpeciesToPlot)):
-        species_name = ListOfSpeciesToPlot[i]
-        species = mod_obj.getSpeciesByName(species_name)
-        if type(species) is list:
-            print('There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
-            for species_i in species:
-                species_ind.append(m.get_species_index(species_i.getId()))
-            key_ind = ListOfSpeciesToPlot.index(species_name)
-            insert_new = []
-            for i in range(len(species)-1):
-                insert_new.append(species_name + str(i+1))
-            SpeciesToPlot[key_ind+1:key_ind+1] = insert_new 
-        else:
-            species_ind.append(m.get_species_index(species.getId()))
-    sim = bioscrape.simulator.DeterministicSimulator()
-    result = sim.py_simulate(s, timepoints)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    for i in range(len(species_ind)):
-        plt.plot(timepoints, result.py_get_result()[:, species_ind[i]])
-        plt.legend(SpeciesToPlot)
-    plt.show()
 

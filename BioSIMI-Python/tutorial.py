@@ -119,7 +119,6 @@ inputSpecies = 'inp_IFFL' #The species which is invalid in the connected model
 connected_subsystem = cell.createNewSubsystem(3,1)
 connected_subsystem.connectSubsystems([DP1, DP2, IFFL], True, connection_logic, inputSpecies)
 
-# All of 1-A, 1-B and 1-C are exclusive as of now. 
 
 # (Optional) Write the connected document to SBML file
 writeSBML(connected_subsystem.getSubsystemDoc(),'odels/DP_IFFL_connected.xml')

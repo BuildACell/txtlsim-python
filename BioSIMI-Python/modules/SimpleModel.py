@@ -43,6 +43,10 @@ class SimpleModel(object):
         self.NewModel = NewModel
 
     def createNewUnitDefinition(self, uid, ukind, exponent, scale, multiplier):
+        ''' 
+        Returns a new UnitDefinition object created inside the 
+        Model with the given attributes
+        '''
         model = self.getNewModel()
         unitdef = model.createUnitDefinition()
         check(unitdef, 'create unit definition')
@@ -57,7 +61,10 @@ class SimpleModel(object):
 
 
     def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant):
-        """"Return the new compartment of the model"""
+        ''' 
+        Returns a new Compartment object created inside the 
+        Model with the given attributes
+        '''
         model = self.getNewModel()
         comp_obj = model.createCompartment()
         check(comp_obj, 'Create comp_obj compartment')
@@ -69,7 +76,10 @@ class SimpleModel(object):
         return comp_obj
 
     def createNewSpecies(self, sId, sName, sComp, sInitial, sConstant, sBoundary, sSubstance, sHasOnlySubstance):
-        """Return the new species of the model"""
+        ''' 
+        Returns a new Species object created inside the 
+        Model with the given attributes
+        '''
         model = self.getNewModel()
         s_obj = model.createSpecies()
         check(s_obj, 'created s_obj species')
@@ -86,7 +96,10 @@ class SimpleModel(object):
         return s_obj
 
     def createNewReaction(self, rId, rReversible, rFast):
-        """Return new reaction object"""
+        ''' 
+        Returns a new Reaction object created inside the 
+        Model with the given attributes
+        '''
         model = self.getNewModel()
         r_obj = model.createReaction()
         check(r_obj, 'created r_obj reaction')
@@ -96,6 +109,10 @@ class SimpleModel(object):
         return r_obj
 
     def createNewParameter(self, pId, pName, pValue, pConstant, pUnit):
+        ''' 
+        Returns a new Parameter object created inside the 
+        Model with the given attributes
+        '''
         model = self.getNewModel()
         p_obj = model.createParameter()
         check(p_obj, 'created p_obj species')
@@ -107,6 +124,9 @@ class SimpleModel(object):
         return p_obj
     
     def getSpeciesByName(self, name):
+        ''' 
+        Returns a list of species in the Model with the given name
+        '''
         model = self.getNewModel()
         species_found =[]
         for species in model.getListOfSpecies():
