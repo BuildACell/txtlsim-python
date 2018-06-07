@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from libsbml import *
-from modules.SimpleModel import *
+from modules.SimpleModel import * 
 
 def simulateSbmlWithBioscrape(filename, initialTime, timepoints):
     ''' 
@@ -128,6 +128,3 @@ def plotSbmlWithBioscrape(ListOfFiles, initialTime, timepoints, ListOfListOfSpec
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.show()
-
-
-

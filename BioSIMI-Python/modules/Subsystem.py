@@ -249,9 +249,10 @@ class Subsystem(object):
         for subsystem in ListOfSubsystems:
             mod = subsystem.getSubsystemDoc().getModel()
             check(mod,'retreiving model in mergeSubsystem')
-            if mod.getNumCompartmentTypes() != 0:
-                for each_compartmentType in mod.getListOfCompartmentType():
-                    model.addCompartment(each_compartmentType)
+            # Obsolete in SBML Level 3 
+            # if mod.getNumCompartmentTypes() != 0:
+            #     for each_compartmentType in mod.getListOfCompartmentType():
+            #         model.addCompartmentType(each_compartmentType)
             if mod.getNumConstraints() != 0:
                 for each_constraint in mod.getListOfConstraints():
                     model.addConstraint(each_constraint)
@@ -395,12 +396,14 @@ class Subsystem(object):
         # in the final subsystem.
         if combineNames == True:
             final_species_hash_map = {}
+            final_reaction_map = {}
             for subsystem in ListOfSubsystems:
+                sub_model = subsystem.getSubsystemDoc().getModel()
                 mod_id += '_' + mod.getId()
                 # Set the list of reactions in the final subsystem. Get the list of
                 # reactions in the input subsystem and set it to final subsystem
                 species_hash_map = {}
-                for species in subsystem.getSubsystemDoc().getModel().getListOfSpecies():
+                for species in sub_model.getListOfSpecies():
                     if species.getName() not in ListOfResources:
                     # Maintain the dictionary for all species in the input subsystems by their name
                         species_hash_map[species.getName()] = species
@@ -415,6 +418,39 @@ class Subsystem(object):
                         # hash map, save them to the final hash map dictionary.
                         final_species_hash_map[species_name] = [
                             species_hash_map[species_name]]
+
+                # Removing duplicate reactions 
+                reaction_map = {}
+                for reaction in sub_model.getListOfReactions():
+                    rc1_list = reaction.getListOfReactants()
+                    pt1_list = reaction.getListOfProducts()
+                    rStr = ''
+                    for i in range(len(rc1_list)):
+                        sref = rc1_list[i]
+                        rStr += sub_model.getElementBySId(sref.getSpecies()).getName()
+                        if i < (len(rc1_list) - 1):
+                            rStr += ' + '
+                    if reaction.getReversible():
+                        rStr += ' <--> '
+                    else:
+                        rStr += ' --> '
+                    for i in range(len(pt1_list)):
+                        sref = pt1_list[i]
+                        rStr += sub_model.getElementBySId(sref.getSpecies()).getName()
+                        if i < (len(pt1_list) - 1):
+                            rStr += ' + '
+                    reaction_map[rStr] = reaction
+                for rStr in reaction_map:
+                    if final_reaction_map.get(rStr):
+                        final_reaction_map[rStr].append(reaction_map[rStr])
+                    else:
+                        final_reaction_map[rStr] = [reaction_map[rStr]]
+            for rxn_str in final_reaction_map:
+                if len(final_reaction_map[rxn_str]) > 1:
+                    uni_rxn = final_reaction_map[rxn_str][0]
+                    for i in final_reaction_map[rxn_str]:
+                        model.getListOfReactions().remove(i.getId())
+                    model.getListOfReactions().append(uni_rxn)
 
             for unique_species_name in final_species_hash_map:
                 cumulative_amount = 0

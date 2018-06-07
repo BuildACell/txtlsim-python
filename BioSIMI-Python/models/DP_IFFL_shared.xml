@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
-  <model id="shared_Subsystems__DPmodel_DP1_DPmodel_DP2_IFFLmodel_IFFL" substanceUnits="count" timeUnits="second" extentUnits="mole">
+  <model id="shared_Subsystems__DP_DP1_DP_DP2_IFFLmodel_IFFL" substanceUnits="count" timeUnits="second" extentUnits="mole">
     <listOfUnitDefinitions>
       <unitDefinition id="per_second">
         <listOfUnits>
