@@ -51,15 +51,6 @@
           </apply>
         </math>
       </initialAssignment>
-      <initialAssignment symbol="k2f">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <apply>
-            <times/>
-            <cn type="integer"> 2 </cn>
-            <ci> k1f </ci>
-          </apply>
-        </math>
-      </initialAssignment>
     </listOfInitialAssignments>
     <listOfRules>
       <assignmentRule variable="inP">
@@ -76,34 +67,8 @@
           <cn type="integer"> 2 </cn>
         </math>
       </rateRule>
-      <assignmentRule variable="inP">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <apply>
-            <times/>
-            <cn type="integer"> 2 </cn>
-            <ci> X </ci>
-          </apply>
-        </math>
-      </assignmentRule>
-      <rateRule variable="k3f">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <cn type="integer"> 2 </cn>
-        </math>
-      </rateRule>
     </listOfRules>
     <listOfConstraints>
-      <constraint>
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <apply>
-            <gt/>
-            <ci> k1f </ci>
-            <cn type="integer"> 0 </cn>
-          </apply>
-        </math>
-        <message>
-          <p xmlns="http://www.w3.org/1999/xhtml">constraint_name</p>
-        </message>
-      </constraint>
       <constraint>
         <math xmlns="http://www.w3.org/1998/Math/MathML">
           <apply>
@@ -300,24 +265,6 @@
       </reaction>
     </listOfReactions>
     <listOfEvents>
-      <event id="ev1" useValuesFromTriggerTime="true">
-        <trigger initialValue="true" persistent="true">
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <lt/>
-              <ci> k6f </ci>
-              <cn type="integer"> 0 </cn>
-            </apply>
-          </math>
-        </trigger>
-        <listOfEventAssignments>
-          <eventAssignment variable="k7f">
-            <math xmlns="http://www.w3.org/1998/Math/MathML">
-              <cn type="integer"> 10 </cn>
-            </math>
-          </eventAssignment>
-        </listOfEventAssignments>
-      </event>
       <event id="ev1" useValuesFromTriggerTime="true">
         <trigger initialValue="true" persistent="true">
           <math xmlns="http://www.w3.org/1998/Math/MathML">
