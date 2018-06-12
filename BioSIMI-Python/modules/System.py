@@ -71,7 +71,7 @@ class System(object):
         Final_subsystem.shareSubsystems(self.ListOfSubsystems, ListOfResources)
         return Final_subsystem
 
-    def createSubsystem(self, filename, subsystemName):
+    def createSubsystem(self, filename, subsystemName = ''):
         ''' 
         Creates a new Subsystem object inside the System
         with the SubsystemName suffixed to all elements of the given SBML filename

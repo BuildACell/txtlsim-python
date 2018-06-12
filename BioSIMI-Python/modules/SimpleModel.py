@@ -261,7 +261,7 @@ class SimpleModel(object):
             print('WARNING -- The species ' + name + ' not found. The program may not work')
             return
         else:
-            print('Multiple species with name ' + name + ' found. Returning a list')
+            print('WARNING -- Multiple species with name ' + name + ' found. Returning a list')
             return species_found
     
 

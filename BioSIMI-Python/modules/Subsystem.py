@@ -333,6 +333,8 @@ class Subsystem(object):
                         final_species_hash_map[species_name] = [
                             species_hash_map[species_name]]
 
+        allids = self.getAllIds()
+        trans = SetIdFromNames(allids)
         for unique_species_name in final_species_hash_map:
             cumulative_amount = 0
             if len(final_species_hash_map[unique_species_name]) > 1: 
@@ -345,7 +347,7 @@ class Subsystem(object):
                     check(model.getListOfSpecies().append(i),'appending species to list of species in model in shareSubsystems')
                     oldid = i.getId()
                     check(oldid,'getting olid in shareSubsystems')
-                    newid = i.getName() + '_shared'
+                    newid = trans.getValidIdForName(i.getName()) + '_shared'
                     self.renameSId(oldid, newid)
                     if count >= 1:
                         check(model.getListOfSpecies().remove(newid),'removing from list of species in shareSubsystems')
@@ -397,11 +399,11 @@ class Subsystem(object):
         if combineNames == True:
             final_species_hash_map = {}
             final_reaction_map = {}
+            final_parameter_map = {}
             for subsystem in ListOfSubsystems:
                 sub_model = subsystem.getSubsystemDoc().getModel()
                 mod_id += '_' + mod.getId()
-                # Set the list of reactions in the final subsystem. Get the list of
-                # reactions in the input subsystem and set it to final subsystem
+                # Finding duplicate species by name
                 species_hash_map = {}
                 for species in sub_model.getListOfSpecies():
                     if species.getName() not in ListOfResources:
@@ -419,7 +421,7 @@ class Subsystem(object):
                         final_species_hash_map[species_name] = [
                             species_hash_map[species_name]]
 
-                # Removing duplicate reactions 
+                # Finding duplicate reactions by the reaction string
                 reaction_map = {}
                 for reaction in sub_model.getListOfReactions():
                     rc1_list = reaction.getListOfReactants()
@@ -431,7 +433,7 @@ class Subsystem(object):
                         if i < (len(rc1_list) - 1):
                             rStr += ' + '
                     if reaction.getReversible():
-                        rStr += ' <--> '
+                        rStr += ' <-> '
                     else:
                         rStr += ' --> '
                     for i in range(len(pt1_list)):
@@ -439,19 +441,47 @@ class Subsystem(object):
                         rStr += sub_model.getElementBySId(sref.getSpecies()).getName()
                         if i < (len(pt1_list) - 1):
                             rStr += ' + '
+
                     reaction_map[rStr] = reaction
+
                 for rStr in reaction_map:
                     if final_reaction_map.get(rStr):
                         final_reaction_map[rStr].append(reaction_map[rStr])
                     else:
                         final_reaction_map[rStr] = [reaction_map[rStr]]
+            
+                # Finding duplicate parameters by name and value
+                parameter_map = {}
+                for param in sub_model.getListOfParameters():
+                    parameter_map[param.getName()] = param
+                for param_name in parameter_map:
+                    if final_parameter_map.get(param_name):
+                        final_parameter_map[param_name].append(parameter_map[param_name])
+                    else:
+                        final_parameter_map[param_name] = [parameter_map[param_name]]
+
+            # Removing duplicate global parameters and adding only one
+            # for param_name in final_parameter_map:
+            #     if len(final_parameter_map[param_name]) > 1:
+            #         # uni_param = final_parameter_map[param_name][0]
+            #         for ind in range(0,len(final_parameter_map[param_name])):
+            #             i = final_parameter_map[param_name][ind]
+            #             if ind > 0:
+            #                 model.removeParameter(i.getId())
+            #         # model.addParameter(uni_param)
+            #         print('BioSIMI-Python WARNING -- Removing all duplicates of global parameter {0} in the combined model. Check the value to ensure model is consistent.'.format(param_name))
+                    
+            # Removing duplicate reactions and adding only one
             for rxn_str in final_reaction_map:
                 if len(final_reaction_map[rxn_str]) > 1:
-                    uni_rxn = final_reaction_map[rxn_str][0]
-                    for i in final_reaction_map[rxn_str]:
-                        model.getListOfReactions().remove(i.getId())
-                    model.getListOfReactions().append(uni_rxn)
+                    for ind in range(0,len(final_reaction_map[rxn_str])):
+                        i = final_reaction_map[rxn_str][ind]
+                        if ind > 0:
+                            status = model.removeReaction(i.getId())
+                            if status != None:
+                                print('BioSIMI-Python WARNING -- Removing all duplicates of the reaction {0} in the combined model. Check the reaction rate to ensure model is consistent.'.format(rxn_str))
 
+            # Removing duplicate species and adding only one
             for unique_species_name in final_species_hash_map:
                 cumulative_amount = 0
                 if len(final_species_hash_map[unique_species_name]) > 1: 
@@ -472,11 +502,11 @@ class Subsystem(object):
                             check(model.removeSpecies(newid),'removing species in combineSubsystems')
                         count += 1
                     sp = model_obj.getSpeciesByName(uni_sp.getName())
-                    # if type(sp) is list: 
-                        # for sp_i in sp:
-                            # check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
-                    # else:
-                        # check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
+                    if type(sp) is list: 
+                        for sp_i in sp:
+                            check(sp_i.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
+                    else:
+                        check(sp.setInitialAmount(cumulative_amount),'setting initial amount to cumulative in combineSubsystems')
                 else:
                     # If there are no species with multiple occurence in different subsystems
                     # then just add the list of all species maintained in the final hash map
@@ -529,7 +559,7 @@ class Subsystem(object):
                 # Rename ID of x by that of y
                 oldid = x.getId()
                 check(oldid,'retreiving oldid of x in connectSubsystem')
-                newid = y.getId()
+                newid = y.getId() + 'connected'
                 check(newid,'retreiving newid of y in connectSubsystem')
                 self.renameSId(oldid, newid)
                 # Remove x from species list to avoid duplication

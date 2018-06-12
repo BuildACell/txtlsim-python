@@ -68,7 +68,7 @@ def plotSbmlWithBioscrape(ListOfFiles, initialTime, timepoints, ListOfListOfSpec
             species_name = ListOfSpeciesToPlot[i]
             species = mod_obj.getSpeciesByName(species_name)
             if type(species) is list:
-                print('There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
+                print('WARNING -- There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
                 for species_i in species:
                     species_ind.append(m.get_species_index(species_i.getId()))
                 key_ind = ListOfSpeciesToPlot.index(species_name)
@@ -108,7 +108,7 @@ def plotSbmlWithBioscrape(ListOfFiles, initialTime, timepoints, ListOfListOfSpec
             speciesLegend.append(species_name)
             species = mod_obj.getSpeciesByName(species_name)
             if type(species) is list:
-                print('There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
+                print('WARNING -- There are multiple species with the name ' + species_name + ' in plot function. Suffixed species will be plotted ')
                 for species_i in species:
                     species_ind.append(m.get_species_index(species_i.getId()))
                 key_ind = ListOfSpeciesToPlot.index(species_name)

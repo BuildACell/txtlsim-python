@@ -13,7 +13,7 @@ cell = System('cell')
 # system.ListOfSharedResources = ['RNAP','Ribo','ATP']
 
 # For our simple example of DP and IFFL subsystems, we use the following for a working demo
-cell.ListOfSharedResources = ['inp','Xp']
+cell.ListOfSharedResources = ['inP','X:P']
 
 
 # Now, create a subsystem inside the cell as follows - 
@@ -93,7 +93,7 @@ writeSBML(shared_subsystem.getSubsystemDoc(),'models/DP_IFFL_shared.xml')
 # names need to be merged and False otherwise. 
 
 combined_subsystem = cell.createNewSubsystem(3,1)
-combined_subsystem.combineSubsystems([DP1, DP2, IFFL], False)
+combined_subsystem.combineSubsystems([DP1, DP2, IFFL], True)
 
 # (Optional) Write the combined document model to SBML file
 writeSBML(combined_subsystem.getSubsystemDoc(),'models/DP_IFFL_combined.xml')
@@ -104,7 +104,7 @@ writeSBML(combined_subsystem.getSubsystemDoc(),'models/DP_IFFL_combined.xml')
 # Usage - connection_logic is a dictionary specifying the map. 
 # The species in the key is replaced by the species given as the value 
 connection_logic = {}
-connection_logic['out'] = 'pA_IFFL'
+connection_logic['X:P:P'] = 'pA_IFFL'
 # DP2.renameSName('out','out_DP2')
 # connection_logic['out_DP2'] = 'pB_IFFL'
 
@@ -121,13 +121,15 @@ connected_subsystem.connectSubsystems([DP1, DP2, IFFL], True, connection_logic, 
 
 
 # (Optional) Write the connected document to SBML file
-writeSBML(connected_subsystem.getSubsystemDoc(),'odels/DP_IFFL_connected.xml')
+writeSBML(connected_subsystem.getSubsystemDoc(),'models/DP_IFFL_connected.xml')
 
 # Simulate using bioscrape
 timepoints = np.linspace(0,50,1000)
 # Usage - plotSbmlWithBioscrape(filename, initialTime, timepoints, 
 # ListOfSpeciesToPlot, xLabel, yLabel, xAxisSize, yAxisSize)
 
-plotSbmlWithBioscrape('models/DP_IFFL_connected.xml',0,
-timepoints,['inp','pA_IFFL','pB_IFFL','out_IFFL'],'Time',
+# plotSbmlWithBioscrape('models/DP_IFFL_shared.xml',0,
+plotSbmlWithBioscrape('models/DP_IFFL_combined.xml',0,
+# plotSbmlWithBioscrape('models/DP_IFFL_connected.xml',0,
+timepoints,['inP','pA_IFFL','pB_IFFL','out_IFFL'],'Time',
 'Input and Output Species',14,14)
