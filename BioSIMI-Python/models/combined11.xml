@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
-  <model id="combined_Subsystems__mw967a8ab1_b005_4143_b8a9_50eb345f7156_A1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1" substanceUnits="substance" timeUnits="second" volumeUnits="volume" areaUnits="area" lengthUnits="metre" extentUnits="substance">
+  <model id="combined_Subsystems__mw967a8ab1_b005_4143_b8a9_50eb345f7156_A1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1" substanceUnits="substance" timeUnits="second" volumeUnits="volume" areaUnits="area" lengthUnits="metre" extentUnits="substance">
     <listOfUnitDefinitions>
       <unitDefinition id="volume">
         <listOfUnits>
@@ -19,7 +19,7 @@
       </unitDefinition>
     </listOfUnitDefinitions>
     <listOfCompartments>
-      <compartment id="cell" name="cell" spatialDimensions="3" size="1" units="volume" constant="true"/>
+      <compartment id="cell" name="cell" spatialDimensions="3" size="2" units="volume" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
       <species id="mwcd1c814e_f9b8_4d24_884f_d5704904c450_A1" name="protein deGFP" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -116,6 +116,74 @@
       <parameter id="mw786a2e83_d802_4211_81cc_786f08db726f_B1" name="AGTPdeg_F" value="0" constant="false"/>
     </listOfParameters>
     <listOfReactions>
+      <reaction id="mw959d31fc_757b_482f_9952_6a2ad51d115a_A1" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference species="protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
+          <speciesReference species="aTc_combined" stoichiometry="2" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="x_2_aTc_protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> mw287c5df4_a030_420c_96b0_fff051404c8f </ci>
+                <ci> protein_tetRdimer_combined </ci>
+                <apply>
+                  <power/>
+                  <ci> aTc_combined </ci>
+                  <cn type="integer"> 2 </cn>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <ci> mw10f581a6_c4e7_42fe_aab6_2fe9dd958fdb </ci>
+                <ci> x_2_aTc_protein_tetRdimer_combined </ci>
+              </apply>
+            </apply>
+          </math>
+          <listOfLocalParameters>
+            <localParameter id="mw287c5df4_a030_420c_96b0_fff051404c8f" name="TXTL_INDUCER_TETR_ATC_F" value="1e-05"/>
+            <localParameter id="mw10f581a6_c4e7_42fe_aab6_2fe9dd958fdb" name="TXTL_INDUCER_TETR_ATC_R" value="0.1"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction id="mwc457ec48_5146_43f1_b82b_c658314430c8_A1" reversible="true" fast="false">
+        <listOfReactants>
+          <speciesReference species="protein_tetR_combined" stoichiometry="2" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <minus/>
+              <apply>
+                <times/>
+                <ci> mw8a89c10f_8c5e_48c4_8553_47d7463f717f </ci>
+                <apply>
+                  <power/>
+                  <ci> protein_tetR_combined </ci>
+                  <cn type="integer"> 2 </cn>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <ci> mwcb1b5260_ecb9_487b_8486_66288c60911f </ci>
+                <ci> protein_tetRdimer_combined </ci>
+              </apply>
+            </apply>
+          </math>
+          <listOfLocalParameters>
+            <localParameter id="mw8a89c10f_8c5e_48c4_8553_47d7463f717f" name="kf" value="1"/>
+            <localParameter id="mwcb1b5260_ecb9_487b_8486_66288c60911f" name="kr" value="1"/>
+          </listOfLocalParameters>
+        </kineticLaw>
+      </reaction>
       <reaction id="mw4ce2286a_12a9_4730_a483_d2ad525d600e_A1" reversible="false" fast="false">
         <listOfReactants>
           <speciesReference species="mwcd1c814e_f9b8_4d24_884f_d5704904c450_A1" stoichiometry="1" constant="true"/>
@@ -1723,6 +1791,23 @@
           </listOfLocalParameters>
         </kineticLaw>
       </reaction>
+      <reaction id="mw48179675_3904_4841_9999_5fdb348851e4_A1" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="AGTP_combined" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="AGTP_USED_combined" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> mw5996d02e_ace7_48f3_a137_02e414010144_A1 </ci>
+              <ci> AGTP_combined </ci>
+            </apply>
+          </math>
+        </kineticLaw>
+      </reaction>
       <reaction id="mwc4415d8f_7467_4000_adac_49e8ce637e05_B1" reversible="true" fast="false">
         <listOfReactants>
           <speciesReference species="mwcab9d721_d5fe_46ba_8abd_db6023744051_B1" stoichiometry="1" constant="true"/>
@@ -3028,91 +3113,6 @@
           <listOfLocalParameters>
             <localParameter id="mw917d10eb_9640_4113_ba1d_29a778fd0571" name="TXTL_RNAdeg_F" value="0.00277777777777778"/>
           </listOfLocalParameters>
-        </kineticLaw>
-      </reaction>
-      <reaction id="mw959d31fc_757b_482f_9952_6a2ad51d115a_A1" reversible="true" fast="false">
-        <listOfReactants>
-          <speciesReference species="protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
-          <speciesReference species="aTc_combined" stoichiometry="2" constant="true"/>
-        </listOfReactants>
-        <listOfProducts>
-          <speciesReference species="x_2_aTc_protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
-        </listOfProducts>
-        <kineticLaw>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <minus/>
-              <apply>
-                <times/>
-                <ci> mw287c5df4_a030_420c_96b0_fff051404c8f </ci>
-                <ci> protein_tetRdimer_combined </ci>
-                <apply>
-                  <power/>
-                  <ci> aTc_combined </ci>
-                  <cn type="integer"> 2 </cn>
-                </apply>
-              </apply>
-              <apply>
-                <times/>
-                <ci> mw10f581a6_c4e7_42fe_aab6_2fe9dd958fdb </ci>
-                <ci> x_2_aTc_protein_tetRdimer_combined </ci>
-              </apply>
-            </apply>
-          </math>
-          <listOfLocalParameters>
-            <localParameter id="mw287c5df4_a030_420c_96b0_fff051404c8f" name="TXTL_INDUCER_TETR_ATC_F" value="1e-05"/>
-            <localParameter id="mw10f581a6_c4e7_42fe_aab6_2fe9dd958fdb" name="TXTL_INDUCER_TETR_ATC_R" value="0.1"/>
-          </listOfLocalParameters>
-        </kineticLaw>
-      </reaction>
-      <reaction id="mwc457ec48_5146_43f1_b82b_c658314430c8_A1" reversible="true" fast="false">
-        <listOfReactants>
-          <speciesReference species="protein_tetR_combined" stoichiometry="2" constant="true"/>
-        </listOfReactants>
-        <listOfProducts>
-          <speciesReference species="protein_tetRdimer_combined" stoichiometry="1" constant="true"/>
-        </listOfProducts>
-        <kineticLaw>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <minus/>
-              <apply>
-                <times/>
-                <ci> mw8a89c10f_8c5e_48c4_8553_47d7463f717f </ci>
-                <apply>
-                  <power/>
-                  <ci> protein_tetR_combined </ci>
-                  <cn type="integer"> 2 </cn>
-                </apply>
-              </apply>
-              <apply>
-                <times/>
-                <ci> mwcb1b5260_ecb9_487b_8486_66288c60911f </ci>
-                <ci> protein_tetRdimer_combined </ci>
-              </apply>
-            </apply>
-          </math>
-          <listOfLocalParameters>
-            <localParameter id="mw8a89c10f_8c5e_48c4_8553_47d7463f717f" name="kf" value="1"/>
-            <localParameter id="mwcb1b5260_ecb9_487b_8486_66288c60911f" name="kr" value="1"/>
-          </listOfLocalParameters>
-        </kineticLaw>
-      </reaction>
-      <reaction id="mw48179675_3904_4841_9999_5fdb348851e4_A1" reversible="false" fast="false">
-        <listOfReactants>
-          <speciesReference species="AGTP_combined" stoichiometry="1" constant="true"/>
-        </listOfReactants>
-        <listOfProducts>
-          <speciesReference species="AGTP_USED_combined" stoichiometry="1" constant="true"/>
-        </listOfProducts>
-        <kineticLaw>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <times/>
-              <ci> mw5996d02e_ace7_48f3_a137_02e414010144_A1 </ci>
-              <ci> AGTP_combined </ci>
-            </apply>
-          </math>
         </kineticLaw>
       </reaction>
     </listOfReactions>

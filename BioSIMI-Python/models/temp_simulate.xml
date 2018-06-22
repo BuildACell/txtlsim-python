@@ -17,13 +17,13 @@
       <compartment id="cell" name="cell" size="1" units="litre" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
-      <species id="inp_1" name="inp" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="inP_1" name="inP" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
       <species id="X_1" name="X" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C1_1" name="C1" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="Xp_1" name="Xp" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="inP_X_1" name="inP:X" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="X_P_1" name="X:P" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="E_1" name="E" compartment="cell" initialAmount="50" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="out_1" name="out" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="C4_1" name="C4" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="X_P_P_1" name="X:P:P" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="E_X_P_P_1" name="E:X:P:P" compartment="cell" initialAmount="0" substanceUnits="count" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
       <parameter id="k1f_1" name="k1f" value="1" units="per_second" constant="false"/>
@@ -42,11 +42,11 @@
     <listOfReactions>
       <reaction id="r1_1" reversible="true" fast="true">
         <listOfReactants>
-          <speciesReference species="inp_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="inP_1" stoichiometry="1" constant="false"/>
           <speciesReference species="X_1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C1_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="inP_X_1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -55,36 +55,32 @@
               <apply>
                 <times/>
                 <ci> k1f_1 </ci>
-                <ci> inp_1 </ci>
+                <ci> inP_1 </ci>
                 <ci> X_1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k1r_1 </ci>
-                <ci> C1_1 </ci>
+                <ci> inP_X_1 </ci>
               </apply>
             </apply>
           </math>
-          <listOfLocalParameters>
-            <localParameter id="mwf84363f2_d68f_4294_9d89_0d2dcbef3483" name="TXTL_INDUCER_TETR_ATC_F" value="1e-05"/>
-            <localParameter id="mw01ade0d9_bbf0_4b95_a889_150c9f8ed48e" name="TXTL_INDUCER_TETR_ATC_R" value="0.1"/>
-          </listOfLocalParameters>
         </kineticLaw>
       </reaction>
       <reaction id="r2_1" reversible="false" fast="true">
         <listOfReactants>
-          <speciesReference species="C1_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="inP_X_1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="inp_1" stoichiometry="1" constant="false"/>
-          <speciesReference species="Xp_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="inP_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="X_P_1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <times/>
               <ci> k2f_1 </ci>
-              <ci> C1_1 </ci>
+              <ci> inP_X_1 </ci>
             </apply>
           </math>
         </kineticLaw>
@@ -92,10 +88,10 @@
       <reaction id="r7_1" reversible="true" fast="true">
         <listOfReactants>
           <speciesReference species="E_1" stoichiometry="1" constant="false"/>
-          <speciesReference species="out_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="X_P_P_1" stoichiometry="1" constant="false"/>
         </listOfReactants>
         <listOfProducts>
-          <speciesReference species="C4_1" stoichiometry="1" constant="false"/>
+          <speciesReference species="E_X_P_P_1" stoichiometry="1" constant="false"/>
         </listOfProducts>
         <kineticLaw>
           <math xmlns="http://www.w3.org/1998/Math/MathML">
@@ -105,12 +101,12 @@
                 <times/>
                 <ci> k7f_1 </ci>
                 <ci> E_1 </ci>
-                <ci> out_1 </ci>
+                <ci> X_P_P_1 </ci>
               </apply>
               <apply>
                 <times/>
                 <ci> k7r_1 </ci>
-                <ci> C4_1 </ci>
+                <ci> E_X_P_P_1 </ci>
               </apply>
             </apply>
           </math>

@@ -4,20 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from libsbml import *
 from modules.SimpleModel import * 
-
-def simulateSbmlWithBioscrape(filename, initialTime, timepoints):
-    ''' 
-    To simulate SBML model without generating the plot. 
-    Returns the data for all species.
-    '''
-    m = bioscrape.types.read_model_from_sbml(filename)
-    s = bioscrape.simulator.ModelCSimInterface(m)
-    s.py_prep_deterministic_simulation()
-    s.py_set_initial_time(initialTime)
-    sim = bioscrape.simulator.DeterministicSimulator()
-    result = sim.py_simulate(s, timepoints)
-    return result.py_get_result(), m
-    
+   
 def createSbmlDoc(newLevel, newVersion):
     ''' 
     Creates a new SBMLDocument ojbect of the given newLevel and newVersion
@@ -39,6 +26,7 @@ def getFromXML(filename):
     doc = reader.readSBML(filename)
     check(doc, "reading from SBML file")
     return doc
+
 
 def plotSbmlWithBioscrape(ListOfFiles, initialTime, timepoints, ListOfListOfSpeciesToPlot, xlabel = 'Time', ylabel = 'Concentration (AU)', sizeOfXLabels = 14, sizeOfYLabels = 14):
     ''' 
@@ -73,8 +61,8 @@ def plotSbmlWithBioscrape(ListOfFiles, initialTime, timepoints, ListOfListOfSpec
                     species_ind.append(m.get_species_index(species_i.getId()))
                 key_ind = ListOfSpeciesToPlot.index(species_name)
                 insert_new = []
-                for i in range(len(species)-1):
-                    insert_new.append(species_name + str(i+1))
+                for j in range(len(species)-1):
+                    insert_new.append(species_name + str(j+1))
                 SpeciesToPlot[key_ind+1:key_ind+1] = insert_new 
             else:
                 species_ind.append(m.get_species_index(species.getId()))

@@ -1,28 +1,7 @@
 from libsbml import *
-
-def check(value, message):
-    """If 'value' is None, prints an error message constructed using
-    'message' and then exits with status code 1.  If 'value' is an integer,
-    it assumes it is a libSBML return status code.  If the code value is
-    LIBSBML_OPERATION_SUCCESS, returns without further action; if it is not,
-    prints an error message constructed using 'message' along with text from
-    libSBML explaining the meaning of the code, and exits with status code 1.
-    """
-    if value == None:
-            raise SystemExit(
-                'LibSBML returned a null value trying to ' + message + '.')
-    elif type(value) is int:
-        if value == LIBSBML_OPERATION_SUCCESS:
-            return
-        else:
-            err_msg = 'Error encountered trying to ' + message + '.' \
-                + 'LibSBML returned error code ' + str(value) + ': "' \
-                + OperationReturnValue_toString(value).strip() + '"'
-            raise SystemExit(err_msg)
-    else:
-        return
-
-
+from modules.setIdFromNames import *
+from modules.NewReaction import *
+import warnings
 
 class SimpleModel(object):
     """
@@ -40,7 +19,7 @@ class SimpleModel(object):
     def setModel(self, Model):
         """ Set the new Model object """
         self.Model = Model
-
+   
     def createNewUnitDefinition(self, uid, ukind, exponent, scale, multiplier):
         ''' 
         Creates a new UnitDefinition inside the 
@@ -58,7 +37,163 @@ class SimpleModel(object):
         check(unit.setMultiplier(multiplier), 'set unit multiplier')
         return unitdef
 
+    def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant):
+        '''
+        Creates a new Compartment in the Model and returns a pointer to the object created
+        '''
+        model = self.getModel()
+        check(model,'retreived model object')
+        comp_obj = model.createCompartment()
+        check(comp_obj, 'Create comp_obj compartment')
+        check(comp_obj.setId(cId), 'Set comp_obj id')
+        check(comp_obj.setName(cName), 'Set comp_obj name')
+        check(comp_obj.setSize(cSize), 'set comp_obj size')
+        check(comp_obj.setUnits(cUnits), 'set comp_obj units')
+        check(comp_obj.setConstant(cConstant), 'set comp_obj constant')
+        return comp_obj
 
+    def createNewSpecies(self, ListOfSpecies, sComp, ListOfAmounts, sConstant, sSubstance, sBoundary = False, sHasOnlySubstance = False):
+        ''' 
+        Creates new Species object inside the 
+        Model with the given attributes and returns a pointer to the list of Species object created
+        '''
+        model = self.getModel()
+        allIds = self.getAllIds()
+        trans = SetIdFromNames(allIds)
+        check(model,'retreived model object')
+        amount = []
+        speciesList = []
+        if (type(ListOfSpecies) is str) or  (len(ListOfSpecies) == 1):
+            if (type(ListOfAmounts) is list) and (len(ListOfAmounts) > 1):
+                raise SyntaxError('The amount cannot be a list of multiple items when only one species is being created')
+            elif (type(ListOfAmounts) is list) and (len(ListOfAmounts) == 1):
+                amount.append(ListOfAmounts[0])
+            elif type(ListOfAmounts) is not list:
+                if not isinstance(ListOfAmounts, (int, float)):
+                    raise SyntaxError('The amount should be a real number corresponding to the species given')
+                amount.append(ListOfAmounts)
+            if type(ListOfSpecies) is str:
+                speciesList.append(ListOfSpecies)
+                
+        # Multiple species
+        elif (type(ListOfSpecies) is list) and (len(ListOfSpecies) > 1):
+            if type(ListOfAmounts) is not list:
+                raise SyntaxError('For multiple species, the initial amounts should be a list of real numbers')
+            elif len(ListOfSpecies) != len(ListOfAmounts):
+                raise SyntaxError('The length of ListOfSpecies and ListOfAmounts should be the same.')
+            else:
+                amount = ListOfAmounts[:]
+            for sp_name, sp_amt in zip(ListOfSpecies, amount):
+                if not isinstance(sp_amt, (int, float)):
+                    raise SyntaxError('The amount should be a real number corresponding to the species given')
+                if not isinstance(sp_name, str):
+                    raise SyntaxError('The species name should be a string.')
+            speciesList = ListOfSpecies[:]
+        else:
+            raise SyntaxError('ListOfSpecies should be a list type with string items and ListOfAmounts should be list type with real numbers')
+
+
+        list_s_obj = []
+        for sName, sInitial in zip(speciesList, amount):
+            s_obj = model.createSpecies()
+            check(s_obj, 'created s_obj species')
+            sId = trans.getValidIdForName(sName)
+            check(s_obj.setId(sId), 'set s_obj ID')
+            check(s_obj.setName(sName), 'set s_obj name')
+            check(s_obj.setCompartment(sComp), 'set s_obj compartment')
+            check(s_obj.setInitialAmount(sInitial), 'set s_obj initial amount')
+            check(s_obj.setConstant(sConstant), 'set s_obj constant')
+            check(s_obj.setBoundaryCondition(sBoundary),
+                'set boundary s_obj condition false')
+            check(s_obj.setSubstanceUnits(sSubstance), 'set substance units s_obj')
+            check(s_obj.setHasOnlySubstanceUnits(sHasOnlySubstance),
+                'set has only substance units s_obj')
+            list_s_obj.append(s_obj)
+        return list_s_obj
+
+    def createNewParameter(self, ListOfParameters, ListOfValues, pConstant, pUnit):
+        ''' 
+        Creates new Parameter object inside the 
+        Model with the given attributes and returns pointer to the list of Parameter object created
+        '''
+        model = self.getModel()
+        allIds = self.getAllIds()
+        trans = SetIdFromNames(allIds)
+        check(model,'retreived model object')
+        values = []
+        parametersList = []
+        if (type(ListOfParameters) is str) or  (len(ListOfParameters) == 1):
+            if (type(ListOfValues) is list) and (len(ListOfValues) > 1):
+                raise SyntaxError('The values cannot be a list of multiple items when only one parameter is being created')
+            elif (type(ListOfValues) is list) and (len(ListOfValues) == 1):
+                values.append(ListOfValues[0])
+            elif type(ListOfValues) is not list:
+                if not isinstance(ListOfValues, (int, float)):
+                    raise SyntaxError('The values should be a real number corresponding to the parameters given')
+                values.append(ListOfValues)
+            if type(ListOfParameters) is str:
+                parametersList.append(ListOfParameters)
+                
+        # Multiple parameters 
+        elif (type(ListOfParameters) is list) and (len(ListOfParameters) > 1):
+            if type(ListOfValues) is not list:
+                raise SyntaxError('For multiple parameters, the values should be a list of real numbers')
+            elif len(ListOfParameters) != len(ListOfValues):
+                raise SyntaxError('The length of ListOfParameters and ListOfValues should be the same.')
+            else:
+                values = ListOfValues[:]
+            for p_name, p_val in zip(ListOfParameters, values):
+                if not isinstance(p_val, (int, float)):
+                    raise SyntaxError('The values should be a real number corresponding to the parameter given')
+                if not isinstance(p_name, str):
+                    raise SyntaxError('The parameter name should be a string.')
+            parametersList = ListOfParameters[:]
+        else:
+            raise SyntaxError('ListOfParameters should be a list type with string items and ListOfValues should be list type with real numbers')
+
+
+        list_p_obj = []
+        for pName, pValue in zip(parametersList, values):
+            p_obj = model.createParameter()
+            check(p_obj, 'created p_obj parameter')
+            pId = trans.getValidIdForName(pName)
+            check(p_obj.setId(pId), 'set p_obj ID')
+            check(p_obj.setName(pName), 'set p_obj name')
+            check(p_obj.setValue(pValue), 'set p_obj value')
+            check(p_obj.setConstant(pConstant), 'set p_obj constant')
+            check(p_obj.setUnits(pUnit), 'set p_obj units')
+            list_p_obj.append(p_obj)
+        return list_p_obj
+
+
+    def createNewReaction(self, rId, rStr, rRate, rFast = False, isConstant = False):
+        ''' 
+        Creates a new Reaction object inside the 
+        Model with the given attributes and returns a pointer to the Reaction object created
+        '''
+        model = self.getModel()
+        check(model,'retreived model object')
+        r_obj = model.createReaction()
+        check(r_obj, 'created r_obj reaction')
+        check(r_obj.setId(rId), 'set r_obj ID')
+        check(r_obj.setFast(rFast), 'set r_obj Fast')
+        newRxn = NewReaction(r_obj)
+        reactantList, reactant_stoichList, productList, product_stoichList = newRxn.parseReactionString(rStr)
+        for reactant, stoich in zip(reactantList, reactant_stoichList):
+            reactant_sp = self.getSpeciesByName(reactant)
+            if type(reactant_sp) is list:
+                raise SyntaxError('Multiple species found with the same name.')
+            newRxn.createNewReactant(reactant_sp.getId(), isConstant, stoich)
+        for product, stoich in zip(productList, product_stoichList):
+            product_sp = self.getSpeciesByName(product)
+            if type(product_sp) is list:
+                raise SyntaxError('Multiple species found with the same name.')
+            newRxn.createNewProduct(product_sp.getId(), isConstant, stoich)
+        newRxn_math = newRxn.createMath(rRate)
+        newRxn.createRate(newRxn_math)
+        return r_obj
+
+ 
     def createNewConstraint(self, formulaString, msg = 'Constraint not satisfied for the model', name = ''):
         '''
         Creates a new Constraint in the Model and returns a pointer to the object created
@@ -179,72 +314,7 @@ class SimpleModel(object):
         check(func_def.setMath(func_math), 'setting the math for the function definition')
         return 
 
-    def createNewCompartment(self, cId, cName, cSize, cUnits, cConstant):
-        '''
-        Creates a new Compartment in the Model and returns a pointer to the object created
-        '''
-        model = self.getModel()
-        check(model,'retreived model object')
-        comp_obj = model.createCompartment()
-        check(comp_obj, 'Create comp_obj compartment')
-        check(comp_obj.setId(cId), 'Set comp_obj id')
-        check(comp_obj.setName(cName), 'Set comp_obj name')
-        check(comp_obj.setSize(cSize), 'set comp_obj size')
-        check(comp_obj.setUnits(cUnits), 'set comp_obj units')
-        check(comp_obj.setConstant(cConstant), 'set comp_obj constant')
-        return comp_obj
-
-    def createNewSpecies(self, sId, sName, sComp, sInitial, sConstant, sBoundary, sSubstance, sHasOnlySubstance):
-        ''' 
-        Creates a new Species object inside the 
-        Model with the given attributes and returns a pointer to the Species object created
-        '''
-        model = self.getModel()
-        check(model,'retreived model object')
-        s_obj = model.createSpecies()
-        check(s_obj, 'created s_obj species')
-        check(s_obj.setId(sId), 'set s_obj ID')
-        check(s_obj.setName(sName), 'set s_obj name')
-        check(s_obj.setCompartment(sComp), 'set s_obj compartment')
-        check(s_obj.setInitialAmount(sInitial), 'set s_obj initial amount')
-        check(s_obj.setConstant(sConstant), 'set s_obj constant')
-        check(s_obj.setBoundaryCondition(sBoundary),
-              'set boundary s_obj condition false')
-        check(s_obj.setSubstanceUnits(sSubstance), 'set substance units s_obj')
-        check(s_obj.setHasOnlySubstanceUnits(sHasOnlySubstance),
-              'set has only substance units s_obj')
-        return s_obj
-
-    def createNewReaction(self, rId, rReversible, rFast):
-        ''' 
-        Creates a new Reaction object inside the 
-        Model with the given attributes and returns a pointer to the Reaction object created
-        '''
-        model = self.getModel()
-        check(model,'retreived model object')
-        r_obj = model.createReaction()
-        check(r_obj, 'created r_obj reaction')
-        check(r_obj.setId(rId), 'set r_obj ID')
-        check(r_obj.setReversible(rReversible), 'set r_obj reversible')
-        check(r_obj.setFast(rFast), 'set r_obj Fast')
-        return r_obj
-
-    def createNewParameter(self, pId, pName, pValue, pConstant, pUnit):
-        ''' 
-        Creates a new Parameter object inside the 
-        Model with the given attributes and returns a pointer to the Parameter object created
-        '''
-        model = self.getModel()
-        check(model,'retreived model object')
-        p_obj = model.createParameter()
-        check(p_obj, 'created p_obj species')
-        check(p_obj.setId(pId), 'set p_obj ID')
-        check(p_obj.setName(pName), 'set p_obj name')
-        check(p_obj.setValue(pValue), 'set p_obj value')
-        check(p_obj.setConstant(pConstant), 'set p_obj constant')
-        check(p_obj.setUnits(pUnit), 'set p_obj units')
-        return p_obj
-    
+  
     def getSpeciesByName(self, name):
         ''' 
         Returns a list of species in the Model with the given name
@@ -258,10 +328,27 @@ class SimpleModel(object):
         if len(species_found) == 1:
             return species_found[0] 
         elif not species_found:
-            print('WARNING -- The species ' + name + ' not found. The program may not work')
-            return
+            raise SyntaxError('The species ' + name + ' not found.')
         else:
-            print('WARNING -- Multiple species with name ' + name + ' found. Returning a list')
+            warnings.warn('Multiple species with name ' + name + ' found. Returning a list')
             return species_found
     
-
+ 
+    def getAllIds(self):
+        """ 
+        Returns all SIds in the model in string format
+        """
+        model = self.getModel()
+        check(model,'retreiving model in getAllIds')
+        document = model.getSBMLDocument()
+        check(document,'retreiving document in getAllIds')
+        allElements = document.getListOfAllElements()
+        result = []
+        if (allElements == None or allElements.getSize() == 0):
+            return result 
+        for i in range (allElements.getSize()):
+            current = allElements.get(i) 
+            if (current.isSetId() and current.getTypeCode() != libsbml.SBML_EVENT and current.getTypeCode() != libsbml.SBML_LOCAL_PARAMETER):
+                result.append(current.getId()) 
+        return result     
+    

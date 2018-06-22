@@ -20,12 +20,12 @@ reversible_rxns = DP2.getReversibleReactions()
 # Create the new parameters in the Subsystem model that will be introduced
 # (if any) on changing the rate formula
 model_obj = SimpleModel(DP2.getSubsystemDoc().getModel())
-model_obj.createNewParameter('k2r','k2r',1,True,'per_second')
-model_obj.createNewParameter('k2f','k2f',1,True,'per_second')
+model_obj.createNewParameter('k2r',1,True,'per_second')
+model_obj.createNewParameter('k2f',1,True,'per_second')
 
 # Set the reactions indexes in the first argument as reversible 
 # and the new rate formula of the corresponding reactions given in the second argument
-DP2_new = DP2.setReversibleReactions(2,'k2f*'+model_obj.getSpeciesByName('C1').getId()+ '- k2r*' + model_obj.getSpeciesByName('inp').getId() +'*' + model_obj.getSpeciesByName('Xp').getId())
+DP2_new = DP2.setReversibleReactions(2,'k2f*'+model_obj.getSpeciesByName('inP:X').getId()+ '- k2r*' + model_obj.getSpeciesByName('inP').getId() +'*' + model_obj.getSpeciesByName('X:P').getId())
 
 # To keep the rate formula unchanged, the second argument can be skipped, it is optional.
 
@@ -45,4 +45,4 @@ for rxn in reversible_rxns:
 # Write the new Subsystem to SBML file
 writeSBML(DP2_new.getSubsystemDoc(), 'models/reversibleSetDP2.xml')
 timepoints = np.linspace(0,1000,1000)
-plotSbmlWithBioscrape('models/reversibleSetDP2.xml', 0, timepoints, ['inp','out'])
+plotSbmlWithBioscrape('models/reversibleSetDP2.xml', 0, timepoints, ['inP','X:P:P'])

@@ -6,6 +6,7 @@ class System(object):
         self.SystemName = SystemName
         self.ListOfSubsystems = []
         self.ListOfSharedResources = []
+        self.Size = 0
     
     def getSystemName(self):
         ''' 
@@ -55,21 +56,30 @@ class System(object):
         if type(resource) is str and resource in self.ListOfSharedResources:
             self.ListOfSharedResources.remove(resource)
 
-    def setSharedResources(self):
+    def setSize(self, size):
+        '''
+        Sets the size of the System compartment to given size (float)
+        ''' 
+        self.Size = size
+    
+    def getSize(self):
+        '''
+        Returns the size of the System compartment
+        '''
+        return self.Size
+
+    def setSharedResources(self, mode = 'volume'):
         ''' 
         Returns a new Subsystem object containing the 
         model which shares the self.ListOfSharedResources among 
         self.ListOfSubsystems
         '''
         ListOfResources = self.ListOfSharedResources
-        # Create a blank document for the final connected system and the subsystem object
-        final_sbml_doc = createSbmlDoc(3,1)
-        Final_subsystem = Subsystem(final_sbml_doc)
-        Final_subsystem.setSystem(self)
-        # The shareSubsystems member function implements Example 1-A.
+        ListOfSubsystems = self.ListOfSubsystems
+        shared_subsystem = self.createNewSubsystem(3,1)
         # Usage - self.shareSubsystems(ListOfSubsystems, ListOfSharedResources)
-        Final_subsystem.shareSubsystems(self.ListOfSubsystems, ListOfResources)
-        return Final_subsystem
+        shared_subsystem.shareSubsystems(ListOfSubsystems, ListOfResources, mode)
+        return shared_subsystem
 
     def createSubsystem(self, filename, subsystemName = ''):
         ''' 
@@ -80,20 +90,29 @@ class System(object):
     # 2. Create an object of the Subsystem class with the SBMLDocument read in Step 1
         name = self.getSystemName()
         sbmlDoc = getFromXML(filename)
+        model = sbmlDoc.getModel()
         subsystem = Subsystem(sbmlDoc)
         subsystem.setSystem(self)
         if subsystem.getSubsystemDoc().getLevel() != 3:
-            print('Subsystem SBML model is not the latest. Converting to SBML level 3, version 1')
+            print('BioSIMI-Python WARNING -- Subsystem SBML model is not the latest. Converting to SBML level 3, version 1')
             subsystem.convertSubsystemLevelAndVersion(3,1)
         subsystem.suffixAllElementIds(subsystemName)
-        if sbmlDoc.getModel().getNumCompartments() > 1:
-            print('More than 1 compartments in the model')
+        if model.getNumCompartments() == 0:
+            print('BioSIMI-Python WARNING -- No compartments in the Subsystem model, the System compartment will be used. Compartment Size will be set to zero for this Subsystem.')
+        elif model.getNumCompartments() > 1:
+            print('BioSIMI-Python WARNING -- More than 1 compartments in the Subsystem model. Check resulting models for consistency.')
+
+        if not model.getCompartment(0).isSetSize():
+            print('BioSIMI-Python WARNING -- Compartment Size is not set. Setting to zero.')
+            model.getCompartment(0).setSize(0)
+    
         subsystem.setCompartments([name])
         # handling sbml events --- incomplete ---
         # model = subsystem.getSubsystemDoc().getModel()
         # if model.getNumEvents():
         #     for event in model.getListOfEvents()
         self.ListOfSubsystems.append(subsystem)
+        self.Size += model.getCompartment(0).getSize()
         return subsystem 
 
     def createNewSubsystem(self, level, version):
@@ -105,4 +124,15 @@ class System(object):
         subsystem = Subsystem(newDocument)
         subsystem.setSystem(self)
         return subsystem
+
+
+
+def createNewSubsystem(level, version):
+    '''
+    Creates a new empty Subsystem object with SBMLDocument 
+    of given level and version
+    '''
+    newDocument = createSbmlDoc(level,version)
+    subsystem = Subsystem(newDocument)
+    return subsystem
 

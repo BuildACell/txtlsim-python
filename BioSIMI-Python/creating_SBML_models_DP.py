@@ -30,100 +30,118 @@ count = simpleModel.createNewUnitDefinition('count',UNIT_KIND_DIMENSIONLESS, 1, 
 simpleModel.createNewCompartment('cell','cell',1,'litre',True)
 
 # createNewSpecies arguments - id, name, compartment,
-#  initial amount, isConstant, BoundaryCondition, Substance units, HasOnlySubstance
+#  initial amount, isConstant, BoundaryCondition = False, Substance units, HasOnlySubstance
 
-simpleModel.createNewSpecies( 'inP','inP','cell',50,False,True,'count',False)
-simpleModel.createNewSpecies( 'X','X','cell',50,False,False,'count',False)
-simpleModel.createNewSpecies( 'inP_X','inP:X','cell',0,False,False,'count',False)
-simpleModel.createNewSpecies( 'X_P','X:P','cell',0,False,False,'count',False)
-simpleModel.createNewSpecies( 'E','E','cell',50,False,False,'count',False)
-simpleModel.createNewSpecies( 'E_X_P','E:X:P','cell',0,False,False,'count',False)
-simpleModel.createNewSpecies( 'inP_X_P','inP:X:P','cell',0,False,False,'count',False)
-simpleModel.createNewSpecies( 'X_P_P','X:P:P','cell',0,False,False,'count',False)
-simpleModel.createNewSpecies( 'E_X_P_P','E:X:P:P','cell',0,False,False,'count',False)
+simpleModel.createNewSpecies( 'inP','cell',50,False,'count',True, False)
+simpleModel.createNewSpecies( 'X','cell',50,False,'count')
+
+simpleModel.createNewSpecies(['inP:X','X:P','E','E:X:P','inP:X:P', 'X:P:P', 'E:X:P:P'],
+ 'cell',[0,0,50,0,0,0,0], False, 'count')
+
+
+# simpleModel.createNewSpecies( 'inP_X','inP:X','cell',0,False,False,'count',False)
+# simpleModel.createNewSpecies( 'X_P','X:P','cell',0,False,False,'count',False)
+# simpleModel.createNewSpecies( 'E','E','cell',50,False,False,'count',False)
+# simpleModel.createNewSpecies( 'E_X_P','E:X:P','cell',0,False,False,'count',False)
+# simpleModel.createNewSpecies( 'inP_X_P','inP:X:P','cell',0,False,False,'count',False)
+# simpleModel.createNewSpecies( 'X_P_P','X:P:P','cell',0,False,False,'count',False)
+# simpleModel.createNewSpecies( 'E_X_P_P','E:X:P:P','cell',0,False,False,'count',False)
 
 # print(simpleModel.getModel().toSBML())
 # Create all parameters 
 # arguments - id, name, value, isConstant, Unit id
-simpleModel.createNewParameter( 'k1f','k1f',1,False,'per_second')
-simpleModel.createNewParameter( 'k1r','k1r',1,False,'per_second')
+simpleModel.createNewParameter( 'k1f',1,False,'per_second')
+simpleModel.createNewParameter( 'k1r',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k2f','k2f',1,False,'per_second')
+simpleModel.createNewParameter( ['k2f','k3f','k3r','k4f','k5f','k5r','k6f','k7f','k7r','k8f'],
+[1,1,1,1,1,1,1,1,1,1],False,'per_second')
 
-simpleModel.createNewParameter( 'k3f','k3f',1,False,'per_second')
-simpleModel.createNewParameter( 'k3r','k3r',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k4f','k4f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k3f','k3f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k3r','k3r',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k5f','k5f',1,False,'per_second')
-simpleModel.createNewParameter( 'k5r','k5r',1,False,'per_second')
+# simpleModel.createNewParameter( 'k4f','k4f',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k6f','k6f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k5f','k5f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k5r','k5r',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k7f','k7f',1,False,'per_second')
-simpleModel.createNewParameter( 'k7r','k7r',1,False,'per_second')
+# simpleModel.createNewParameter( 'k6f','k6f',1,False,'per_second')
 
-simpleModel.createNewParameter( 'k8f','k8f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k7f','k7f',1,False,'per_second')
+# simpleModel.createNewParameter( 'k7r','k7r',1,False,'per_second')
+
+# simpleModel.createNewParameter( 'k8f','k8f',1,False,'per_second')
 
 # Create all reactions using the NewReaction class to call the simple commands to define Reactions
 # Arguments - id, isReversible, isFast
-r1 = NewReaction(simpleModel.createNewReaction('r1',True,False))   
-# Arguments - species id, isConstant, Stoichiometry
-r1.createNewReactant('inP',False,1)
-r1.createNewReactant('X',False,1)
-r1.createNewProduct('inP_X',False,1)
-math_r1 = r1.createMath('k1f * inP * X - k1r * inP_X')
-r1.createRate(math_r1)
+simpleModel.createNewReaction('r1','inP + X <-> inP:X',
+'k1f * inP * X - k1r * inP_X', False, False)
+# r1 = NewReaction(model.createReaction())
+# # Arguments - species id, isConstant, Stoichiometry
+# r1.createNewReactant('inP',False,1)
+# r1.createNewReactant('X',False,1)
+# r1.createNewProduct('inP_X',False,1)
+# math_r1 = r1.createMath('k1f * inP * X - k1r * inP_X')
+# r1.createRate(math_r1)
 
 
-r2 = NewReaction(simpleModel.createNewReaction('r2',False,False))
+r2 = NewReaction(model.createReaction())
+r2.getReaction().setId('r2')
+r2.getReaction().setReversible(False)
+r2.getReaction().setFast(False)
 r2.createNewReactant('inP_X',False,1)
 r2.createNewProduct('inP',False,1)
 r2.createNewProduct('X_P',False,1)
 math_r2 = r2.createMath('k2f * inP_X')
 r2.createRate(math_r2)
 
-r3 = NewReaction(simpleModel.createNewReaction('r3',True,False))
-r3.createNewReactant('E',False,1)
-r3.createNewReactant('X_P',False,1)
-r3.createNewProduct('E_X_P',False,1)
-math_r3 = r3.createMath('k3f * E * X_P - k3r * E_X_P')
-r3.createRate(math_r3)
+simpleModel.createNewReaction('r3','E + X:P <-> E:X:P','k3f * E * X_P - k3r * E_X_P')
+# r3 = NewReaction(simpleModel.createNewReaction('r3',True,False))
+# r3.createNewReactant('E',False,1)
+# r3.createNewReactant('X_P',False,1)
+# r3.createNewProduct('E_X_P',False,1)
+# math_r3 = r3.createMath('k3f * E * X_P - k3r * E_X_P')
+# r3.createRate(math_r3)
 
-r4 = NewReaction(simpleModel.createNewReaction('r4',False,False))
-r4.createNewReactant('E_X_P',False,1)
-r4.createNewProduct('E',False,1)
-r4.createNewProduct('X',False,1)
-math_r4 = r4.createMath('k4f * E_X_P')
-r4.createRate(math_r4)
+simpleModel.createNewReaction('r4','E:X:P --> E + X','k4f * E_X_P')
+# r4 = NewReaction(simpleModel.createNewReaction('r4',False,False))
+# r4.createNewReactant('E_X_P',False,1)
+# r4.createNewProduct('E',False,1)
+# r4.createNewProduct('X',False,1)
+# math_r4 = r4.createMath('k4f * E_X_P')
+# r4.createRate(math_r4)
 
-r5 = NewReaction(simpleModel.createNewReaction('r5',True,False))
-r5.createNewReactant('inP',False,1)
-r5.createNewReactant('X_P',False,1)
-r5.createNewProduct('inP_X_P',False,1)
-math_r5 = r5.createMath('k5f * inP * X_P - k5r * inP_X_P')
-r5.createRate(math_r5)
+simpleModel.createNewReaction('r5','inP + X:P <-> inP:X:P', 'k5f * inP * X_P - k5r * inP_X_P')
+# r5 = NewReaction(simpleModel.createNewReaction('r5',True,False))
+# r5.createNewReactant('inP',False,1)
+# r5.createNewReactant('X_P',False,1)
+# r5.createNewProduct('inP_X_P',False,1)
+# math_r5 = r5.createMath('k5f * inP * X_P - k5r * inP_X_P')
+# r5.createRate(math_r5)
 
-r6 = NewReaction(simpleModel.createNewReaction('r6',False,False))
-r6.createNewReactant('inP_X_P',False,1)
-r6.createNewProduct('X_P_P',False,1)
-r6.createNewProduct('inP',False,1)
-math_r6 = r6.createMath('k6f * inP_X_P')
-r6.createRate(math_r6)
+simpleModel.createNewReaction('r6','inP:X:P --> X:P:P + inP', 'k6f * inP_X_P')
+# r6 = NewReaction(simpleModel.createNewReaction('r6',False,False))
+# r6.createNewReactant('inP_X_P',False,1)
+# r6.createNewProduct('X_P_P',False,1)
+# r6.createNewProduct('inP',False,1)
+# math_r6 = r6.createMath('k6f * inP_X_P')
+# r6.createRate(math_r6)
 
-r7 = NewReaction(simpleModel.createNewReaction('r7',True,False))
-r7.createNewReactant('E',False,1)
-r7.createNewReactant('X_P_P',False,1)
-r7.createNewProduct('E_X_P_P',False,1)
-math_r7 = r7.createMath('k7f * E * X_P_P - k7r * E_X_P_P')
-r7.createRate(math_r7)
+simpleModel.createNewReaction('r7','E + X:P:P <-> E:X:P:P', 'k7f * E * X_P_P - k7r * E_X_P_P')
+# r7 = NewReaction(simpleModel.createNewReaction('r7',True,False))
+# r7.createNewReactant('E',False,1)
+# r7.createNewReactant('X_P_P',False,1)
+# r7.createNewProduct('E_X_P_P',False,1)
+# math_r7 = r7.createMath('k7f * E * X_P_P - k7r * E_X_P_P')
+# r7.createRate(math_r7)
 
-r8 = NewReaction(simpleModel.createNewReaction('r8',False,False))
-r8.createNewReactant('E_X_P_P',False,1)
-r8.createNewProduct('X_P',False,1)
-r8.createNewProduct('E',False,1)
-math_r8 = r8.createMath('k8f * E_X_P_P')
-r8.createRate(math_r8)
+simpleModel.createNewReaction('r8','E:X:P:P --> X:P + E', 'k8f * E_X_P_P')
+# r8 = NewReaction(simpleModel.createNewReaction('r8',False,False))
+# r8.createNewReactant('E_X_P_P',False,1)
+# r8.createNewProduct('X_P',False,1)
+# r8.createNewProduct('E',False,1)
+# math_r8 = r8.createMath('k8f * E_X_P_P')
+# r8.createRate(math_r8)
 
 
 # Write to XML file 

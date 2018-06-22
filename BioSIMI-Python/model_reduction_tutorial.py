@@ -40,7 +40,7 @@ writeSBML(DP1reduced.getSubsystemDoc(),'models/reducedDP.xml')
 timepoints = np.linspace(0,1000,1000)
 print('###### Simulating reduced model... The fast reaction parameters will be marked useless')
 time.sleep(2)
-plotSbmlWithBioscrape('models/reducedDP.xml',0,timepoints,['inp','out'])
+plotSbmlWithBioscrape('models/reducedDP.xml',0,timepoints,['inP','X:P:P'])
 
 
 

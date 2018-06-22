@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sbml xmlns="http://www.sbml.org/sbml/level3/version1/core" level="3" version="1">
-  <model id="combined_Subsystems__mw8a4ca32c_dea1_493b_acec_2cc45ea812c5_A0_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1" substanceUnits="substance" timeUnits="second" volumeUnits="volume" areaUnits="area" lengthUnits="metre" extentUnits="substance">
+  <model id="combined_Subsystems__mw8a4ca32c_dea1_493b_acec_2cc45ea812c5_A0_mw66ac99a0_0b6e_4b34_9d1d_e2300e577675_B1" substanceUnits="substance" timeUnits="second" volumeUnits="volume" areaUnits="area" lengthUnits="metre" extentUnits="substance">
     <listOfUnitDefinitions>
       <unitDefinition id="volume">
         <listOfUnits>
@@ -19,14 +19,14 @@
       </unitDefinition>
     </listOfUnitDefinitions>
     <listOfCompartments>
-      <compartment id="cell" name="cell" spatialDimensions="3" size="1" units="volume" constant="true"/>
+      <compartment id="cell" name="cell" spatialDimensions="3" size="2" units="volume" constant="true"/>
     </listOfCompartments>
     <listOfSpecies>
       <species id="mwece12cb0_788c_4d80_aacb_158afc63be78_A0" name="protein deGFP" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw4c49a944_cb18_4848_9df8_d269a16a522f_A0" name="protein deGFP*" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw13299012_9d61_4da1_9237_576f460c5bc3_A0" name="RNA utr1--deGFP" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwa63b6bc2_3062_4276_906a_bec4375fd6f1_A0" name="Ribo:RNA utr1--deGFP" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="mw3720c25e_5f8d_4e8a_aa0c_2107880eedbe_A0" name="DNA p28_ptet--utr1--deGFP" compartment="cell" initialAmount="2.00000133333422" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="mw3720c25e_5f8d_4e8a_aa0c_2107880eedbe_A0" name="DNA p28_ptet--utr1--deGFP" compartment="cell" initialAmount="0.500000333333555" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw5576dd43_d1a5_4349_963e_08d3372d976a_A0" name="RNAP28" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw9e0e02a5_500c_4c07_ae7f_25e3954419dd_A0" name="RNAP28:DNA p28_ptet--utr1--deGFP" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw877dd876_63c5_4801_b778_351a377ac9de_A0" name="protein sigma28" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -48,19 +48,19 @@
       <species id="mwdc093847_c1af_4016_aad3_e2c57c50d317_A0" name="AA:2AGTP:Ribo:RNA utr1--deGFP:RNase" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw364eef4c_8431_467d_bd97_6172b02b980b_A0" name="term_Ribo:RNA utr1--deGFP:RNase" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwb7433d67_6138_489c_b6ac_9fc9b22bbfcf_A0" name="AA:Ribo:RNA utr1--deGFP:RNase" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="RNAP_combined" name="RNAP" compartment="cell" initialAmount="100.000066666711" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="Ribo_combined" name="Ribo" compartment="cell" initialAmount="30.0000200000133" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="RecBCD_combined" name="RecBCD" compartment="cell" initialAmount="5.00000333333556" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="RNase_combined" name="RNase" compartment="cell" initialAmount="100.000066666711" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="AGTP_combined" name="AGTP" compartment="cell" initialAmount="3180048.20076943" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="CUTP_combined" name="CUTP" compartment="cell" initialAmount="1908028.92046166" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="AA_combined" name="AA" compartment="cell" initialAmount="31800482.0076943" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="RNAP_combined" name="RNAP" compartment="cell" initialAmount="50.0000333333555" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="Ribo_combined" name="Ribo" compartment="cell" initialAmount="15.0000100000067" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="RecBCD_combined" name="RecBCD" compartment="cell" initialAmount="2.50000166666778" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="RNase_combined" name="RNase" compartment="cell" initialAmount="50.0000333333555" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="AGTP_combined" name="AGTP" compartment="cell" initialAmount="1590024.10038472" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="CUTP_combined" name="CUTP" compartment="cell" initialAmount="954014.46023083" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="AA_combined" name="AA" compartment="cell" initialAmount="15900241.0038472" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwb072cf50_050b_4bec_97e3_cacc9c6c80b7_B1" name="protein tetR" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwc00f5b5a_e21d_42e7_a0ca_6a931ffb4ec0_B1" name="aTc" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="protein_tetRdimer_combined" name="protein tetRdimer" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwcab9d721_d5fe_46ba_8abd_db6023744051_B1" name="RNA utr1--tetR" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwe49f90af_dd8c_43dd_948f_ad0a5a401277_B1" name="Ribo:RNA utr1--tetR" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="mwfb07f4d9_670f_4329_bed5_e109f421698e_B1" name="DNA psigX--utr1--tetR" compartment="cell" initialAmount="0.500000333333556" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="mwfb07f4d9_670f_4329_bed5_e109f421698e_B1" name="DNA psigX--utr1--tetR" compartment="cell" initialAmount="0.125000083333389" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwdc1e07fe_9c7d_43d2_9ae9_2e9bb4e826f3_B1" name="RNAPSIGX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw3b47668e_6c7d_4a08_9772_b34bca7fb884_B1" name="RNAPSIGX:DNA psigX--utr1--tetR" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwe8451d4a_d4c8_405c_8ad4_6540824528ee_B1" name="AA:2AGTP:Ribo:RNA utr1--tetR" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -68,7 +68,7 @@
       <species id="mw877e5da9_7092_45a9_a813_ef218b4c657d_B1" name="protein sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw36edb9f5_273a_49e0_934c_53af44826f29_B1" name="RNA utr1--sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw3f61c48c_778f_42d0_bc92_da35a18105d3_B1" name="Ribo:RNA utr1--sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="mw29bca20f_bb74_4aea_a37a_0df7c5808987_B1" name="DNA plac--utr1--sigmaX" compartment="cell" initialAmount="5.00000333333556" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="mw29bca20f_bb74_4aea_a37a_0df7c5808987_B1" name="DNA plac--utr1--sigmaX" compartment="cell" initialAmount="1.25000083333389" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw2ee2aa24_784a_4146_b966_da635c45f303_B1" name="RNAP:DNA plac--utr1--sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mwc92d9367_0957_4147_8d27_b4d8aaf06cb6_B1" name="CUTP:AGTP:RNAP:DNA plac--utr1--sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="mw6ff72b56_f396_433c_8b68_d4b90158ef92_B1" name="term_RNAP:DNA plac--utr1--sigmaX" compartment="cell" initialAmount="0" substanceUnits="substance" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
@@ -1067,6 +1067,23 @@
           <listOfLocalParameters>
             <localParameter id="mw01b30421_d7a1_469e_953f_416266dcc005" name="TXTL_RNAdeg_F" value="0.00277777777777778"/>
           </listOfLocalParameters>
+        </kineticLaw>
+      </reaction>
+      <reaction id="mwe1df7722_9564_4ae2_8545_f55e73861e3f_A0" reversible="false" fast="false">
+        <listOfReactants>
+          <speciesReference species="AGTP_combined" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+          <speciesReference species="AGTP_USED_combined" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+              <times/>
+              <ci> mw1b3c7b9e_a9ce_4463_ac55_43201909284a_A0 </ci>
+              <ci> AGTP_combined </ci>
+            </apply>
+          </math>
         </kineticLaw>
       </reaction>
       <reaction id="mw45715d9a_add7_43bd_873b_23a5b728a3ea_B1" reversible="true" fast="false">
@@ -2442,23 +2459,6 @@
           <listOfLocalParameters>
             <localParameter id="mw917d10eb_9640_4113_ba1d_29a778fd0571" name="TXTL_RNAdeg_F" value="0.00277777777777778"/>
           </listOfLocalParameters>
-        </kineticLaw>
-      </reaction>
-      <reaction id="mwe1df7722_9564_4ae2_8545_f55e73861e3f_A0" reversible="false" fast="false">
-        <listOfReactants>
-          <speciesReference species="AGTP_combined" stoichiometry="1" constant="true"/>
-        </listOfReactants>
-        <listOfProducts>
-          <speciesReference species="AGTP_USED_combined" stoichiometry="1" constant="true"/>
-        </listOfProducts>
-        <kineticLaw>
-          <math xmlns="http://www.w3.org/1998/Math/MathML">
-            <apply>
-              <times/>
-              <ci> mw1b3c7b9e_a9ce_4463_ac55_43201909284a_A0 </ci>
-              <ci> AGTP_combined </ci>
-            </apply>
-          </math>
         </kineticLaw>
       </reaction>
     </listOfReactions>
