@@ -5,6 +5,7 @@
 # See LICENSE file in the project root directory for details.
 
 import re                      # use Python's regular expression library
+from .sbmlutil import add_species, add_reaction
 
 # The main DNA class, used to represent a DNA fragment
 class DNA:
@@ -316,45 +317,6 @@ def load_model(prefix, spec):
         raise ValueError("couldn't find model %s_%s" % (prefix, name))
 
     return model
-
-# Helper function to add a species to the model
-#! TODO: move to a different location
-def add_species(model, type, name):
-    species = model.createSpecies()
-    prefix = type + " " if type != None else ""
-    species.setName(prefix + name)
-
-    # Construct the species ID
-    species_id = re.sub(" ", "_", prefix + name)
-    species_id = re.sub("--", "_", species_id)
-    species.setId(species_id)
-
-    return species
-
-# Helper function to add a reaction to a model
-#! TODO: move to a different location
-def add_reaction(model, reactants, products, kf, kr):
-    reaction = model.createReaction()
-
-    # Create the reactants
-    for species in reactants:
-        reactant = reaction.createReactant()
-        reactant.setSpecies(species.getId())
-
-    # Create the products
-    for species in products:
-        product = reaction.createProduct()
-        product.setSpecies(species.getId())
-
-    # Create the rate constants for forward and reverse reactions
-    param = model.createParameter()
-    param.setValue(kf)
-    if (kr != None):
-        reaction.setReversible(True)
-        param = model.createParameter()
-        param.setValue(kr)
-
-    return reaction
 
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
 def parse_DNA_string(spec):
