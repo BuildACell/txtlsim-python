@@ -6,6 +6,7 @@
 
 import re                      # use Python's regular expression library
 from .sbmlutil import add_species, add_reaction
+from .mechanisms import Mechanism
 
 # The main DNA class, used to represent a DNA fragment
 class DNA:
@@ -45,6 +46,7 @@ class DNAassembly:
     cds         Coding sequence (DNA) 
     ctag        C-terminus tag (DNA)
     utr3        3' UTR (DNA)
+    mechanisms  list of mechanisms for generating models
 
     Methods
     -------
@@ -61,52 +63,19 @@ class DNAassembly:
         self.cds = cds
         self.ctag = ctag
         self.utr3 = utr3
+        self.mechanisms = [dna2rna_basic, rna2prot_basic]
 
     # Create/update all of the species associated with this DNA assembly
     def update_species(self, model):
-        # Create the DNA species
-        self.dna = add_species(model, "DNA", self.name)
-
-        # Create the mRNA species
-        rnaname = self.utr5.name + "--" + self.cds.name;
-        if (self.ctag != None): rnaname += "--" + self.ctag.name
-        self.rna = add_species(model, "RNA", rnaname)
-
-        # Add promoter-specific species
-        self.promoter.update_species(model, self.dna, self.rna)
-
-        # Create the protein species
-        protname = self.cds.name;
-        if (self.ctag != None): protname += "--" + self.ctag.name
-        self.protein = add_species(model, "protein", self.cds.name)
-                
-        # Process any protein-specific additions
-        try:
-            self.cds.update_species(model)
-        except:
-            None
+        # Process mechanism-specific species updates
+        for mechanism in self.mechanisms:
+            mechanism.update_species(self, model)
                 
     def update_reactions(self, model):
-        if isinstance(self.promoter, DNA):
-            # Create reactions that initiate transcription
-            self.promoter.update_reactions(model, self.dna, self.rna)
+        # Process mechanism-specific reactions
+        for mechanism in self.mechanisms:
+            mechanism.update_reactions(self, model)
             
-        if isinstance(self.utr5, DNA):
-            # Create reactions that control translation
-            self.utr5.update_reactions(model, self.rna, self.protein)
-            
-        if isinstance(self.cds, DNA):
-            # Create reactions that convert RNA into proteins
-            self.cds.update_reactions(model, self.rna, self.protein)
-
-        if isinstance(self.ctag, DNA):
-            # Create reactions that degrade proteins
-            self.ctag.update_reactions(model, self.protein)
-            
-        if isinstance(self.utr3, DNA):
-            # Create reactions that terminate transcription
-            self.utr3.update_reactions(model, self.rna)
-
 #
 # Promoter subclasses
 #
@@ -338,3 +307,63 @@ def parse_DNA_string(spec):
 
     # Return name and length as a tuple
     return name, length
+
+#
+# Default core mechanisms for transcription and translation
+#
+
+# Convert DNA to RNA
+class dna2rna_basic(Mechanism):
+    def __init__(self):
+        return None
+
+    def update_species(self, model):
+        # Create the DNA species
+        self.dna = add_species(model, "DNA", self.name)
+
+        # Create the mRNA species
+        rnaname = self.utr5.name + "--" + self.cds.name;
+        if (self.ctag != None): rnaname += "--" + self.ctag.name
+        self.rna = add_species(model, "RNA", rnaname)
+
+        # Add promoter-specific species
+        self.promoter.update_species(model, self.dna, self.rna)
+
+    def update_reactions(self, model):
+        if isinstance(self.cds, DNA):
+            # Create reactions that convert RNA into proteins
+            self.cds.update_reactions(model, self.rna, self.protein)
+
+        if isinstance(self.ctag, DNA):
+            # Create reactions that degrade proteins
+            self.ctag.update_reactions(model, self.protein)
+        
+class rna2prot_basic(Mechanism):
+    def __init__(self):
+        return None
+
+    def update_species(self, model):
+        # Create the protein species
+        protname = self.cds.name;
+        if (self.ctag != None): protname += "--" + self.ctag.name
+        self.protein = add_species(model, "protein", self.cds.name)
+                
+        # Process any protein-specific additions
+        try:
+            self.cds.update_species(model)
+        except:
+            None
+
+    def update_reactions(self, model):
+        if isinstance(self.promoter, DNA):
+            # Create reactions that initiate transcription
+            self.promoter.update_reactions(model, self.dna, self.rna)
+            
+        if isinstance(self.utr5, DNA):
+            # Create reactions that control translation
+            self.utr5.update_reactions(model, self.rna, self.protein)
+            
+        if isinstance(self.utr3, DNA):
+            # Create reactions that terminate transcription
+            self.utr3.update_reactions(model, self.rna)
+        
