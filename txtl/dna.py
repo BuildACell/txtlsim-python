@@ -7,6 +7,7 @@
 import re                      # use Python's regular expression library
 from .sbmlutil import add_species, add_reaction
 from .mechanisms import Mechanism
+from .pathutil import load_model
 
 # The main DNA class, used to represent a DNA fragment
 class DNA:
@@ -221,7 +222,10 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
     sequence = DNAassembly("")
 
     # Parse and store the promoter sequence
-    if isinstance(prom, str): prom = load_model("Prom", prom) 
+    if isinstance(prom, str):
+        name, length = parse_DNA_string(prom)   # Get component name
+        prom = load_model("Prom", name, length) # Load from library
+        
     if isinstance(prom, Promoter):
         sequence.promoter = prom
         sequence.length += prom.length
@@ -230,7 +234,10 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
         ValueError("invalid promoter specification")
 
     # Parse and store the 5' UTR
-    if isinstance(utr5, str): utr5 = load_model("UTR5", utr5) 
+    if isinstance(utr5, str):
+        name, length = parse_DNA_string(utr5)   # Get component name
+        utr5 = load_model("UTR5", name, length) # Load from library
+
     if isinstance(utr5, UTR5):
         sequence.utr5 = utr5
         sequence.length += utr5.length
@@ -239,7 +246,10 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
         ValueError("invalid UTR5 specification")
 
     # Parse and store the protein coding sequence
-    if isinstance(cds, str): cds = load_model("Prot", cds) 
+    if isinstance(cds, str):
+        name, length = parse_DNA_string(cds)    # Get component name
+        cds = load_model("Prot", name, length)  # Load from library
+
     if isinstance(cds, CDS):
         sequence.cds = cds
         sequence.length += cds.length
@@ -248,7 +258,10 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
         ValueError("invalid CDS specification")
 
     # Parse and store the C-terminus tag
-    if isinstance(ctag, str): ctag = load_model("Ctag", ctag) 
+    if isinstance(ctag, str):
+        name, length = parse_DNA_string(ctag)   # Get component name
+        ctag = load_model("Ctag", name, length) # Load from library
+
     if isinstance(ctag, Ctag):
         sequence.ctag = ctag
         sequence.length += ctag.length
@@ -257,7 +270,10 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
         ValueError("invalid Ctag specification")
 
     # Parse and store the 3' UTR
-    if isinstance(utr3, str): utr3 = load_model("UTR3", utr3) 
+    if isinstance(utr3, str):
+        name, length = parse_DNA_string(utr3)   # Get component name
+        utr3 = load_model("UTR3", utr3, length) # Load from library
+        
     if isinstance(utr3, UTR3):
         sequence.utr3 = utr3
         sequence.length += utr3.length
@@ -268,24 +284,6 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
     # Set the name of the DNA assembly
 
     return sequence
-
-# Load a model from a file
-#! TODO: move this to a better location
-def load_model(prefix, spec):
-    # Parse the string into a name and length
-    name, length = parse_DNA_string(spec)
-
-    # Look to see if we have a model for this promoter
-    try:
-        from importlib import import_module
-        module = import_module("txtl.models.%s_%s" %
-                               (prefix.lower(), name.lower()))
-        model = eval("module.%s_%s('%s', %d)" %
-                     (prefix, name.lower(), name, length))
-    except:
-        raise ValueError("couldn't find model %s_%s" % (prefix, name))
-
-    return model
 
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
 def parse_DNA_string(spec):
