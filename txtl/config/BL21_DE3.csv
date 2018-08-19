@@ -1,0 +1,40 @@
+NTPmodel,Numeric,2, NTP model in use, see documentation
+AAmodel,Numeric,2, AA model in use, see documentation
+Transcription_Rate, Expression, 1, 1 NTP/second VN PRL
+Translation_Rate, Expression, 4, >4 AA/second VN PRL
+,,,,
+DNA_RecBCD_Forward, Numeric, 0.4, TODO
+DNA_RecBCD_Reverse, Numeric, 0.1, TODO
+DNA_RecBCD_complex_deg, Numeric, 0.5, TODO
+,,,,
+Protein_ClpXP_Forward, Numeric, 0.5 , TODO
+Protein_ClpXP_Reverse, Numeric, 0.0001 , TODO
+Protein_ClpXP_complex_deg, Numeric, 0.1, TODO
+,,,,
+RNAP_S70_F, Numeric, 100, really fast
+RNAP_S70_R, Numeric, 0.01,
+,,,,
+GamS_RecBCD_F, Numeric, 0.001, ! TODO
+GamS_RecBCD_R, Numeric,0.09, !TODO: document,
+,,,,
+TL_AA_Forward,Expression,300,  !TODO: document,TL_AA_Reverse,Expression,.10, !TODO: document,
+TL_AGTP_Forward,Expression,30,  !TODO: document,TL_AGTP_Reverse,Expression,10, !TODO: document,,,,,
+RNA_deg,Expression,1/360, s^-1 12 min half life (VN PRL) 
+RNase_F,Expression,10, nM^-1 s^-1 see derivation on wiki,
+RNase_R,Expression,2000, s^-1 see derivation on wiki,
+,,,,
+Ribosome_Binding_F, Expression, 22,  TODO
+Ribosome_Binding_R, Expression, 400000,  TODO
+,,,,NTP_Forward_1,Expression,1, !TODO: document,NTP_Reverse_1,Expression,1.20E+05, !TODO: document ,
+NTP_Forward_2,Expression,1000, !TODO: document,NTP_Reverse_2,Expression,1.20E+8, !TODO: document,
+,,,,
+RNAPbound_termination_rate, Numeric, 0.05, TODO
+Ribobound_termination_rate, Numeric,50, !TODO: document,
+,,,,RecBCD_ic, Numeric,5, !TODO: carry out MCMC and check lit,
+RNAP_ic, Numeric,100, !TODO: carry out MCMC and check lit,
+Ribo_ic, Numeric,30, !TODO: carry out MCMC and check lit,
+RNase_ic, Numeric,100, !TODO: carry out MCMC and check lit,
+,,,,
+ATP_degradation_rate, Numeric,0.0002, !TODO: document,
+ATP_degradation_start_time, Numeric,5400, in seconds !TODO: document,
+,,,,AGTP_Concentration, Expression,3000000, ATP and GTP are at 1.5mM each (JoVE),CUTP_Concentration, Expression,1800000, CTP and UTP are at 0.9mM each (JovE),AA_Concentration, Expression,30000000, 20 tyes of AAs, $20% usability$  30mM JoVE

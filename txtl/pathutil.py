@@ -9,7 +9,7 @@
 
 # Load a model from a file
 def load_model(prefix, name, length):
-    # Look to see if we have a model for this promoter
+    # Look to see if we have a model for this component
     #! Expand this to look in other locations
     try:
         from importlib import import_module

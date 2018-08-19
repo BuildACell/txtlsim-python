@@ -164,6 +164,7 @@ class ConstitutiveRBS(UTR5):
     def __init__(self, name, length=20,
                  Ribosome_Binding_F=0.2, Ribosome_Binding_R=4):
         UTR5.__init__(self, name, length)
+        #! TODO: decide if these should be set here; I don't think so...
         self.Ribosome_Binding_F = Ribosome_Binding_F
         self.Ribosome_Binding_R = Ribosome_Binding_R
 
@@ -328,13 +329,9 @@ class dna2rna_basic(Mechanism):
         self.promoter.update_species(model, self.dna, self.rna)
 
     def update_reactions(self, model):
-        if isinstance(self.cds, DNA):
-            # Create reactions that convert RNA into proteins
-            self.cds.update_reactions(model, self.rna, self.protein)
-
-        if isinstance(self.ctag, DNA):
-            # Create reactions that degrade proteins
-            self.ctag.update_reactions(model, self.protein)
+        if isinstance(self.promoter, DNA):
+            # Create reactions that initiate transcription
+            self.promoter.update_reactions(model, self.dna, self.rna)
         
 class rna2prot_basic(Mechanism):
     def __init__(self):
@@ -353,14 +350,18 @@ class rna2prot_basic(Mechanism):
             None
 
     def update_reactions(self, model):
-        if isinstance(self.promoter, DNA):
-            # Create reactions that initiate transcription
-            self.promoter.update_reactions(model, self.dna, self.rna)
-            
         if isinstance(self.utr5, DNA):
             # Create reactions that control translation
             self.utr5.update_reactions(model, self.rna, self.protein)
             
+        if isinstance(self.cds, DNA):
+            # Create reactions that convert RNA into proteins
+            self.cds.update_reactions(model, self.rna, self.protein)
+
+        if isinstance(self.ctag, DNA):
+            # Create reactions that degrade proteins
+            self.ctag.update_reactions(model, self.protein)
+
         if isinstance(self.utr3, DNA):
             # Create reactions that terminate transcription
             self.utr3.update_reactions(model, self.rna)

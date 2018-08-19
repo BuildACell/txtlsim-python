@@ -8,6 +8,6 @@
 
 from ..dna import ProteinCDS
 
+#! TODO: decide if this should be CDS_tetr
 class Prot_tetr(ProteinCDS):
-    def update_species(self, model):
-        print("updating species for ", self.name)
+    "DNA for TetR protein"
