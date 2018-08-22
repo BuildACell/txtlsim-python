@@ -3,32 +3,20 @@
 #
 # Copyright (c) 2018, Build-A-Cell. All rights reserved.
 # See LICENSE file in the project root directory for details.
+#
+# This file contains the implementation of DNA in the txtlsim toolbox.
+# This includes objects that represent the individual elements of a
+# DNA assembly as well as the functions required to create the models
+# associated with gene expression.
 
 import re                      # use Python's regular expression library
+from .component import Component
 from .sbmlutil import add_species, add_reaction
-from .mechanisms import Mechanism
+from .mechanism import Mechanism
 from .pathutil import load_model
 
-# The main DNA class, used to represent a DNA fragment
-class DNA:
-    """DNA class
-
-    The DNA class is used to represent a DNA sequence that has a given
-    length.  Its main purpose is as the parent object for DNA
-    fragments and DNA assemblies.
-
-    Data attributes
-    ---------------
-    name        Name of the sequence (str)
-    length      Length of the sequence (int)
-
-    """
-    def __init__(self, name, length=0):
-        self.name = name
-        self.length = length
-
 # DNA assembly
-class DNAassembly:
+class DNAassembly(Component):
     """DNA assembly class
 
     The DNA assembly class is used to represent a DNA assembly,
@@ -56,7 +44,7 @@ class DNAassembly:
 
     """
     def __init__(self, name, length=0, promoter=None, utr5=None,
-                 cds=None, ctag=None, utr3=None):
+                 cds=None, ctag=None, utr3=None, mechanisms={}):
         self.name = name
         self.length = length
         self.promoter = promoter
@@ -64,19 +52,53 @@ class DNAassembly:
         self.cds = cds
         self.ctag = ctag
         self.utr3 = utr3
-        self.mechanisms = [dna2rna_basic, rna2prot_basic]
+        self.mechanisms = mechanisms
 
     # Create/update all of the species associated with this DNA assembly
     def update_species(self, model):
-        # Process mechanism-specific species updates
-        for mechanism in self.mechanisms:
-            mechanism.update_species(self, model)
-                
-    def update_reactions(self, model):
-        # Process mechanism-specific reactions
-        for mechanism in self.mechanisms:
-            mechanism.update_reactions(self, model)
+        # Create the DNA species
+        self.dna = add_species(model, "DNA", self.name)
+
+        # Let the individual DNA elements create the relevant species
+        for dna in [self.promoter, self.utr5, self.cds,
+                       self.ctag, self.utr3]:
+            if dna != None: dna.update_species(self, model)
+
+    # Create/update all of the relevant reactions for this DNA assembly
+    def update_reactions(self, model, default_mechanisms={}, debug=False):
+        for dna in [self.promoter, self.utr5, self.cds,
+                       self.ctag, self.utr3]:
+            if dna != None:
+                # Sort out which mechanisms to use
+                mechanisms = default_mechanisms
+                mechanisms.update(self.mechanisms)
+                mechanisms.update(dna.mechanisms)
+                dna.update_reactions(self, model, mechanisms)
             
+# The main DNA class, used to represent a DNA fragment
+class DNA(Component):
+    """DNA class
+
+    The DNA class is used to represent a DNA sequence that has a given
+    length.  Its main purpose is as the parent object for DNA
+    fragments and DNA assemblies.
+
+    Data attributes
+    ---------------
+    name        Name of the sequence (str)
+    length      Length of the sequence (int)
+    mechanisms  Local mechanisms for this component (overrides defaults)
+
+    """
+    def __init__(self, name, length=0, mechanisms={}):
+        self.name = name
+        self.length = length
+        self.mechanisms = mechanisms
+
+    # Set up default update functions to do nothing
+    def update_species(self, assy, model): return None
+    def update_reactions(self, assy, model, mechanisms): return None
+
 #
 # Promoter subclasses
 #
@@ -89,64 +111,77 @@ class DNAassembly:
 
 class Promoter(DNA):
     "Promoter class - define a promoter sequence"
-    def update_reactions(self, model, rna, dna): return None
+    def __init__(self, name, length=50, config_file=None, rnapname="RNAP", 
+                 RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
+                 mechanisms={}):
+        # Promoter initialization
+        DNA.__init__(self, name, length, mechanisms)
 
-# Constitute promoter
-class ConstitutivePromoter(Promoter):
-    #! TODO: add docstring
-    def __init__(self, name, length=50, rnapname="RNAP70",
-                 RNAPbound_F=20, RNAPbound_R=400):
-        self.name = name
-        self.length = length
+        #! TODO: read parameter values parameter file
+
+        # Set (or reset) values based on function arguments
         self.rnapname = rnapname
         self.RNAPbound_F = RNAPbound_F
         self.RNAPbound_R = RNAPbound_R
 
-    def update_species(self, model, dna, rna):
+    def update_species(self, assy, model):
+        # Create the mRNA species
+        rnaname = assy.utr5.name + "--" + assy.cds.name;
+        if (assy.ctag != None): rnaname += "--" + assy.ctag.name
+        assy.rna = add_species(model, "RNA", rnaname)
+
         # Create the RNA polymerase
-        self.rnap = add_species(model, None, self.rnapname)
+        assy.rnap = add_species(model, None, self.rnapname)
 
         # Create RNA polymerase bound to DNA
-        self.rnap_bound = add_species(model, None,
-                                      self.rnapname + ":" + dna.name)
+        assy.rnap_bound = add_species(model, "Complex",
+                                      self.rnapname + ":" + assy.name)
+        
+    # Default action of a promoter is to implement transcription
+    def update_reactions(self, assy, model, mechanisms, debug=False):
+        if debug: print("creating transcription reactions for", assy.name)
+        mechanisms['transcription'](model, assy)
 
-    def update_reactions(self, model, dna, rna):
-        add_reactions(model, [self.rnap, dna], rna, 
-                      kf=RNAPbound_F, kr=RNAbound_R)
+# Constitute promoter
+class ConstitutivePromoter(Promoter):
+    "ConstitutivePromoter - define a constitutive promoter"
 
 # Repressed promoter
 class RepressedPromoter(Promoter):
     #! TODO: add docstring
-    def __init__(self, name, repressor, length=50, rnapname="RNAP70",
-                 dimer=False, RNAPbound_F=20, RNAPbound_R=400,
-                 DNAsequestration_F=25e-1, DNAsequestration_R=1.11e-4):
-        self.name = name
-        self.length = length
-        self.RNAPbound_F = RNAPbound_F
-        self.RNAPbound_R = RNAPbound_R
+    def __init__(self, name, repressor, length=50, rnapname="RNAP",
+                 dimer=False, 
+                 RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
+                 DNAsequestration_F=25e-1, DNAsequestration_R=1.11e-4,
+                 mechanisms={}):
+        # Promoter initialization
+        Promoter.__init__(self, name, length, 
+                          RNAPbound_F=RNAPbound_F, RNAPbound_R=RNAPbound_R,
+                          mechanisms=mechanisms)
         self.DNAsequestration_F = DNAsequestration_F
         self.DNAsequestration_R = DNAsequestration_R
         self.tfname = repressor
         self.rnapname=rnapname
         self.dimer = dimer
 
-    def update_species(self, model, dna, rna):
+    def update_species(self, assy, model):
         # Create species for unrepressed promoter
-        ConstitutivePromoter.update_species(self, model, dna, rna)
+        Promoter.update_species(self, assy, model)
 
         # Create species for the transcription factor
         self.tf_species = add_species(model, "Protein", self.tfname)
         
         # Create repressor bound to DNA
         self.tf_bound = add_species(model, "Complex",
-                                    self.tf_species.name + ":" + dna.name)
+                                    self.tf_species.name + ":" + assy.name)
 
-    def update_reactions(self, model, dna, rna):
-        # Create reactios for unrepressed promoter
-        Promoter.update_reactions(self, model, dna, rna)
+    def update_reactions(self, assy, model, mechanisms, debug=False):
+        # Create the reactions for the unbound promoter
+        Promoter.update_reactions(self, assy, model, mechanisms)
+        if debug: print("-- RepressedPromoter done with Promoter reactions")
 
-        # Create sequestration reaction
-        add_reaction(model, [self.tf_species, dna], [self.tf_bound],
+        # Create the reaction for the transcription factor binding to DNA
+        add_reaction(model, [self.tf_species, assy.dna], [self.tf_bound],
                       kf=self.DNAsequestration_F, kr=self.DNAsequestration_R)
 
 #
@@ -156,7 +191,6 @@ class RepressedPromoter(Promoter):
 
 class UTR5(DNA):
     "UTR5 class - define 5' untranslated region sequence"
-    def update_reactions(self, model, rna, protein): return None
 
 # Constitutive RBS
 class ConstitutiveRBS(UTR5):
@@ -172,10 +206,14 @@ class ConstitutiveRBS(UTR5):
 # CDS subclasses
 #
 # The CDS subclasses are used to create proteins and peptides
+#
+#! Sort out whether we need anything more than CDS
 
 class CDS(DNA):
     "CDS class - define protein coding sequence"
-    def update_reactions(self, model, rna, protein): return None
+    def update_species(self, assy, model):
+        # Create species for the protein
+        add_species(model, "Protein", self.name)
 
 # Protein coding sequence
 class ProteinCDS(CDS):
@@ -189,8 +227,8 @@ class ProteinCDS(CDS):
 # The Ctag subclasses are used to C-terminus tags
 
 class Ctag(DNA):
+    #! TODO: add docstring
     "Ctag class - define C-terminus protein tag"
-    def update_reactions(self, model, protein): return None
 
 # Degradation tag
 class DegradationTag(Ctag):
@@ -205,7 +243,6 @@ class DegradationTag(Ctag):
 
 class UTR3(DNA):
     "UTR3 class - define 3' untranslated region sequence"
-    def update_reactions(self, model, rna): return None
 
 # Terminator
 class Terminator(UTR3):
@@ -217,7 +254,7 @@ class Terminator(UTR3):
 # Functions for creatng and manipulating DNA
 #
 
-# Assemble fragmeents of DNA into a gene
+# Assemble fragments of DNA into a gene
 def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
     # Create a new sequence of DNA
     sequence = DNAassembly("")
@@ -282,8 +319,6 @@ def assemble_dna(prom, utr5, cds, ctag=None, utr3=None):
     else:
         ValueError("invalid UTR3 specification")
 
-    # Set the name of the DNA assembly
-
     return sequence
 
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
@@ -310,59 +345,22 @@ def parse_DNA_string(spec):
 #
 # Default core mechanisms for transcription and translation
 #
+# These functions define the core mechanisms used to implement
+# transcription and translation of a DNA assembly.
+#
+
+#! TODO: move core mechanisms to mechanisms/ directory
 
 # Convert DNA to RNA
-class dna2rna_basic(Mechanism):
-    def __init__(self):
-        return None
+def dna2rna_basic(model, assy, debug=False):
+    # Create reaction that binds RNAP to DNA
+    add_reaction(model, [assy.rnap, assy.dna], [assy.rnap_bound], 
+                 kf=assy.promoter.RNAPbound_F,
+                 kr=assy.promoter.RNAPbound_R)
 
-    def update_species(self, model):
-        # Create the DNA species
-        self.dna = add_species(model, "DNA", self.name)
-
-        # Create the mRNA species
-        rnaname = self.utr5.name + "--" + self.cds.name;
-        if (self.ctag != None): rnaname += "--" + self.ctag.name
-        self.rna = add_species(model, "RNA", rnaname)
-
-        # Add promoter-specific species
-        self.promoter.update_species(model, self.dna, self.rna)
-
-    def update_reactions(self, model):
-        if isinstance(self.promoter, DNA):
-            # Create reactions that initiate transcription
-            self.promoter.update_reactions(model, self.dna, self.rna)
+    # Create reaction that produces mRNA
+    if debug: print("dna2rna_basic: produce mRNA")
+    add_reaction(model, [assy.rnap_bound], [assy.rnap, assy.rna], kf=1)
         
-class rna2prot_basic(Mechanism):
-    def __init__(self):
-        return None
-
-    def update_species(self, model):
-        # Create the protein species
-        protname = self.cds.name;
-        if (self.ctag != None): protname += "--" + self.ctag.name
-        self.protein = add_species(model, "protein", self.cds.name)
-                
-        # Process any protein-specific additions
-        try:
-            self.cds.update_species(model)
-        except:
-            None
-
-    def update_reactions(self, model):
-        if isinstance(self.utr5, DNA):
-            # Create reactions that control translation
-            self.utr5.update_reactions(model, self.rna, self.protein)
-            
-        if isinstance(self.cds, DNA):
-            # Create reactions that convert RNA into proteins
-            self.cds.update_reactions(model, self.rna, self.protein)
-
-        if isinstance(self.ctag, DNA):
-            # Create reactions that degrade proteins
-            self.ctag.update_reactions(model, self.protein)
-
-        if isinstance(self.utr3, DNA):
-            # Create reactions that terminate transcription
-            self.utr3.update_reactions(model, self.rna)
-        
+def rna2prot_basic(model, assy):
+    return None

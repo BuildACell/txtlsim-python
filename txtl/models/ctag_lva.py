@@ -9,5 +9,5 @@
 from ..dna import Ctag
 
 class Ctag_lva(Ctag):
-    def update_species(self, model):
+    def update_species(self, assy, model):
         print("updating species for ", self.name)

@@ -14,8 +14,9 @@ class Extract:
         self.params = load_config(config_file)
 
         # Save the name of the config file
-        self.config_file = config_file
+        self.name = "Extract " + config_file
 
+class StandardExtract(Extract):
     def update_species(self, model):
         # Add in the species that are present in the extract
         add_species(model, None, 'RNAP', self.params['RNAP_ic'].value)
@@ -45,16 +46,17 @@ class Extract:
                 # Create the parameter
                 add_parameter(model, name, self.params[name].value)
 
-    def update_reactions(self, model):
+    def update_reactions(self, model, mechanisms={}):
+        #! TODO: add reactions that are instantiated by extract
         return None
 
 # Create a mixture containing extract
-def create_extract(name):
+def create_extract(name, type=StandardExtract):
     # Create a mixture to hold the extract
     mixture = Mixture(name)
 
     # Create the extract
-    extract = Extract(name)
+    extract = type(name)
 
     # Add the extract as the sole contents of the tube
     mixture.components = [extract]

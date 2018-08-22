@@ -142,7 +142,7 @@ def add_reaction(model, reactants, products, kf, kr=None,
     ratelaw.setFormula(ratestring);
 
     # If the reverse rate is given, switch things around create reverse raaction
-    if (kf != None):
+    if (kr != None):
         revreaction = add_reaction(model, products, reactants, kr, None)
         return (reaction, revreaction)
 

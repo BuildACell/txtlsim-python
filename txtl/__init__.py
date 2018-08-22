@@ -3,7 +3,7 @@
 
 from .mixture import *
 from .dna import *
-from .mechanisms import *
+from .mechanism import *
 from .extract import *
 
 # Some constants used through the library
