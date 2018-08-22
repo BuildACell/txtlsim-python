@@ -17,7 +17,7 @@ class Extract:
         self.name = "Extract " + config_file
 
 class StandardExtract(Extract):
-    def update_species(self, model):
+    def update_species(self, model, mechanisms={}):
         # Add in the species that are present in the extract
         add_species(model, None, 'RNAP', self.params['RNAP_ic'].value)
         add_species(model, None, 'Ribo', self.params['Ribo_ic'].value)

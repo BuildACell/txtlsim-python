@@ -34,8 +34,8 @@ class Mixture():
 
         # Default mechanisms to use
         self.mechanisms = {
-            'transcription' : dna2rna_basic,
-            'translation'   : rna2prot_basic,
+            'transcription' : dna2rna_basic(),
+            'translation'   : rna2prot_basic(),
         }
 
         # Override the default mechanisms with anything we were passed
@@ -44,7 +44,7 @@ class Mixture():
     def write_sbml(self, filename):
         # Update all species in the mixture to make sure everything exists
         for component in self.components:
-            component.update_species(self.model)
+            component.update_species(self.model, self.mechanisms)
 
         # Now go through and add all of the reactions that are required
         for component in self.components:
