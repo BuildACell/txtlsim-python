@@ -44,6 +44,7 @@ class Mixture():
     def write_sbml(self, filename):
         # Update all species in the mixture to make sure everything exists
         for component in self.components:
+            #! TODO: figure out how concentrations should be handled
             component.update_species(self.model, self.mechanisms)
 
         # Now go through and add all of the reactions that are required

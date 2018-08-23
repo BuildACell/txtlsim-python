@@ -127,10 +127,18 @@ class DNA(Component):
     mechanisms  Local mechanisms for this component (overrides defaults)
 
     """
-    def __init__(self, name, length=0, mechanisms={}):
+    def __init__(self, name, length=0, mechanisms={},
+                 config_file=None, prefix="dna_"):
         self.name = name
         self.length = length
         self.mechanisms = mechanisms
+        self.prefix = prefix
+
+        # Read in parameters from the config file
+        self.parameters = {}
+        if config_file != None:
+            self.parameters = load_config(prefix + name.lower())
+            if self.parameters == None: self.parameters = {}
 
     # Set up default update functions to do nothing
     def update_species(self, model, mechanisms, parameters={}): return None
@@ -152,11 +160,8 @@ class Promoter(DNA):
                  RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
                  mechanisms={}):
         # Promoter initialization
-        DNA.__init__(self, name, length, mechanisms)
-
-        #! TODO: read parameter values parameter file
-        self.parameters = load_config("prot_" + name.lower())
-        if self.parameters == None: self.parameters = {}
+        DNA.__init__(self, name, length, mechanisms, config_file,
+                     prefix="prom_")
 
         # Set (or reset) values based on function arguments
         self.rnapname = rnapname

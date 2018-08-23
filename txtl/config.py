@@ -60,7 +60,7 @@ def load_config(name, extension=".csv", debug=False):
 
     return params
 
-def eval_parameter(param, parameters):
+def eval_parameter(param, parameters={}):
     # See if we already have a floating point number
     if isinstance(param.value, (float, int)): return float(param.value)
 
