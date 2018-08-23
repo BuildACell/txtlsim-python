@@ -9,5 +9,5 @@
 from ..dna import UTR5
 
 class UTR5_bcd2(UTR5):
-    def update_species(self, model, mechanism, parameters={}):
+    def update_species(self, mixture, mechanism, parameters={}):
         print("updating species for ", self.name)

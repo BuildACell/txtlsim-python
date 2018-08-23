@@ -9,7 +9,9 @@ from .dna import dna2rna_basic  #! TODO: move mechanisms to mechanisms/
 from .dna import rna2prot_basic #! TODO: move mechanisms to mechanisms/
 
 class Mixture():
-    """The Mixture class is used as a container for a set of components.
+    """Mixture()
+
+    The Mixture class is used as a container for a set of components.
     The components of a mixture define the species and reactions that
     are present in that mixture.  Mixtures can be added and scaled to
     create new mixtures (not yet implemented).
@@ -38,6 +40,9 @@ class Mixture():
             'translation'   : rna2prot_basic(),
         }
 
+        # Mixture level variables (set by special components)
+        self.parameters = {}
+
         # Override the default mechanisms with anything we were passed
         self.mechanisms.update(mechanisms)
 
@@ -45,11 +50,12 @@ class Mixture():
         # Update all species in the mixture to make sure everything exists
         for component in self.components:
             #! TODO: figure out how concentrations should be handled
-            component.update_species(self.model, self.mechanisms)
+            #! TODO: should probably pass mixture instead of model
+            component.update_species(self, self.mechanisms)
 
         # Now go through and add all of the reactions that are required
         for component in self.components:
-            component.update_reactions(self.model, self.mechanisms)
+            component.update_reactions(self, self.mechanisms, self.parameters)
 
         # Write the model to a file
         libsbml.writeSBMLToFile(self._SBMLdoc, filename)

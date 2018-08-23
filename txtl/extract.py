@@ -18,7 +18,9 @@ class Extract(Component):
         self.name = "Extract " + config_file
 
 class StandardExtract(Extract):
-    def update_species(self, model, mechanisms={}):
+    def update_species(self, mixture, mechanisms={}):
+        model = mixture.model   # Get the model where we will store results
+
         # Add in the species that are present in the extract
         add_species(model, None, 'RNAP', self.parameters['RNAP_ic'].value)
         add_species(model, None, 'Ribo', self.parameters['Ribo_ic'].value)
@@ -50,7 +52,9 @@ class StandardExtract(Extract):
                 # Create the parameter in the model
                 add_parameter(model, name, value)
 
-    def update_reactions(self, model, mechanisms={}):
+    def update_reactions(self, mixture, mechanisms={}, parameters={}):
+        model = mixture.model   # Get the model where we will store results
+
         #! TODO: add reactions that are instantiated by extract
         return None
 
