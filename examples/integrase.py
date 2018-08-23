@@ -9,8 +9,8 @@
 import txtl
 
 # Import mechanism libraries
-import txtl.models as ML1
-import examples.models as ML2
+import txtl.mechanisms as ML1
+import examples.mechanisms as ML2
 
 # Extract and Energy Parameters are stored in a user curated CSV
 #! TODO: mixture + mixture -> mixture

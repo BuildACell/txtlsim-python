@@ -5,13 +5,14 @@
 # See LICENSE file in the project root directory for details.
 
 from .mixture import Mixture
+from .component import Component
 from .sbmlutil import add_species, add_reaction, add_parameter
-from .config import load_config
+from .config import load_config, eval_parameter
 
-class Extract:
+class Extract(Component):
     def __init__(self, config_file):
         # Read the configuration parameters
-        self.params = load_config(config_file)
+        self.parameters = load_config(config_file)
 
         # Save the name of the config file
         self.name = "Extract " + config_file
@@ -19,10 +20,10 @@ class Extract:
 class StandardExtract(Extract):
     def update_species(self, model, mechanisms={}):
         # Add in the species that are present in the extract
-        add_species(model, None, 'RNAP', self.params['RNAP_ic'].value)
-        add_species(model, None, 'Ribo', self.params['Ribo_ic'].value)
-        add_species(model, None, 'RecBCD', self.params['RecBCD_ic'].value)
-        add_species(model, None, 'RNase', self.params['RNase_ic'].value)
+        add_species(model, None, 'RNAP', self.parameters['RNAP_ic'].value)
+        add_species(model, None, 'Ribo', self.parameters['Ribo_ic'].value)
+        add_species(model, None, 'RecBCD', self.parameters['RecBCD_ic'].value)
+        add_species(model, None, 'RNase', self.parameters['RNase_ic'].value)
 
         # Add in the (global) parameters that are present in the extract
         parameter_names = [
@@ -42,9 +43,12 @@ class StandardExtract(Extract):
         ]
         for name in parameter_names:
             # Make sure parameter was given in configuration file
-            if self.params[name] != None:
-                # Create the parameter
-                add_parameter(model, name, self.params[name].value)
+            if self.parameters[name] != None:
+                # Determine the value of the parameter
+                value = eval_parameter(self.parameters[name], self.parameters)
+                
+                # Create the parameter in the model
+                add_parameter(model, name, value)
 
     def update_reactions(self, model, mechanisms={}):
         #! TODO: add reactions that are instantiated by extract

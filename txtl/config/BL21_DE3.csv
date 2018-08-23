@@ -1,7 +1,7 @@
 NTPmodel,Numeric,2, NTP model in use, see documentation
 AAmodel,Numeric,2, AA model in use, see documentation
-Transcription_Rate, Expression, 1, 1 NTP/second VN PRL
-Translation_Rate, Expression, 4, >4 AA/second VN PRL
+Transcription_Rate, Expression, 1/(RNA_Length), 1 NTP/second VN PRL
+Translation_Rate, Expression, 4/(Protein_Length), >4 AA/second VN PRL
 ,,,,
 DNA_RecBCD_Forward, Numeric, 0.4, TODO
 DNA_RecBCD_Reverse, Numeric, 0.1, TODO
