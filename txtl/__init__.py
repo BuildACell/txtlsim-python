@@ -5,6 +5,7 @@ from .mixture import *
 from .dna import *
 from .mechanism import *
 from .extract import *
+from .parameter import *
 
 # Some constants used through the library
 minutes = 60                    # number of seconds in a minute

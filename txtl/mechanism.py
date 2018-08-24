@@ -6,7 +6,7 @@
 
 # Mechanism class for core mechanisms
 class Mechanism:
-    """Mechanism class
+    """Core mechanisms within a mixture (transcription, translation, etc)
 
     The Mechanism class is used to impelement different core
     mechanisms in TX-TL.  All specific core mechanisms should be

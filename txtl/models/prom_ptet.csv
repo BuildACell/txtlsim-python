@@ -1,0 +1,9 @@
+RNAPbound_Forward, Expression, 20, 
+RNAPbound_Reverse, Expression, 400, 
+
+Promoter_Length, Numeric, 50
+Thio_Length, Numeric, 500
+Junk_Length, Numeric, 0
+
+DNA_Sequestration_F, Numeric, 2.5e-1, V. Sotiropoulos 2007 BMC Sys Bio Table 1 12.86e-1
+DNA_Sequestration_R, Numeric, 1.11e-4, V. Sotiropoulos 2007 BMC Sys Bio Table 1 1.11e-4

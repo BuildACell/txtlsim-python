@@ -13,7 +13,7 @@ from warnings import warn
 
 # Component class for core components
 class Component:
-    """Component(name, mechanisms, config_file)
+    """Individual components within a TX-TL mixture
 
     The Component class is used to represent different components of a
     TX-TL mixture.  All specific components should be derived from

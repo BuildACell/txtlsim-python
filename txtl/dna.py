@@ -14,7 +14,7 @@ from .component import Component
 from .sbmlutil import add_species, add_reaction
 from .mechanism import Mechanism
 from .pathutil import load_model
-from .config import load_config
+from .parameter import load_config
 
 # DNA assembly
 class DNAassembly(Component):
@@ -81,10 +81,8 @@ class DNAassembly(Component):
 
     # Create/update all of the species associated with this DNA assembly
     def update_species(self, mixture, mechanisms, parameters={}, debug=False):
-        model = mixture.model   # Get the model where we will store results
-        
         # Create the DNA species
-        self.dna = add_species(model, "DNA", self.name)
+        self.dna = add_species(mixture, "DNA", self.name)
 
         # Let the individual DNA elements create the relevant species
         for dna in [self.promoter, self.utr5, self.cds,
@@ -138,10 +136,8 @@ class DNA(Component):
         self.prefix = prefix
 
         # Read in parameters from the config file
-        self.parameters = {}
-        if config_file != None:
-            self.parameters = load_config(prefix + name.lower())
-            if self.parameters == None: self.parameters = {}
+        self.parameters = load_config(prefix + name.lower())
+        if self.parameters == None: self.parameters = {}
 
     # Set up default update functions to do nothing
     def update_species(self, mixture, mechanisms, parameters={}): return None
@@ -160,7 +156,8 @@ class DNA(Component):
 class Promoter(DNA):
     "Promoter class - define a promoter sequence"
     def __init__(self, name, length=50, config_file=None, rnapname="RNAP", 
-                 RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
+                 RNAPbound_F='RNAPbound_Forward',
+                 RNAPbound_R='RNAPbound_Reverse',
                  mechanisms={}):
         # Promoter initialization
         DNA.__init__(self, name, length, mechanisms, config_file,
@@ -172,20 +169,19 @@ class Promoter(DNA):
         self.RNAPbound_R = RNAPbound_R
 
     def update_species(self, mixture, mechanisms, parameters={}):
-        model = mixture.model   # Get the model where we will store results
         assy = self.assy        # Get the DNA assembly we are part of
         
         # Create the mRNA species
         assy.rnaname = assy.utr5.name + "--" + assy.cds.name
         if (assy.ctag != None): assy.rnaname += "--" + assy.ctag.name
-        assy.rna = add_species(model, "RNA", assy.rnaname)
+        assy.rna = add_species(mixture, "RNA", assy.rnaname)
 
         # Create the RNA polymerase
         #! TODO: Does this belong here?  Not produced by the promoter
-        assy.rnap = add_species(model, None, self.rnapname)
+        assy.rnap = add_species(mixture, None, self.rnapname)
 
         # Create RNA polymerase bound to DNA
-        assy.rnap_bound = add_species(model, "Complex",
+        assy.rnap_bound = add_species(mixture, "Complex",
                                       self.rnapname + ":" + assy.name)
 
         # Create any other species needed by the transcriptional machinery
@@ -212,12 +208,12 @@ class ConstitutivePromoter(Promoter):
 class RepressedPromoter(Promoter):
     #! TODO: add docstring
     def __init__(self, name, repressor, length=50, rnapname="RNAP",
-                 dimer=False, 
+                 dimer=False, config_file=None,
                  RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
                  DNAsequestration_F=25e-1, DNAsequestration_R=1.11e-4,
                  mechanisms={}):
         # Promoter initialization
-        Promoter.__init__(self, name, length, 
+        Promoter.__init__(self, name, length, config_file=config_file,
                           RNAPbound_F=RNAPbound_F, RNAPbound_R=RNAPbound_R,
                           mechanisms=mechanisms)
         self.DNAsequestration_F = DNAsequestration_F
@@ -227,17 +223,16 @@ class RepressedPromoter(Promoter):
         self.dimer = dimer
 
     def update_species(self, mixture, mechanisms, parameters={}):
-        model = mixture.model   # Get the model where we will store results
         assy = self.assy        # Get the DNA assembly we are part of
 
         # Create species for unrepressed promoter
-        Promoter.update_species(self, model, mechanisms, parameters)
+        Promoter.update_species(self, mixture, mechanisms, parameters)
 
         # Create species for the transcription factor
-        self.tf_species = add_species(model, "Protein", self.tfname)
+        self.tf_species = add_species(mixture, "Protein", self.tfname)
         
         # Create repressor bound to DNA
-        self.tf_bound = add_species(model, "Complex",
+        self.tf_bound = add_species(mixture, "Complex",
                                     self.tf_species.name + ":" + assy.name)
 
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
@@ -249,7 +244,7 @@ class RepressedPromoter(Promoter):
         if debug: print("-- RepressedPromoter done with Promoter reactions")
 
         # Create the reaction for the transcription factor binding to DNA
-        add_reaction(model, [self.tf_species, assy.dna], [self.tf_bound],
+        add_reaction(mixture, [self.tf_species, assy.dna], [self.tf_bound],
                       kf=self.DNAsequestration_F, kr=self.DNAsequestration_R)
 
 #
@@ -277,20 +272,19 @@ class ConstitutiveRBS(UTR5):
         self.Ribosome_Binding_R = Ribosome_Binding_R
 
     def update_species(self, mixture, mechanisms, parameters={}):
-        model = mixture.model   # Get the model where we will store results
         assy = self.assy        # Get the DNA assembly we are part of
 
         # Create the protein
         assy.protname = assy.cds.name
         if (assy.ctag != None): assy.protname += "--" + assy.ctag.name
-        assy.protein = add_species(model, "Protein", assy.protname)
+        assy.protein = add_species(mixture, "Protein", assy.protname)
 
         # Create the ribosome
         #! TODO: think about whether this belongs here or not
-        assy.ribo = add_species(model, None, self.riboname)
+        assy.ribo = add_species(mixture, None, self.riboname)
 
         # Create Ribosome bound to RNA
-        assy.ribo_bound = add_species(model, "Complex",
+        assy.ribo_bound = add_species(mixture, "Complex",
                                       self.riboname + ":" + assy.rnaname)
         
         # Create any other species needed by the transcriptional machinery
@@ -325,7 +319,7 @@ class CDS(DNA):
         model = mixture.model   # Get the model where we will store results
         
         # Create species for the protein
-        add_species(model, "Protein", self.name)
+        add_species(mixture, "Protein", self.name)
 
     # Default action of a protein is to mature and (optionally) dimerize
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
@@ -476,31 +470,30 @@ class dna2rna_basic(Mechanism):
     "Basic transcription mechanism"
     def update_reactions(self, mixture, assy, mechanisms, parameters={},
                          debug=False):
-        model = mixture.model   # Get the model where we will store results
+        # Figure out the reaction rates
+        kf = parameters['RNAPbound_Forward']
+        kr = parameters['RNAPbound_Reverse']
         
         # Create reaction that binds RNAP to DNA
-        add_reaction(model, [assy.rnap, assy.dna], [assy.rnap_bound], 
-                     kf=assy.promoter.RNAPbound_F,
-                     kr=assy.promoter.RNAPbound_R)
+        add_reaction(mixture, [assy.rnap, assy.dna], [assy.rnap_bound], kf, kr)
 
         # Create reaction that produces mRNA
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(model, [assy.rnap_bound], [assy.rnap, assy.rna], kf=1)
+        add_reaction(mixture, [assy.rnap_bound], [assy.rnap, assy.rna], kf=1)
         
 class rna2prot_basic(Mechanism):
     "Basic translation mechanism"
     def update_reactions(self, mixture, assy, mechanisms, parameters={},
                          debug=False):
-        model = mixture.model   # Get the model where we will store results
-
         # Create reaction that binds Ribo to RNA
-        add_reaction(model, [assy.ribo, assy.rna], [assy.ribo_bound], 
+        add_reaction(mixture, [assy.ribo, assy.rna], [assy.ribo_bound], 
                      kf=assy.utr5.Ribosome_Binding_F,
                      kr=assy.utr5.Ribosome_Binding_R)
 
         # Create reaction that produces protein
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(model, [assy.ribo_bound], [assy.ribo, assy.protein], kf=1)
+        add_reaction(mixture, [assy.ribo_bound], [assy.ribo, assy.protein],
+                     kf=1)
 
 class protein_maturation(Mechanism):
     "Basic protein maturation"

@@ -8,7 +8,8 @@ import csv
 import os
 import sys
 
-class ConfigParam:
+class Parameter:
+    "Parameter value (reaction rates)"
     def __init__(self, name, type, value, comment, debug=False):
         self.name = name.strip()
         self.type = type.strip()
@@ -48,12 +49,16 @@ def load_config(name, extension=".csv", debug=False):
     csvreader = csv.reader(csvfile)
     params = {}
     for row in csvreader:
-        # Skip blank lines
-        if row[0].strip() == "": continue
+        # Skip blank lines (and malformed lines)
+        if len(row) < 3 or row[0].strip() == "": continue
         
         # Create a new parameter object to keep track of this row
-        #                   name    type    value   comment
-        param = ConfigParam(row[0], row[1], row[2], row[3])
+        #! TODO: this should be done in a better (and more pythonic) way
+        if len(row) >= 4:
+            #                 name    type    value   comment
+            param = Parameter(row[0], row[1], row[2], row[3])
+        else:
+            param = Parameter(row[0], row[1], row[2], "")
 
         # Set up as dictionary for easy access
         params[param.name] = param
