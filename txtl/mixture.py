@@ -57,17 +57,26 @@ class Mixture():
         document = libsbml.SBMLDocument(3, 1)
         model = document.createModel()
 
+        # Define units for area (not used, but keeps COPASI from complaining)
+        unitdef = model.createUnitDefinition()
+        unitdef.setId('square_metre')
+        unit = unitdef.createUnit()
+        unit.setKind(libsbml.UNIT_KIND_METRE)
+        unit.setExponent(2)
+        unit.setScale(0)
+        unit.setMultiplier(1)
+
         # Set up required units and containers
-        model.setTimeUnits("second")            # set model-wide time units
-        model.setExtentUnits("mole")            # set model units of extent
+        model.setTimeUnits('second')            # set model-wide time units
+        model.setExtentUnits('mole')            # set model units of extent
         model.setSubstanceUnits('mole')         # set model substance units
         model.setLengthUnits('metre')           # area units (never used?)
-        model.setAreaUnits('square metre')      # area units (never used?)
-        model.setVolumeUnits("litre")           # default volume unit
+        model.setAreaUnits('square_metre')      # area units (never used?)
+        model.setVolumeUnits('litre')           # default volume unit
 
         # Define the default compartment
         compartment = model.createCompartment()
-        compartment.setId("txtl")
+        compartment.setId('txtl')
         compartment.setConstant(True)           # keep compartment size constant
         compartment.setSpatialDimensions(3)     # 3 dimensional compartment
         compartment.setVolume(1e-6)             # 1 microliter
@@ -90,10 +99,12 @@ class Mixture():
         "Generate an SBML file for the current mixture (model)"
         
         # Update all species in the mixture to make sure everything exists
-        for component in self.components:
-            #! TODO: figure out how concentrations should be handled
-            #! TODO: should probably pass mixture instead of model
-            component.update_species(self, self.mechanisms)
+        for i in range(len(self.components)):
+            concentration = self.concentrations[i]
+            component = self.components[i]
+
+            # Create all of the species for this component
+            component.update_species(self, concentration, self.mechanisms)
 
         # Now go through and add all of the reactions that are required
         for component in self.components:
@@ -128,12 +139,16 @@ def add_dna(mixture, dna, conc, type=None):
     return None
 
 # Combine the components of two more more mixtures
-def combine_mixtures(mixtures, concentrations=None, name=None):
+def combine_mixtures(mixtures, volumes=None, name=None):
     # Create a name if we were sent done
     #! TODO: concatenate names of mixtures
     
     # Create a mixture for the results
     outmixture = Mixture(name)
+
+    # Keep track of the total amount of mixture we are creating (for scaling)
+    # If no volumes are given, assume equal volumes of 1 unit each
+    total_volume = sum(volumes) if volumes != None else len(mixtures)
 
     # Add the components (and concentrations) of inputs to the output
     for i in range(len(mixtures)):
@@ -141,9 +156,13 @@ def combine_mixtures(mixtures, concentrations=None, name=None):
         #! TODO: issue a warning if there are conflicting mechanisms
         outmixture.mechanisms.update(mixtures[i].mechanisms)
 
+        # Components of new mixture are concatenation of mixture components
         outmixture.components += mixtures[i].components
-        #! TODO: scale concentrations 
-        outmixture.concentrations += mixtures[i].concentrations
+
+        # Concentrations are scaled by the volume
+        scale = volume[i]/total_volume if volumes != None else 1/total_volume
+        for j in range(len(mixtures[i].concentrations)):
+            outmixture.concentrations += [mixtures[i].concentrations[j] * scale]
 
     return outmixture
 

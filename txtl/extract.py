@@ -38,7 +38,7 @@ class StandardExtract(Extract):
             'translation'   : rna2prot_basic(),
         }
 
-    def update_species(self, mixture, mechanisms={}):
+    def update_species(self, mixture, conc, mechanisms={}):
         #
         # Add in the species that are present in the extract
         #
@@ -48,14 +48,17 @@ class StandardExtract(Extract):
         # transcription only system or a pure buffer with no cellular
         # machinery).
         #
-        mixture.rnap = add_species(mixture, None, 'RNAP',
-                                   self.parameters['RNAP_ic'].value)
-        mixture.ribo = add_species(mixture, None, 'Ribo',
-                                   self.parameters['Ribo_ic'].value)
-        mixture.recbcd = add_species(mixture, None, 'RecBCD',
-                                     self.parameters['RecBCD_ic'].value)
-        mixture.rnase = add_species(mixture, None, 'RNase',
-                                    self.parameters['RNase_ic'].value)
+        RNAP_ic = self.parameters['RNAP_ic'].value
+        mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_ic * conc)
+        
+        Ribo_ic = self.parameters['Ribo_ic'].value
+        mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_ic * conc)
+
+        RecBCD_ic = self.parameters['RecBCD_ic'].value
+        mixture.recbcd = add_species(mixture, None, 'RecBCD', RecBCD_ic * conc)
+
+        RNase_ic = self.parameters['RNase_ic'].value
+        mixture.rnase = add_species(mixture, None, 'RNase', RNase_ic * conc)
 
         #
         # Add in the (global) parameters that are present in the extract
@@ -121,10 +124,17 @@ def create_extract(name, type=StandardExtract):
     # Add the extract as the sole contents of the tube
     mixture.components = [extract]
 
+    #
     # Keep track of the stock concentration multiplier
-    # Extract is 1/3 of the 10ul reaction volume
-    #! TODO: this is in the wrong place; figure out where it goes
-    mixture.concentration = 10.0/(10.0/3.0)
+    #
+    # In original Noireaux paper they report concentratons in terms of
+    # the total reaction volume of 10 ul, but we need to concentration
+    # of the raw extract. Extract is 1/3 of the 10ul reaction volume,
+    # so rescale concentration to get this to work out correctly.
+    #
+    #! TODO: update config files to get rid of this scaling
+    #
+    mixture.concentrations = [10.0/(10.0/3.0)]
 
     # Initalize the mechanisms that are represented in the extract
     mixture.mechanisms.update(extract.get_mechanisms())

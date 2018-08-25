@@ -81,9 +81,9 @@ class DNAassembly(Component):
             self.parameters.update(load_config(config_file))
 
     # Create/update all of the species associated with this DNA assembly
-    def update_species(self, mixture, mechanisms, parameters={}, debug=False):
+    def update_species(self, mixture, conc, mechanisms, debug=False):
         # Create the DNA species
-        self.dna = add_species(mixture, "DNA", self.name)
+        self.dna = add_species(mixture, "DNA", self.name, conc)
 
         # Let the individual DNA elements create the relevant species
         for dna in [self.promoter, self.utr5, self.cds,
@@ -97,7 +97,7 @@ class DNAassembly(Component):
                 
                 # Update the species required for this component
                 if debug: print("DNAassembly species update:", dna.name)
-                dna.update_species(mixture, mechanisms,
+                dna.update_species(mixture, conc, mechanisms,
                                    parameters=self.parameters)
 
     # Create/update all of the relevant reactions for this DNA assembly
@@ -159,8 +159,11 @@ class DNA(Component):
         if self.parameters == None: self.parameters = {}
 
     # Set up default update functions to do nothing
-    def update_species(self, mixture, mechanisms, parameters={}): return None
-    def update_reactions(self, mixture, mechanisms, parameters={}): return None
+    def update_species(self, mixture, conc, mechanisms, parameters={}):
+        return None
+    
+    def update_reactions(self, mixture, mechanisms, parameters={}):
+        return None
 
 #
 # Promoter subclasses
@@ -190,7 +193,7 @@ class Promoter(DNA):
         # Set (or reset) values based on function arguments
         self.rnapname = rnapname
 
-    def update_species(self, mixture, mechanisms, parameters={}):
+    def update_species(self, mixture, conc, mechanisms, parameters={}):
         assy = self.assy        # Get the DNA assembly we are part of
 
         # Figure out the mechanisms to use
@@ -208,8 +211,8 @@ class Promoter(DNA):
                                       self.rnapname + ":" + assy.name, 0)
 
         # Create any other species needed by the transcriptional machinery
-        mechanisms['transcription'].update_species(mixture, assy, mechanisms,
-                                                   parameters)
+        mechanisms['transcription'].update_species(mixture, assy, conc,
+                                                   mechanisms, parameters)
         
     # Default action of a promoter is to implement transcription
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
@@ -253,11 +256,11 @@ class RepressedPromoter(Promoter):
         if dimer: self.tfname += " dimer" 
         self.dimer = dimer
 
-    def update_species(self, mixture, mechanisms, parameters={}):
+    def update_species(self, mixture, conc, mechanisms, parameters={}):
         assy = self.assy        # Get the DNA assembly we are part of
 
         # Create species for unrepressed promoter
-        Promoter.update_species(self, mixture, mechanisms, parameters)
+        Promoter.update_species(self, mixture, conc, mechanisms, parameters)
 
         # Create repressor bound to DNA
         self.tf_bound = add_species(mixture, "Complex",
@@ -321,7 +324,7 @@ class ConstitutiveRBS(UTR5):
         self.Ribosome_Binding_F = Ribosome_Binding_F
         self.Ribosome_Binding_R = Ribosome_Binding_R
 
-    def update_species(self, mixture, mechanisms, parameters={}):
+    def update_species(self, mixture, conc, mechanisms, parameters={}):
         assy = self.assy        # Get the DNA assembly we are part of
 
         # Create the protein
@@ -334,8 +337,8 @@ class ConstitutiveRBS(UTR5):
                                       self.riboname + ":" + assy.rnaname, 0)
         
         # Create any other species needed by the transcriptional machinery
-        mechanisms['translation'].update_species(mixture, assy, mechanisms,
-                                                 parameters)
+        mechanisms['translation'].update_species(mixture, assy, conc,
+                                                 mechanisms, parameters)
 
     # Default action of a promoter is to implement transcription
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
@@ -368,7 +371,7 @@ class CDS(DNA):
         self.dimerize = dimerize
         self.maturation_time = maturation_time
         
-    def update_species(self, mixture, mechanisms, parameters={}):
+    def update_species(self, mixture, conc, mechanisms, parameters={}):
         model = mixture.model   # Get the model where we will store results
 
         # Create species for the protein

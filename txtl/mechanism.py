@@ -14,7 +14,7 @@ class Mechanism:
 
     """
     def __init__(self): return None
-    def update_species(self, model, component, mechanisms,
+    def update_species(self, mixture, component, conc, mechanisms,
                        parameters={}): return None
     def update_reactions(self, model, component, mechanisms,
                          parameters={}): return None

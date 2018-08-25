@@ -78,10 +78,9 @@ class Component:
             self.parameters.update(load_config(config_file))
 
     #! TODO: think about argument order
-    def update_species(self, model, mechanisms={}):
-        """update_species(model, [mechanisms])
-
-        Update (or create) the set of species associted with this component.
+    def update_species(self, mixture, concentration, mechanisms={}):
+        """Update (or create) the set of species associated with this
+        component.
 
         The update_species() function is responsible for generating
         all of the species associated with this component, including
@@ -93,15 +92,15 @@ class Component:
         
         # Create any other species needed by the transcriptional machinery
         for name in self.mechanisms:
-            mechanisms[name].update_species(model, assy, mechanisms)
+            mechanism = mechanisms[name]
+            mechanism.update_species(mixture, concentration, mechanisms)
         
         # If the default member function gets used, issue a warning
         warn("component: default __init__ called for " + name)
 
-    def update_reactions(self, model, mechanisms={}, parameters={}):
-        """update_species(model, [mechanisms], [parameters])
-
-        Update (or create) the set of reactions associated with this component
+    def update_reactions(self, mixture, mechanisms={}, parameters={}):
+        """Update (or create) the set of reactions associated with this
+        component
 
         The update_reactions() function is responsible for generating
         all of the reactions associated with this component, including
@@ -116,8 +115,8 @@ class Component:
         
         # Create any other species needed by the transcriptional machinery
         for name in self.mechanisms:
-            mechanisms[name].update_reactions(model, assy, mechanisms,
-                                              parameters)
+            mechanism = mechanisms[name]
+            mechanism.update_reactions(mixture, mechanisms, parameters)
         
         # If the default member function gets used, issue a warning
         warn("component: default __init__ called for " + name)
