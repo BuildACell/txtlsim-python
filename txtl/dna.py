@@ -10,22 +10,24 @@
 # associated with gene expression.
 
 import re                      # use Python's regular expression library
+from math import log
 from .component import Component
-from .sbmlutil import add_species, add_reaction
+from .sbmlutil import add_species, add_reaction, find_species
 from .mechanism import Mechanism
 from .pathutil import load_model
-from .parameter import load_config
+from .parameter import Parameter, load_config
 
 # DNA assembly
 class DNAassembly(Component):
     """DNA assembly class
 
-    The DNA assembly class is used to represent a DNA assembly,
-    typically consisting of a promoter, a ribosome binding site (5'
-    UTR), a protein coding sequence (CDS), an optional C-terminus tag
-    (for protein degradation), and a terminator (3' UTR).  Subclasses
-    can be used to create specialized types of DNA and predefined
-    subclasses are available for promoters, RBSs, etc.
+    The DNA assembly class is used to represent a collection of DNA
+    subcomponents, typically consisting of a promoter, a ribosome
+    binding site (5' UTR), a protein coding sequence (CDS), an
+    optional C-terminus tag (for protein degradation), and a
+    terminator (3' UTR).  Subclasses can be used to create specialized
+    types of DNA and predefined subclasses are available for
+    promoters, RBSs, etc.
 
     The DNA assembly follows the rules of a Component but it is more
     complex because each of the elements of the assembly
@@ -57,9 +59,8 @@ class DNAassembly(Component):
     update_reactions()  create/update reactions associated with construct
 
     """
-    def __init__(self, name, length=0, promoter=None, utr5=None,
-                 cds=None, ctag=None, utr3=None, config_file=None,
-                 mechanisms={}):
+    def __init__(self, name, mechanisms={}, config_file=None, length=0, 
+                 promoter=None, utr5=None, cds=None, ctag=None, utr3=None):
         self.name = name
         self.length = length
         self.promoter = promoter
@@ -120,6 +121,24 @@ class DNA(Component):
     length.  Its main purpose is as the parent object for DNA
     fragments and DNA assemblies.
 
+    Note: for initialization of members of this class, the arguments
+    should be as follows:
+
+      DNA(name, length, [mechanisms], [config_file], [prefix])
+
+        DNAtype(name, required_arguments, [length], [mechanisms], 
+                [config_file], [prefix], [optional_arguments])
+
+          DNAelement(name, required_arguments, [length], [mechanisms], 
+                     [config_file], [optional_arguments])
+
+      DNAtypes - DNAelements:
+        Promoter - ConstitutePromoter, RepressedPromoter
+        UTR5     - ConstituteRBS
+        CDS      - ProteinCDS
+        Ctag     - DegrationTAg
+        UTR3     - Terminator
+
     Data attributes
     ---------------
     name        Name of the sequence (str)
@@ -155,30 +174,34 @@ class DNA(Component):
 
 class Promoter(DNA):
     "Promoter class - define a promoter sequence"
-    def __init__(self, name, length=50, config_file=None, rnapname="RNAP", 
-                 RNAPbound_F='RNAPbound_Forward',
-                 RNAPbound_R='RNAPbound_Reverse',
-                 mechanisms={}):
+
+    # Default parameters used to describe a promoter
+    default_parameter_values = {
+        'RNAPbound_Forward' : 20,       # Default for ptet
+        'RNAPbound_Reverse' : 400       # Default for ptet
+    }
+    
+    def __init__(self, name, length=50, mechanisms={}, config_file=None,
+                 rnapname="RNAP"):
         # Promoter initialization
         DNA.__init__(self, name, length, mechanisms, config_file,
                      prefix="prom_")
 
         # Set (or reset) values based on function arguments
         self.rnapname = rnapname
-        self.RNAPbound_F = RNAPbound_F
-        self.RNAPbound_R = RNAPbound_R
 
     def update_species(self, mixture, mechanisms, parameters={}):
         assy = self.assy        # Get the DNA assembly we are part of
-        
+
+        # Figure out the mechanisms to use
+        self.mechanisms = mixture.mechanisms    # default mechanisms
+        self.mechanisms.update(assy.mechanisms) # assembly overrides
+        self.mechanisms.update(mechanisms)      # local overrides
+
         # Create the mRNA species
         assy.rnaname = assy.utr5.name + "--" + assy.cds.name
         if (assy.ctag != None): assy.rnaname += "--" + assy.ctag.name
         assy.rna = add_species(mixture, "RNA", assy.rnaname)
-
-        # Create the RNA polymerase
-        #! TODO: Does this belong here?  Not produced by the promoter
-        assy.rnap = add_species(mixture, None, self.rnapname)
 
         # Create RNA polymerase bound to DNA
         assy.rnap_bound = add_species(mixture, "Complex",
@@ -196,6 +219,11 @@ class Promoter(DNA):
         # Create the parameter values for this reacton
         parameters.update(self.parameters)
 
+        # Make sure that default parameters are defined
+        for key, value in Promoter.default_parameter_values.items():
+            if key not in parameters.keys():
+                parameters[key] = Parameter(key, 'Numeric', value)
+                
         # Create the reactions required for transcription
         mechanisms['transcription'].update_reactions(mixture, assy, mechanisms,
                                                      parameters)
@@ -207,19 +235,22 @@ class ConstitutivePromoter(Promoter):
 # Repressed promoter
 class RepressedPromoter(Promoter):
     #! TODO: add docstring
-    def __init__(self, name, repressor, length=50, rnapname="RNAP",
-                 dimer=False, config_file=None,
-                 RNAPbound_F='RNAPbound_F', RNAPbound_R='RNAPbound_R',
-                 DNAsequestration_F=25e-1, DNAsequestration_R=1.11e-4,
-                 mechanisms={}):
+    
+    # Default parameters used to describe a repressed promoter
+    default_parameter_values = {
+        'DNAsequestration_F' : 2.5e-1,   # Default for ptet
+        'DNAsequestration_R' : 1.11e-4   # Default for ptet
+    }
+    
+    def __init__(self, name, repressor, length=50, mechanisms={},
+                 config_file=None, rnapname="RNAP", dimer=False):
         # Promoter initialization
-        Promoter.__init__(self, name, length, config_file=config_file,
-                          RNAPbound_F=RNAPbound_F, RNAPbound_R=RNAPbound_R,
-                          mechanisms=mechanisms)
-        self.DNAsequestration_F = DNAsequestration_F
-        self.DNAsequestration_R = DNAsequestration_R
-        self.tfname = repressor
-        self.rnapname=rnapname
+        Promoter.__init__(self, name, length=length, mechanisms=mechanisms,
+                          config_file=config_file, rnapname=rnapname)
+
+        # Store additional information related to repression
+        self.tfname = "Protein " + repressor
+        if dimer: self.tfname += " dimer" 
         self.dimer = dimer
 
     def update_species(self, mixture, mechanisms, parameters={}):
@@ -228,24 +259,33 @@ class RepressedPromoter(Promoter):
         # Create species for unrepressed promoter
         Promoter.update_species(self, mixture, mechanisms, parameters)
 
-        # Create species for the transcription factor
-        self.tf_species = add_species(mixture, "Protein", self.tfname)
-        
         # Create repressor bound to DNA
         self.tf_bound = add_species(mixture, "Complex",
-                                    self.tf_species.name + ":" + assy.name)
+                                    self.tfname + ":" + assy.name)
 
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
         model = mixture.model   # Get the model where we will store results
         assy = self.assy        # Get the DNA assembly we are part of
 
+        # Create the parameter values for this reacton
+        parameters.update(self.parameters)
+
+        # Make sure that default parameters are defined
+        for key, value in RepressedPromoter.default_parameter_values.items():
+            if key not in parameters.keys():
+                parameters[key] = Parameter(key, 'Numeric', value)
+                
         # Create the reactions for the unbound promoter
         Promoter.update_reactions(self, mixture, mechanisms, parameters)
         if debug: print("-- RepressedPromoter done with Promoter reactions")
 
         # Create the reaction for the transcription factor binding to DNA
-        add_reaction(mixture, [self.tf_species, assy.dna], [self.tf_bound],
-                      kf=self.DNAsequestration_F, kr=self.DNAsequestration_R)
+        tf_species = find_species(mixture, self.tfname)
+        if tf_species == None:
+            raise NameError("RepressedPromoter: %s not found" % self.tfname)
+        add_reaction(mixture, [tf_species, assy.dna], [self.tf_bound],
+                     kf = parameters['DNAsequestration_F'],
+                     kr = parameters['DNAsequestration_R'])
 
 #
 # UTR5 subclasses
@@ -254,13 +294,23 @@ class RepressedPromoter(Promoter):
 
 class UTR5(DNA):
     "UTR5 class - define 5' untranslated region sequence"
+    def __init__(self, name, length=20, mechanisms={}, config_file=None,
+                 prefix="utr5_"):
+        DNA.__init__(self, name, length, mechanisms, config_file,
+                     prefix=prefix)        
 
 # Constitutive RBS
 class ConstitutiveRBS(UTR5):
     #! TODO: add docstring
-    def __init__(self, name, length=20, riboname="Ribo",
-                 Ribosome_Binding_F=0.2, Ribosome_Binding_R=4):
-        UTR5.__init__(self, name, length)
+    def __init__(self, name, length=20, mechanisms={}, config_file=None,
+                 riboname = 'Ribo',             # Ribosome species name
+                 Ribosome_Binding_F = 'Ribosome_Binding_F',
+                 Ribosome_Binding_R = 'Ribosome_Binding_R',
+                 RBS_length = 30,
+                 spacer_Length = 200,
+    ):
+        UTR5.__init__(self, name, length, mechanisms, config_file,
+                      prefix="rbs_")
         self.riboname = riboname
 
         #! TODO: read parameter values parameter file
@@ -297,7 +347,6 @@ class ConstitutiveRBS(UTR5):
         mechanisms['translation'].update_reactions(mixture, assy, mechanisms,
                                                    parameters)
         
-
 #
 # CDS subclasses
 #
@@ -307,33 +356,59 @@ class ConstitutiveRBS(UTR5):
 
 class CDS(DNA):
     "CDS class - define protein coding sequence"
-    def __init__(self, name, length=0, mechanisms={}):
-        # Promoter initialization
-        DNA.__init__(self, name, length, mechanisms)
-        
-        #! TODO: read parameter values parameter file
-        self.parameters = load_config("cds_" + name.lower())
-        if self.parameters == None: self.parameters = {}
+    
+    # Default parameters used to describe a repressed promoter
+    default_parameter_values = {
+        'Dimerization_Forward' : 1,             # Default for TetR
+        'Dimerization_Reverse' : 1,             # Default for ptet
+        'Protein_Maturation' : log(2)/(5*60)    # 5 minutes (GFP)
+    }
+    
+    def __init__(self, name, length=1000, mechanisms={}, config_file=None,
+                 dimerize = False, maturation_time=None):
+        # DNA initialization
+        DNA.__init__(self, name, length, mechanisms, config_file,
+                     prefix="cds_")
+        self.dimerize = dimerize
+        self.maturation_time = maturation_time
         
     def update_species(self, mixture, mechanisms, parameters={}):
         model = mixture.model   # Get the model where we will store results
-        
+
         # Create species for the protein
-        add_species(mixture, "Protein", self.name)
+        self.protein = add_species(mixture, "Protein", self.name)
+        if self.dimerize:
+            #! Move to mechanism function?
+            self.dimer = add_species(mixture, "Protein", self.name + " dimer")
 
     # Default action of a protein is to mature and (optionally) dimerize
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
         assy = self.assy        # Get the DNA assembly we are part of
 
+        # Create the parameter values for this reacton
+        parameters.update(self.parameters)
+
+        # Make sure that default parameters are defined
+        for key, value in CDS.default_parameter_values.items():
+            if key not in parameters.keys():
+                parameters[key] = Parameter(key, 'Numeric', value)
+
+        if self.dimerize:
+            #! Move to mechanism function?
+            add_reaction(mixture, [self.protein, self.protein], [self.dimer],
+                         kf = parameters['Dimerization_Forward'],
+                         kr = parameters['Dimerization_Reverse'])
+
+        # Allow override of protein maturation time
+        if self.maturation_time != None:
+            parameters['Protein_Maturation'] = log(2)/(self.maturation_time)
+
         # Let the individual mechanisms create all of the reactions
         mechanisms['maturation'].update_reactions(mixture, assy, mechanisms,
                                                   parameters)
-
-# Protein coding sequence
+# Protein coding sequence (same as a CDS)
 class ProteinCDS(CDS):
-    #! TODO: add docstring
-    def __init__(self, name, length=1000, maturation_time=None):
-        CDS.__init__(self, name, length)
+    "Protein coding sequence"
 
 #
 # Ctag subclasses
@@ -343,12 +418,18 @@ class ProteinCDS(CDS):
 class Ctag(DNA):
     #! TODO: add docstring
     "Ctag class - define C-terminus protein tag"
+    def __init__(self, name, length=0, mechanisms={}, config_file=None):
+        # DNA initialization
+        DNA.__init__(self, name, length, mechanisms, config_file,
+                     prefix="ctag_")
 
 # Degradation tag
 class DegradationTag(Ctag):
     #! TODO: add docstring
-    def __init__(self, name, protease, length=10):
-        Ctag.__init__(self, name, length)
+    def __init__(self, name, protease="ClpXP", length=9, mechanisms={},
+                 config_file=None):
+        Ctag.__init__(self, name, length, mechanisms, config_file)
+        self.protease = protease
 
 #
 # UTR3 subclasses
@@ -357,12 +438,17 @@ class DegradationTag(Ctag):
 
 class UTR3(DNA):
     "UTR3 class - define 3' untranslated region sequence"
+    def __init__(self, name, length=0, mechanisms={}, config_file=None):
+        # DNA initialization
+        DNA.__init__(self, name, length, mechanisms, config_file,
+                     prefix="utr3_")
 
 # Terminator
 class Terminator(UTR3):
     #! TODO: add docstring
-    def __init__(self, name, length=50):
-        UTR3.__init__(self, name, length)
+    def __init__(self, name, length=50, mechanisms={}, config_file=None):
+        UTR3.__init__(self, name, length, mechanisms, config_file,
+                      prefix="term_")
 
 #
 # Functions for creatng and manipulating DNA
@@ -475,24 +561,26 @@ class dna2rna_basic(Mechanism):
         kr = parameters['RNAPbound_Reverse']
         
         # Create reaction that binds RNAP to DNA
-        add_reaction(mixture, [assy.rnap, assy.dna], [assy.rnap_bound], kf, kr)
+        add_reaction(mixture, [mixture.rnap, assy.dna], [assy.rnap_bound],
+                     kf, kr)
 
         # Create reaction that produces mRNA
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.rnap_bound], [assy.rnap, assy.rna], kf=1)
+        add_reaction(mixture, [assy.rnap_bound], [mixture.rnap, assy.rna],
+                     kf=1)
         
 class rna2prot_basic(Mechanism):
     "Basic translation mechanism"
     def update_reactions(self, mixture, assy, mechanisms, parameters={},
                          debug=False):
         # Create reaction that binds Ribo to RNA
-        add_reaction(mixture, [assy.ribo, assy.rna], [assy.ribo_bound], 
+        add_reaction(mixture, [mixture.ribo, assy.rna], [assy.ribo_bound], 
                      kf=assy.utr5.Ribosome_Binding_F,
                      kr=assy.utr5.Ribosome_Binding_R)
 
         # Create reaction that produces protein
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.ribo_bound], [assy.ribo, assy.protein],
+        add_reaction(mixture, [assy.ribo_bound], [mixture.ribo, assy.protein],
                      kf=1)
 
 class protein_maturation(Mechanism):

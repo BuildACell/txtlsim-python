@@ -48,10 +48,14 @@ class StandardExtract(Extract):
         # transcription only system or a pure buffer with no cellular
         # machinery).
         #
-        add_species(mixture, None, 'RNAP', self.parameters['RNAP_ic'].value)
-        add_species(mixture, None, 'Ribo', self.parameters['Ribo_ic'].value)
-        add_species(mixture, None, 'RecBCD', self.parameters['RecBCD_ic'].value)
-        add_species(mixture, None, 'RNase', self.parameters['RNase_ic'].value)
+        mixture.rnap = add_species(mixture, None, 'RNAP',
+                                   self.parameters['RNAP_ic'].value)
+        mixture.ribo = add_species(mixture, None, 'Ribo',
+                                   self.parameters['Ribo_ic'].value)
+        mixture.recbcd = add_species(mixture, None, 'RecBCD',
+                                     self.parameters['RecBCD_ic'].value)
+        mixture.rnase = add_species(mixture, None, 'RNase',
+                                    self.parameters['RNase_ic'].value)
 
         #
         # Add in the (global) parameters that are present in the extract

@@ -28,7 +28,7 @@ txtl.add_dna(tube3, gene1, 1, 'plasmid')
 # constructs inline.
 
 # Create individual DNA components based on standard types
-ptet = txtl.RepressedPromoter('ptet', 'tetR')
+ptet = txtl.RepressedPromoter('ptet', 'tetR', dimer=True)
 bcd2 = txtl.ConstitutiveRBS('BCD2', Ribosome_Binding_F=10)
 degfp = txtl.ProteinCDS('deGFP', maturation_time=30*txtl.minutes)
 lva = txtl.DegradationTag('lva', 'clpXP')
@@ -49,4 +49,4 @@ well1 = txtl.combine_tubes([tube1, tube2, tube3])
 # txtl.plot(simData, well1)
 
 # Create an SBML file containing the model
-txtl.write_sbml(well1, 'geneexpr.sbml')
+txtl.write_sbml(well1, 'geneexpr.xml')

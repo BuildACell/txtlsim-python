@@ -6,6 +6,8 @@
 
 import libsbml
 import re
+from .parameter import Parameter
+from warnings import warn
 
 # Reaction ID number
 reaction_id = 0
@@ -46,9 +48,15 @@ def add_species(mixture, type, name, ic=None, debug=False):
     return species
 
 # Look for a species in the current mixture
-def find_species(mixture, id):
+def find_species(mixture, species_name):
     model = mixture.model   # Get the model where we will store results
-    return model.getSpecies(id)
+    
+    # Construct the species ID (no-op if already a species ID)
+    species_id = re.sub(" ", "_", species_name)
+    species_id = re.sub("--", "_", species_id)
+    species_id = re.sub(":", "_", species_id)
+    
+    return model.getSpecies(species_id)
 
 # Helper function to add a pameter to the model
 def add_parameter(mixture, name, value=0, debug=False):
@@ -66,6 +74,7 @@ def add_parameter(mixture, name, value=0, debug=False):
 
     # Set the value of the parameter
     parameter.setValue(float(value))
+    parameter.setConstant(True)
 
     return parameter
 
@@ -76,8 +85,8 @@ def find_parameter(mixture, id):
     return model.getParameter(id)
 
 # Helper function to add a reaction to a model
-def add_reaction(mixture, reactants, products, kf, kr=None,
-                 debug=False, id=None):
+def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
+                 parameters={}, debug=False, ):
     """Add a reaction to a model
 
     The `add_reaction` function is used to add a reaction to a model.
@@ -129,9 +138,17 @@ def add_reaction(mixture, reactants, products, kf, kr=None,
     # created by building up the string that specifies the kinetic
     # law.  If the parameter `kf` is a string, we assume it is a
     # global parameter value that will be set later.  if it is a
-    # number, then we create a local parameter within this reaction.
+    # number or a Parameter, then we create a local parameter within
+    # this reaction.
     #
-    kfname = kf if isinstance(kf, str) else "k"
+    if isinstance(kf, (float, int)):
+        kfname = "k"
+    elif isinstance(kf, Parameter):
+        kfname = kf.name
+    elif isinstance(kf, str):
+        kfname = kf
+    else:
+        raise TypeError("add reaction: unknown parameter type", kf)
 
     # Create the reactants
     ratestring = kfname
@@ -148,12 +165,26 @@ def add_reaction(mixture, reactants, products, kf, kr=None,
         product.setConstant(True)
 
     # Create a kinetic law for the reaction
-    if debug: print("    Creating kinetic law: ", ratestring)
+    if debug: print("    Creating kinetic law (%s): %s" %
+                    (reaction.getId(), ratestring))
     ratelaw = reaction.createKineticLaw();
-    if isinstance(kf, float):
+    if isinstance(kf, Parameter):
+        param = ratelaw.createParameter();
+        param.setId(kf.name)
+        
+        # Set the parameter value
+        if kf.type == 'Numeric':
+            param.setValue(kf.value)
+        elif kf.type == 'Expression':
+            #! TODO: handle more general expressions
+            param.setValue(float(eval(kf.value)))
+        else:
+            warn("add_reaction: parameter type %s not supported" % kf.type)
+            
+    elif isinstance(kf, (float, int)):
         param = ratelaw.createParameter();
         param.setId(kfname)
-        param.setValue(kf)
+        param.setValue(float(kf))
     ratelaw.setFormula(ratestring);
 
     # If the reverse rate is given, switch things around create reverse raaction

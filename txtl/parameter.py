@@ -10,7 +10,7 @@ import sys
 
 class Parameter:
     "Parameter value (reaction rates)"
-    def __init__(self, name, type, value, comment, debug=False):
+    def __init__(self, name, type, value, comment="", debug=False):
         self.name = name.strip()
         self.type = type.strip()
         self.comment = comment.strip()
