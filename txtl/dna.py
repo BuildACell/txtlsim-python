@@ -565,9 +565,10 @@ class dna2rna_basic(Mechanism):
                      kf, kr)
 
         # Create reaction that produces mRNA
+        #! TODO: figure out correct reaction rate
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.rnap_bound], [mixture.rnap, assy.rna],
-                     kf=1)
+        add_reaction(mixture, [assy.rnap_bound],
+                     [mixture.rnap, assy.rna, assy.dna], kf=1)
         
 class rna2prot_basic(Mechanism):
     "Basic translation mechanism"
@@ -579,9 +580,16 @@ class rna2prot_basic(Mechanism):
                      kr=assy.utr5.Ribosome_Binding_R)
 
         # Create reaction that produces protein
+        #! TODO: figure out correct reaction rate
         if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.ribo_bound], [mixture.ribo, assy.protein],
+        add_reaction(mixture, [assy.ribo_bound],
+                     [mixture.ribo, assy.rna, assy.protein],
                      kf=1)
+
+        # RNA degradation
+        #! TODO: include this as a submechanism to allow enzymatic action
+        #! TODO: figure out correct reaction rate
+        add_reaction(mixture, [assy.rna], [], kf=1)
 
 class protein_maturation(Mechanism):
     "Basic protein maturation"
@@ -590,3 +598,10 @@ class protein_maturation(Mechanism):
         #! TODO: See if this protein is subject to maturation
         #! TODO: Create maturation reaction
         return None
+
+class protein_degradation_basic(Mechanism):
+    "Basic protein degradation"
+
+class RNA_degradation_basic(Mechanism):
+    "Basic RNA dedgradation"
+    
