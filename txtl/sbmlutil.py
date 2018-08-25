@@ -34,6 +34,9 @@ def add_species(mixture, type, name, ic=None, debug=False):
         species.setName(species_name)
         species.setId(species_id)
         species.setCompartment(mixture.compartment.getId())
+        species.setConstant(False)
+        species.setBoundaryCondition(False)
+        species.setHasOnlySubstanceUnits(False) #! TODO: confirm this is OK
 
     else:
         if debug: print("add_species: %s already exists", species.getId())

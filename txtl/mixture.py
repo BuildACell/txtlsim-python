@@ -58,13 +58,19 @@ class Mixture():
         model = document.createModel()
 
         # Set up required units and containers
-        model.setTimeUnits("second")    # set model-wide time units
-        model.setExtentUnits("mole")    # set model units of extent
-        model.setSubstanceUnits('mole') # set model substance units
+        model.setTimeUnits("second")            # set model-wide time units
+        model.setExtentUnits("mole")            # set model units of extent
+        model.setSubstanceUnits('mole')         # set model substance units
+        model.setLengthUnits('metre')           # area units (never used?)
+        model.setAreaUnits('square metre')      # area units (never used?)
+        model.setVolumeUnits("litre")           # default volume unit
 
         # Define the default compartment
         compartment = model.createCompartment()
         compartment.setId("txtl")
+        compartment.setConstant(True)           # keep compartment size constant
+        compartment.setSpatialDimensions(3)     # 3 dimensional compartment
+        compartment.setVolume(1e-6)             # 1 microliter
 
         # Initialize instance variables
         self.name = name;               # Save the name of the mixture

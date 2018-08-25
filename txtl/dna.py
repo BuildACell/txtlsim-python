@@ -201,11 +201,11 @@ class Promoter(DNA):
         # Create the mRNA species
         assy.rnaname = assy.utr5.name + "--" + assy.cds.name
         if (assy.ctag != None): assy.rnaname += "--" + assy.ctag.name
-        assy.rna = add_species(mixture, "RNA", assy.rnaname)
+        assy.rna = add_species(mixture, "RNA", assy.rnaname, 0)
 
         # Create RNA polymerase bound to DNA
         assy.rnap_bound = add_species(mixture, "Complex",
-                                      self.rnapname + ":" + assy.name)
+                                      self.rnapname + ":" + assy.name, 0)
 
         # Create any other species needed by the transcriptional machinery
         mechanisms['transcription'].update_species(mixture, assy, mechanisms,
@@ -261,7 +261,7 @@ class RepressedPromoter(Promoter):
 
         # Create repressor bound to DNA
         self.tf_bound = add_species(mixture, "Complex",
-                                    self.tfname + ":" + assy.name)
+                                    self.tfname + ":" + assy.name, 0)
 
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
         model = mixture.model   # Get the model where we will store results
@@ -327,15 +327,11 @@ class ConstitutiveRBS(UTR5):
         # Create the protein
         assy.protname = assy.cds.name
         if (assy.ctag != None): assy.protname += "--" + assy.ctag.name
-        assy.protein = add_species(mixture, "Protein", assy.protname)
-
-        # Create the ribosome
-        #! TODO: think about whether this belongs here or not
-        assy.ribo = add_species(mixture, None, self.riboname)
+        assy.protein = add_species(mixture, "Protein", assy.protname, 0)
 
         # Create Ribosome bound to RNA
         assy.ribo_bound = add_species(mixture, "Complex",
-                                      self.riboname + ":" + assy.rnaname)
+                                      self.riboname + ":" + assy.rnaname, 0)
         
         # Create any other species needed by the transcriptional machinery
         mechanisms['translation'].update_species(mixture, assy, mechanisms,
@@ -376,10 +372,11 @@ class CDS(DNA):
         model = mixture.model   # Get the model where we will store results
 
         # Create species for the protein
-        self.protein = add_species(mixture, "Protein", self.name)
+        self.protein = add_species(mixture, "Protein", self.name, 0)
         if self.dimerize:
             #! Move to mechanism function?
-            self.dimer = add_species(mixture, "Protein", self.name + " dimer")
+            self.dimer = add_species(mixture, "Protein",
+                                     self.name + " dimer", 0)
 
     # Default action of a protein is to mature and (optionally) dimerize
     def update_reactions(self, mixture, mechanisms, parameters={}, debug=False):
