@@ -8,11 +8,8 @@ from .mixture import Mixture
 from .component import Component
 from .sbmlutil import add_species, add_reaction, add_parameter
 from .parameter import get_parameters, eval_parameter
-from .dna import dna2rna_basic  #! TODO: move mechanisms to mechanisms/
-from .dna import rna2prot_basic #! TODO: move mechanisms to mechanisms/
-from .dna import dna_degradation_basic
-from .dna import rna_degradation_basic
-from .dna import protein_degradation_basic
+
+from .mechanisms import transcription, translation, maturation, degradation
 
 class Extract(Component):
     """TX-TL extract component
@@ -37,11 +34,11 @@ class Extract(Component):
 
 class StandardExtract(Extract):
     mechanisms = {
-        'transcription'         : dna2rna_basic(),
-        'translation'           : rna2prot_basic(),
-        'DNA_degradation'       : dna_degradation_basic(),
-        'RNA_degradation'       : rna_degradation_basic(),
-        'protein_degradation'   : protein_degradation_basic()
+        'transcription'         : transcription.basic(),
+        'translation'           : translation.basic(),
+        'DNA_degradation'       : degradation.dna_basic(),
+        'RNA_degradation'       : degradation.rna_basic(),
+        'protein_degradation'   : degradation.protein_basic()
     }
 
     def update_species(self, mixture, conc, mechanisms={}):

@@ -13,7 +13,7 @@ def load_model(prefix, name, length):
     #! Expand this to look in other locations
     try:
         from importlib import import_module
-        module = import_module("txtl.models.%s_%s" %
+        module = import_module("txtl.components.%s_%s" %
                                (prefix.lower(), name.lower()))
         model = eval("module.%s_%s('%s', %d)" %
                      (prefix, name.lower(), name, length))

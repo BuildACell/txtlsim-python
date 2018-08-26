@@ -106,7 +106,7 @@ def load_config(filename, extension=".csv", debug=False):
 
     # Look for the config file in a list of paths
     csvfile = None
-    for path in (module_path + "/models/", module_path + "/config/"):
+    for path in (module_path + "/components/", module_path + "/config/"):
         try:
             #! TODO: add extension if not present
             filepath = path + filename

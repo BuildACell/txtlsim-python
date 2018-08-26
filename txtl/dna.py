@@ -9,7 +9,6 @@
 # Copyright (c) 2018, Build-A-Cell. All rights reserved.
 # See LICENSE file in the project root directory for details.
 
-
 import re                      # use Python's regular expression library
 from math import log
 from .component import Component
