@@ -95,7 +95,7 @@ class Mixture():
 
         # Now go through and add all of the reactions that are required
         for component in self.components:
-            component.update_reactions(self, self.parameters)
+            component.update_reactions(self)
 
         # Write the model to a file
         libsbml.writeSBMLToFile(self._SBMLdoc, filename)
@@ -151,6 +151,10 @@ def combine_mixtures(mixtures, volumes=None, name=None):
         scale = volume[i]/total_volume if volumes != None else 1/total_volume
         for j in range(len(mixtures[i].concentrations)):
             outmixture.concentrations += [mixtures[i].concentrations[j] * scale]
+
+        # Combine parameter dictionaries from each mixture
+        #! TODO: issue a warning if there are conflicting parameters
+        outmixture.parameters.update(mixtures[i].parameters)
 
     return outmixture
 

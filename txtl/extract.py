@@ -7,7 +7,7 @@
 from .mixture import Mixture
 from .component import Component
 from .sbmlutil import add_species, add_reaction, add_parameter
-from .parameter import load_config, eval_parameter
+from .parameter import get_parameters, eval_parameter
 from .dna import dna2rna_basic  #! TODO: move mechanisms to mechanisms/
 from .dna import rna2prot_basic #! TODO: move mechanisms to mechanisms/
 from .dna import dna_degradation_basic
@@ -27,12 +27,13 @@ class Extract(Component):
     mixture mechanisms).
 
     """
-    def __init__(self, config_file):
-        # Read the configuration parameters
-        self.parameters = load_config(config_file)
-
+    def __init__(self, name, parameters={}):
         # Save the name of the config file
-        self.name = "Extract " + config_file
+        self.name = "Extract " + name
+        
+        # Read and store the extract parameters
+        self.config_file = name.lower() + ".csv"
+        self.parameters = get_parameters(self.config_file, parameters)
 
 class StandardExtract(Extract):
     mechanisms = {
@@ -53,17 +54,26 @@ class StandardExtract(Extract):
         # transcription only system or a pure buffer with no cellular
         # machinery).
         #
-        RNAP_ic = self.parameters['RNAP_ic'].value
-        mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_ic * conc)
+        RNAP_ic = self.eval_parameter('RNAP_ic')
+        if RNAP_ic != None:
+            mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_ic * conc)
+        else:
+            warn("Extract missing species RNAP")
         
-        Ribo_ic = self.parameters['Ribo_ic'].value
-        mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_ic * conc)
+        Ribo_ic = self.eval_parameter('Ribo_ic')
+        if Ribo_ic != None:
+            mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_ic * conc)
+        else:
+            warn("Extract missing species Ribo")
 
-        RecBCD_ic = self.parameters['RecBCD_ic'].value
-        mixture.recbcd = add_species(mixture, None, 'RecBCD', RecBCD_ic * conc)
+        RecBCD_ic = self.eval_parameter('RecBCD_ic')
+        if RecBCD_ic != None:
+                 mixture.recbcd = add_species(mixture, None, 'RecBCD',
+                                              RecBCD_ic * conc)
 
-        RNase_ic = self.parameters['RNase_ic'].value
-        mixture.rnase = add_species(mixture, None, 'RNase', RNase_ic * conc)
+        RNase_ic = self.eval_parameter('RNase_ic')
+        if RNase_ic != None:
+            mixture.rnase = add_species(mixture, None, 'RNase', RNase_ic * conc)
 
         #
         # Add in the (global) parameters that are present in the extract
@@ -71,7 +81,10 @@ class StandardExtract(Extract):
         # An extract should define a set of parameters that can be
         # used by all other reactions in the system.  These are added
         # at the time of species creation to insure that they are
-        # available when reactions are created.
+        # available when reactions are created within components.
+        #
+        # TODO: Think about whether this really needs to happen in
+        # update_species.  (I think not.)
         #
         parameter_names = [
             # DNA degradation parameters
@@ -104,18 +117,16 @@ class StandardExtract(Extract):
             'ATP_degradation_rate', 'ATP_degradation_start_time'
         ]
         for name in parameter_names:
-            # Make sure parameter was given in configuration file
-            if self.parameters[name] != None:
-                # Determine the value of the parameter
-                value = eval_parameter(self.parameters[name], self.parameters)
+            # Determine the value of the parameter
+            value = eval_parameter(self, name)
                 
-                # Create the parameter in the model
+            # Create the parameter in the model
+            if value != None:
                 add_parameter(mixture, name, value)
 
-    def update_reactions(self, mixture, mechanisms={}, parameters={}):
+    def update_reactions(self, mixture):
         #! TODO: add reactions that are instantiated by extract
-        # mechanism['RNA_degradation'].update_reactions(mixture, mechanisms,
-        #                                               parameters)
+        # mechanism['RNA_degradation'].update_reactions(mixture, mechanisms)
         None
 
 # Create a mixture containing extract

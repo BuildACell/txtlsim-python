@@ -36,11 +36,8 @@ class Mechanism:
 
     """
     def __init__(self): return None
-    def update_species(self, mixture, component, conc, mechanisms,
-                       parameters={}): return None
-    def update_reactions(self, model, component, mechanisms,
-                         parameters={}): return None
-
+    def update_species(self, mixture, component, conc): return None
+    def update_reactions(self, mixture, component): return None
 
 # Utility function to retrieve mechanism list
 def get_mechanisms(mixture, component, custom={}):
