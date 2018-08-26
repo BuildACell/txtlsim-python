@@ -16,6 +16,7 @@ from .sbmlutil import add_species, add_reaction, find_species
 from .mechanism import Mechanism, get_mechanisms
 from .pathutil import load_model
 from .parameter import get_parameters, update_existing, update_missing
+from .mechanisms import maturation
 
 #
 # DNA assembly
@@ -57,12 +58,15 @@ class DNAassembly(Component):
     Data attributes
     ---------------
     name        Name of the sequence (str)
-    length      Length of the sequence (int)
     promoter    Promoter sequence (DNA)
     utr5        5' UTR (DNA)
     cds         Coding sequence (DNA) 
     ctag        C-terminus tag (DNA)
     utr3        3' UTR (DNA)
+
+    dnalength   Length of the entire sequence (int)
+    rnalength   Length of the transcribed components (int)
+    peplength   Lenth of the translated components (int)
 
     rnaname     Name of the RNA species (str) [not implemented]
     rnap        RNAP species (SMBLspecies) [not implemented]
@@ -93,12 +97,16 @@ class DNAassembly(Component):
         self.cds = cds
         self.ctag = ctag
         self.utr3 = utr3
-        self.length = 0
+
+        # Keep track of the length of DNA, RNA, and protein (peptide)
+        self.dnalength = 0
+        self.rnalength = 0
+        self.peplength = 0
 
         # Set up the default mechanisms for a DNA assembly
         # Note: transcription, translation, degradation are given by extract
         self.default_mechanisms = {
-            'maturation' : protein_maturation_basic()
+            'maturation' : maturation.protein_basic()
         }
         self.custom_mechanisms = mechanisms
 
@@ -198,10 +206,10 @@ class DNA(Component):
             config_file, parameters, default_parameters, **keywords)
 
     # Set up default update functions to do nothing
-    def update_species(self, mixture, conc, parameters={}):
+    def update_species(self, mixture, conc):
         return None
     
-    def update_reactions(self, mixture, parameters={}):
+    def update_reactions(self, mixture):
         return None
 
 #
@@ -260,7 +268,7 @@ class Promoter(DNA):
         mechanisms['transcription'].update_species(mixture, assy, conc)
         
     # Default action of a promoter is to implement transcription
-    def update_reactions(self, mixture, parameters={}, debug=False):
+    def update_reactions(self, mixture, debug=False):
         model = mixture.model   # Get the model where we will store results
         assy = self.assy        # Get the DNA assembly we are part of
 
@@ -331,7 +339,7 @@ class RepressedPromoter(Promoter):
                      kr = params['DNAsequestration_R'])
 
         # mechanisms = get_mechanisms(mixture, assy, self.mechanisms)
-        # mechanisms['process'].update_reactions(mixture, assy, parameters)
+        # mechanisms['process'].update_reactions(mixture, assy)
 
 #
 # UTR5 subclasses
@@ -396,10 +404,10 @@ class ConstitutiveRBS(UTR5):
         mechanisms['translation'].update_species(mixture, assy, conc)
 
     # Default action of a promoter is to implement transcription
-    def update_reactions(self, mixture, parameters={}, debug=False):
+    def update_reactions(self, mixture, debug=False):
         assy = self.assy        # Get the DNA assembly we are part of
         mechanisms = get_mechanisms(mixture, assy, self.mechanisms)
-        mechanisms['translation'].update_reactions(mixture, assy, parameters)
+        mechanisms['translation'].update_reactions(mixture, assy)
         
 #
 # CDS subclasses
@@ -463,7 +471,7 @@ class CDS(DNA):
 
         # Let the individual mechanisms create all of the reactions
         mechanisms = get_mechanisms(mixture, assy, self.mechanisms)
-        mechanisms['maturation'].update_reactions(mixture, assy, parameters)
+        mechanisms['maturation'].update_reactions(mixture, assy)
         
 # Protein coding sequence (same as a CDS)
 class ProteinCDS(CDS):
@@ -529,11 +537,10 @@ def assemble_dna(
         name = None,            # component-specific arguments
         **keywords              # parameter keywords (passed to elements)
 ):
-    #! TODO: add ability to override parameters for the assembly
     # Create a new sequence of DNA
     sequence = DNAassembly(
         name, mechanisms=mechanisms, config_file=config_file,
-        parameters=parameters)
+        parameters=parameters, **keywords)
 
     # Initialize the name string if nothing was given
     if name == None: sequence.name = ""
@@ -546,7 +553,7 @@ def assemble_dna(
     if isinstance(prom, Promoter):
         sequence.promoter = prom
         update_existing(prom.parameters, sequence.parameters)
-        sequence.length += prom.length
+        sequence.dnalength += prom.length
         if name == None: sequence.name += prom.name
     else:
         ValueError("invalid promoter specification")
@@ -559,7 +566,8 @@ def assemble_dna(
     if isinstance(utr5, UTR5):
         sequence.utr5 = utr5
         update_existing(utr5.parameters, sequence.parameters)
-        sequence.length += utr5.length
+        sequence.dnalength += utr5.length
+        sequence.rnalength += utr5.length
         if name == None: sequence.name += "--" + utr5.name
     else:
         ValueError("invalid UTR5 specification")
@@ -572,7 +580,9 @@ def assemble_dna(
     if isinstance(cds, CDS):
         sequence.cds = cds
         update_existing(cds.parameters, sequence.parameters)
-        sequence.length += cds.length
+        sequence.dnalength += cds.length
+        sequence.rnalength += cds.length
+        sequence.peplength += cds.length
         if name == None: sequence.name += "--" + cds.name
     else:
         ValueError("invalid CDS specification")
@@ -585,7 +595,9 @@ def assemble_dna(
     if isinstance(ctag, Ctag):
         sequence.ctag = ctag
         update_existing(ctag.parameters, sequence.parameters)
-        sequence.length += ctag.length
+        sequence.dnalength += ctag.length
+        sequence.rnalength += ctag.length
+        sequence.peplength += ctag.length
         if name == None: sequence.name += "--" + ctag.name
     else:
         ValueError("invalid Ctag specification")
@@ -598,7 +610,8 @@ def assemble_dna(
     if isinstance(utr3, UTR3):
         sequence.utr3 = utr3
         update_existing(utr3.parameters, sequence.parameters)
-        sequence.length += utr3.length
+        sequence.dnalength += utr3.length
+        sequence.rnalength += utr3.length
         if name == None: sequence.name += "--" + utr3.name
     else:
         ValueError("invalid UTR3 specification")
@@ -625,76 +638,3 @@ def parse_DNA_string(spec):
 
     # Return name and length as a tuple
     return name, length
-
-#
-# Default core mechanisms for transcription and translation
-#
-# These functions define the core mechanisms used to implement
-# transcription and translation of a DNA assembly.
-#
-
-#! TODO: move core mechanisms to mechanisms/ directory
-
-# Convert DNA to RNA
-class dna2rna_basic(Mechanism):
-    "Basic transcription mechanism"
-    def update_reactions(self, mixture, assy, debug=False):
-        parameters = assy.promoter.parameters   # get parameter values
-        
-        # Figure out the reaction rates
-        kf = parameters['RNAPbound_Forward']
-        kr = parameters['RNAPbound_Reverse']
-        
-        # Create reaction that binds RNAP to DNA
-        add_reaction(mixture, [mixture.rnap, assy.dna], [assy.rnap_bound],
-                     kf, kr)
-
-        # Create reaction that produces mRNA
-        #! TODO: figure out correct reaction rate
-        if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.rnap_bound],
-                     [mixture.rnap, assy.rna, assy.dna], kf=1)
-        
-class rna2prot_basic(Mechanism):
-    "Basic translation mechanism"
-    def update_reactions(self, mixture, assy, debug=False):
-        parameters = assy.utr5.parameters       # get parameter values
-
-        # Create reaction that binds Ribo to RNA
-        add_reaction(mixture,
-                     [mixture.ribo, assy.rna], [assy.ribo_bound], 
-                     kf = parameters['Ribosome_Binding_F'],
-                     kr = parameters['Ribosome_Binding_R'])
-
-        # Create reaction that produces protein
-        #! TODO: figure out correct reaction rate
-        if debug: print("dna2rna_basic: produce mRNA")
-        add_reaction(mixture, [assy.ribo_bound],
-                     [mixture.ribo, assy.rna, assy.protein],
-                     kf=1)
-
-        # RNA degradation
-        #! TODO: include this as a submechanism to allow enzymatic action
-        #! TODO: figure out correct reaction rate
-        add_reaction(mixture, [assy.rna], [], kf=1)
-
-class protein_maturation_basic(Mechanism):
-    "Basic protein maturation"
-    def update_reactions(self, mixture, assy, debug=False):
-        #! TODO: See if this protein is subject to maturation
-        #! TODO: Create maturation reaction
-        return None
-
-class dna_degradation_basic(Mechanism):
-    "Basic DNA degradation"
-    #! TODO: not implemented
-
-class rna_degradation_basic(Mechanism):
-    "Basic RNA degradation"
-    #! TODO: not implemented
-
-class protein_degradation_basic(Mechanism):
-    "Basic protein degradation"
-    #! TODO: not implemented
-
-    

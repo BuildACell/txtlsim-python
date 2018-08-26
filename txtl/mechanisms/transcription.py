@@ -9,6 +9,7 @@
 
 from ..mechanism import Mechanism
 from ..sbmlutil import add_species, add_reaction
+from ..parameter import Parameter, eval_parameter
 
 # Convert DNA to RNA
 class basic(Mechanism):
@@ -24,9 +25,16 @@ class basic(Mechanism):
         add_reaction(mixture, [mixture.rnap, assy.dna], [assy.rnap_bound],
                      kf, kr)
 
+        # Figure out the transcription rate based on length of the protein
+        txrate = eval_parameter(
+            mixture, 'Transcription_Rate', {'RNA_Length' : assy.rnalength})
+        txparam = Parameter('TX_Rate', 'Numeric', txrate)
+
+        if debug:
+            print("Transcription rate for RNA %s of length %d = " %
+                  (assy.utr5.name, assy.rnalength), transcription_rate)
+
         # Create reaction that produces mRNA
-        #! TODO: figure out correct reaction rate
-        if debug: print("dna2rna_basic: produce mRNA")
         add_reaction(mixture, [assy.rnap_bound],
-                     [mixture.rnap, assy.rna, assy.dna], kf=1)
-        
+                     [mixture.rnap, assy.rna, assy.dna],
+                     kf=txparam)

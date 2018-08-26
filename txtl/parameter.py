@@ -194,7 +194,7 @@ def update_existing(existing_dict, custom_dict):
         if key in existing_dict.keys():
             existing_dict[key] = value
 
-def eval_parameter(component, name):
+def eval_parameter(component, name, assignments={}):
     parameters = component.parameters
     if name not in parameters.keys() or parameters[name] == None:
         # Couldn't find the parmaeter
@@ -202,8 +202,9 @@ def eval_parameter(component, name):
     param = parameters[name]
     
     # See if we already have a floating point number
+    #! TODO: decide if we need this; can just use the evaluation below?
     if isinstance(param.value, (float, int)): return float(param.value)
 
-    #! TODO: evaluate the expression using `parameters` as a dictionary
+    # Evaluate the expression 
+    return float(eval(param.value, assignments))
 
-    return eval(param.value)

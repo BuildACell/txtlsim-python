@@ -153,5 +153,8 @@ def create_extract(name, type=StandardExtract, mechanisms={}):
     mixture.default_mechanisms = extract.mechanisms
     mixture.custom_mechanisms = mechanisms
 
+    # Store the parameters in the mixture so that components can access them
+    mixture.parameters = extract.parameters
+
     #! TODO: read extract specific parameters
     return mixture

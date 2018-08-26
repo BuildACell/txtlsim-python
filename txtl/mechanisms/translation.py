@@ -9,6 +9,7 @@
 
 from ..mechanism import Mechanism
 from ..sbmlutil import add_species, add_reaction
+from ..parameter import Parameter, eval_parameter
 
 class basic(Mechanism):
     "Basic translation mechanism"
@@ -21,14 +22,16 @@ class basic(Mechanism):
                      kf = parameters['Ribosome_Binding_F'],
                      kr = parameters['Ribosome_Binding_R'])
 
+        # Figure out the translation rate based on length of the protein
+        tlrate = eval_parameter(
+            mixture, 'Translation_Rate', {'Protein_Length' : assy.cds.length})
+        tlparam = Parameter('TL_Rate', 'Numeric', tlrate)
+                                          
+        if debug:
+            print("Translation rate for RBS %s of length %d = " %
+                  (assy.utr5.name, assy.peplength), tlrate)
+
         # Create reaction that produces protein
-        #! TODO: figure out correct reaction rate
-        if debug: print("dna2rna_basic: produce mRNA")
         add_reaction(mixture, [assy.ribo_bound],
                      [mixture.ribo, assy.rna, assy.protein],
-                     kf=1)
-
-        # RNA degradation
-        #! TODO: include this as a submechanism to allow enzymatic action
-        #! TODO: figure out correct reaction rate
-        add_reaction(mixture, [assy.rna], [], kf=1)
+                     kf = tlparam)

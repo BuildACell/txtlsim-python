@@ -16,7 +16,9 @@ class dna_basic(Mechanism):
 
 class rna_basic(Mechanism):
     "Basic RNA degradation"
-    #! TODO: not implemented
+    def update_reactions(self, mixture, assy):
+        parameters = mixture.parameters         # get parameter values
+        add_reaction(mixture, [assy.rna], [], kf=parameters['RNA_deg'])
 
 class protein_basic(Mechanism):
     "Basic protein degradation"
