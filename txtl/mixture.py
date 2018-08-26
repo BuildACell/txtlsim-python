@@ -1,18 +1,23 @@
 # mixture.py - Mixture class and related functions
 # RMM, 11 Aug 2018
 #
+# This file default the mixture class, which is used to hold a
+# collection of components.  The docstring from the Mixture class
+# describes the use of this function in more detail.
+#
 # Copyright (c) 2018, Build-A-Cell. All rights reserved.
 # See LICENSE file in the project root directory for details.
 
 import libsbml
+from .sbmlutil import create_sbml_model
 
 class Mixture():
     """Container for components (extract, genes, etc)
 
-    The Mixture class is used as a container for a set of components.
-    The components of a mixture define the species and reactions that
-    are present in that mixture.  Mixtures can be added and scaled to
-    create new mixtures (not yet implemented).
+    The Mixture class is used as a container for a set of components
+    that define the species and reactions to implement a TX-TL system.
+    Mixtures can be added and scaled to create new mixtures (not yet
+    implemented).
 
     Data attributes
     ---------------
@@ -55,32 +60,7 @@ class Mixture():
         "Create a new mixture"
         
         # Create an SBML document container and model
-        document = libsbml.SBMLDocument(3, 1)
-        model = document.createModel()
-
-        # Define units for area (not used, but keeps COPASI from complaining)
-        unitdef = model.createUnitDefinition()
-        unitdef.setId('square_metre')
-        unit = unitdef.createUnit()
-        unit.setKind(libsbml.UNIT_KIND_METRE)
-        unit.setExponent(2)
-        unit.setScale(0)
-        unit.setMultiplier(1)
-
-        # Set up required units and containers
-        model.setTimeUnits('second')            # set model-wide time units
-        model.setExtentUnits('mole')            # set model units of extent
-        model.setSubstanceUnits('mole')         # set model substance units
-        model.setLengthUnits('metre')           # area units (never used?)
-        model.setAreaUnits('square_metre')      # area units (never used?)
-        model.setVolumeUnits('litre')           # default volume unit
-
-        # Define the default compartment
-        compartment = model.createCompartment()
-        compartment.setId('txtl')
-        compartment.setConstant(True)           # keep compartment size constant
-        compartment.setSpatialDimensions(3)     # 3 dimensional compartment
-        compartment.setVolume(1e-6)             # 1 microliter
+        document, model, compartment = create_sbml_model()
 
         # Initialize instance variables
         self.name = name;               # Save the name of the mixture

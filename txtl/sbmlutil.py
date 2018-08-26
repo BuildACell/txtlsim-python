@@ -9,8 +9,39 @@ import re
 from .parameter import Parameter
 from warnings import warn
 
-# Reaction ID number
+# Reaction ID number (global)
 reaction_id = 0
+
+# Create an SBML model
+def create_sbml_model():
+    document = libsbml.SBMLDocument(3, 1)
+    model = document.createModel()
+
+    # Define units for area (not used, but keeps COPASI from complaining)
+    unitdef = model.createUnitDefinition()
+    unitdef.setId('square_metre')
+    unit = unitdef.createUnit()
+    unit.setKind(libsbml.UNIT_KIND_METRE)
+    unit.setExponent(2)
+    unit.setScale(0)
+    unit.setMultiplier(1)
+
+    # Set up required units and containers
+    model.setTimeUnits('second')            # set model-wide time units
+    model.setExtentUnits('mole')            # set model units of extent
+    model.setSubstanceUnits('mole')         # set model substance units
+    model.setLengthUnits('metre')           # area units (never used?)
+    model.setAreaUnits('square_metre')      # area units (never used?)
+    model.setVolumeUnits('litre')           # default volume unit
+
+    # Define the default compartment
+    compartment = model.createCompartment()
+    compartment.setId('txtl')
+    compartment.setConstant(True)           # keep compartment size constant
+    compartment.setSpatialDimensions(3)     # 3 dimensional compartment
+    compartment.setVolume(1e-6)             # 1 microliter
+
+    return document, model, compartment
 
 # Helper function to add a species to the model
 def add_species(mixture, type, name, ic=None, debug=False):
