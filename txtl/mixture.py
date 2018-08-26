@@ -16,13 +16,14 @@ class Mixture():
 
     Data attributes
     ---------------
-    name            Name of the mixture
-    document        SBMLDocument containing the model
-    model           SBML Model containing species, reactions
-    components      List of components in the mixture (list of Components)
-    concentrations  Concentration of each component (list of floats)
-    mechanisms      Default mechanisms for this mixture (dict)
-    parameters      Global parameters for the mixture (dict)
+    name                Name of the mixture
+    document            SBMLDocument containing the model
+    model               SBML Model containing species, reactions
+    components          List of components in the mixture (list of Components)
+    concentrations      Concentration of each component (list of floats)
+    default_mechanisms  Default mechanisms for this mixture (dict)
+    custom_mechanisms   User-specified mechanisms for this mixture (dict)
+    parameters          Global parameters for the mixture (dict)
 
     The mechanisms and parameters dictionaries are established by the
     create_extract() and create_buffer() functions, using the
@@ -50,7 +51,7 @@ class Mixture():
     mix.write_sbml(filename)
 
     """
-    def __init__(self, name=None):
+    def __init__(self, name=None, mechanisms={}, config_file=None):
         "Create a new mixture"
         
         # Create an SBML document container and model
@@ -89,11 +90,17 @@ class Mixture():
         self.components = []            # components contained in mixture
         self.concentrations = []        # concentrations of each component
 
-        # Mixture level variables (set by special components)
-        self.parameters = {}
-
         # Override the default mechanisms with anything we were passed
-        self.mechanisms = {}
+        # Note: These are overrwriten by create_extract()
+        self.default_mechanisms = {
+            # 'mechanism' : MechanismConstructor()
+        }
+        self.custom_mechanisms = mechanisms
+
+        # Read the configuration parameters
+        self.parameters = {}
+        if (config_file != None):
+            self.parameters.update(load_config(config_file))
 
     def write_sbml(self, filename):
         "Generate an SBML file for the current mixture (model)"
@@ -104,11 +111,11 @@ class Mixture():
             component = self.components[i]
 
             # Create all of the species for this component
-            component.update_species(self, concentration, self.mechanisms)
+            component.update_species(self, concentration)
 
         # Now go through and add all of the reactions that are required
         for component in self.components:
-            component.update_reactions(self, self.mechanisms, self.parameters)
+            component.update_reactions(self, self.parameters)
 
         # Write the model to a file
         libsbml.writeSBMLToFile(self._SBMLdoc, filename)
@@ -154,7 +161,8 @@ def combine_mixtures(mixtures, volumes=None, name=None):
     for i in range(len(mixtures)):
         # Combine the mechanisms
         #! TODO: issue a warning if there are conflicting mechanisms
-        outmixture.mechanisms.update(mixtures[i].mechanisms)
+        outmixture.default_mechanisms.update(mixtures[i].default_mechanisms)
+        outmixture.custom_mechanisms.update(mixtures[i].custom_mechanisms)
 
         # Components of new mixture are concatenation of mixture components
         outmixture.components += mixtures[i].components

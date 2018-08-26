@@ -8,8 +8,9 @@
 # Copyright (c) 2018, Build-A-Cell. All rights reserved.
 # See LICENSE file in the project root directory for details.
 
-from .sbmlutil import add_species, add_reaction
 from warnings import warn
+from .sbmlutil import add_species, add_reaction
+from .mechanism import get_mechanisms
 
 # Component class for core components
 class Component:
@@ -22,7 +23,8 @@ class Component:
     Data attributes
     ---------------
     name                Component name (str)
-    mechanisms          Mechanism dictionary (dict)
+    default_mechanisms  Default mechanisms for the component (dict)
+    custom_mechanisms   User-specified mechanisms for the component (dict)
     config_file         Configuration file (str)
     parameters          Parameter dictionary (dict)
 
@@ -65,12 +67,12 @@ class Component:
         # should be placed in the mechanisms/ diretory and imported
         # before use.
         #
-        self.mechanisms = {
+        self.default_mechanisms = {
             # 'mechanism' : MechanismConstructor()
         }
 
         # Add (or overwrite) any mechanisms passed as arguments
-        self.mechanisms.update(mechanisms)
+        self.custom_mechanisms = mechanisms
 
         # Read the configuration parameters
         self.parameters = {}
@@ -78,7 +80,7 @@ class Component:
             self.parameters.update(load_config(config_file))
 
     #! TODO: think about argument order
-    def update_species(self, mixture, concentration, mechanisms={}):
+    def update_species(self, mixture, concentration):
         """Update (or create) the set of species associated with this
         component.
 
@@ -91,14 +93,15 @@ class Component:
         # self.product = add_species(model, "Type", name)
         
         # Create any other species needed by the transcriptional machinery
-        for name in self.mechanisms:
+        mechanisms = get_mechanisms(mixture, self)
+        for name in mechanisms:
             mechanism = mechanisms[name]
-            mechanism.update_species(mixture, concentration, mechanisms)
+            mechanism.update_species(mixture, concentration)
         
         # If the default member function gets used, issue a warning
         warn("component: default __init__ called for " + name)
 
-    def update_reactions(self, mixture, mechanisms={}, parameters={}):
+    def update_reactions(self, mixture, parameters={}):
         """Update (or create) the set of reactions associated with this
         component
 
@@ -114,9 +117,10 @@ class Component:
         parameters.update(self.parameters)
         
         # Create any other species needed by the transcriptional machinery
-        for name in self.mechanisms:
+        mechanisms = get_mechanisms(mixture, component)
+        for name in mechanisms:
             mechanism = mechanisms[name]
-            mechanism.update_reactions(mixture, mechanisms, parameters)
+            mechanism.update_reactions(mixture, parameters)
         
         # If the default member function gets used, issue a warning
         warn("component: default __init__ called for " + name)

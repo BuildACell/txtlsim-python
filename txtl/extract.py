@@ -10,6 +10,9 @@ from .sbmlutil import add_species, add_reaction, add_parameter
 from .parameter import load_config, eval_parameter
 from .dna import dna2rna_basic  #! TODO: move mechanisms to mechanisms/
 from .dna import rna2prot_basic #! TODO: move mechanisms to mechanisms/
+from .dna import dna_degradation_basic
+from .dna import rna_degradation_basic
+from .dna import protein_degradation_basic
 
 class Extract(Component):
     """TX-TL extract component
@@ -32,11 +35,13 @@ class Extract(Component):
         self.name = "Extract " + config_file
 
 class StandardExtract(Extract):
-    def get_mechanisms(self):
-        return {
-            'transcription' : dna2rna_basic(),
-            'translation'   : rna2prot_basic(),
-        }
+    mechanisms = {
+        'transcription'         : dna2rna_basic(),
+        'translation'           : rna2prot_basic(),
+        'DNA_degradation'       : dna_degradation_basic(),
+        'RNA_degradation'       : rna_degradation_basic(),
+        'protein_degradation'   : protein_degradation_basic()
+    }
 
     def update_species(self, mixture, conc, mechanisms={}):
         #
@@ -114,7 +119,7 @@ class StandardExtract(Extract):
         None
 
 # Create a mixture containing extract
-def create_extract(name, type=StandardExtract):
+def create_extract(name, type=StandardExtract, mechanisms={}):
     # Create a mixture to hold the extract
     mixture = Mixture(name)
 
@@ -136,8 +141,9 @@ def create_extract(name, type=StandardExtract):
     #
     mixture.concentrations = [10.0/(10.0/3.0)]
 
-    # Initalize the mechanisms that are represented in the extract
-    mixture.mechanisms.update(extract.get_mechanisms())
-    
+    # Store default mechanisms and custom mechanisms
+    mixture.default_mechanisms = extract.mechanisms
+    mixture.custom_mechanisms = mechanisms
+
     #! TODO: read extract specific parameters
     return mixture
