@@ -18,8 +18,8 @@ class basic(Mechanism):
         parameters = assy.promoter.parameters   # get parameter values
         
         # Figure out the reaction rates
-        kf = parameters['RNAPbound_Forward']
-        kr = parameters['RNAPbound_Reverse']
+        kf = parameters['RNAPbound_F']
+        kr = parameters['RNAPbound_R']
         
         # Create reaction that binds RNAP to DNA
         add_reaction(mixture, [mixture.rnap, assy.dna], [assy.rnap_bound],

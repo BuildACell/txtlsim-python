@@ -46,11 +46,11 @@ The following general guidelines hold for usage of parameters in the
    the component or using the `parameters` argument (passed as a dict
    object, described below).  Examples:
 
-     myptet = Promoter('ptet', RNAPbound_Forward=20)
-     myptet = Promoter('ptet', parameters={'RNAPbound_Forward':20})
+     myptet = Promoter('ptet', RNAPbound_F=20)
+     myptet = Promoter('ptet', parameters={'RNAPbound_F':20})
      ptet_param = {
-       'RNAPbound_Forward' : 20,
-       'RNAPbound_Reverse' : Parameter('my_param', 'Numeric', 20)
+       'RNAPbound_F' : 20,
+       'RNAPbound_R' : Parameter('my_param', 'Numeric', 20)
      }
      myptet = Promoter('ptet', ptet_param)
 
@@ -78,6 +78,7 @@ The following general guidelines hold for usage of parameters in the
 import csv
 import os
 import sys
+import re
 from warnings import warn
 
 class Parameter:
@@ -132,6 +133,12 @@ def load_config(filename, extension=".csv", debug=False):
             param = Parameter(row[0], row[1], row[2], row[3])
         else:
             param = Parameter(row[0], row[1], row[2], "")
+
+        # Name simplification for backward compatibility with MATLAB code
+        param.name = re.sub("_Forward", "_F", param.name)
+        param.name = re.sub("_Reverse", "_R", param.name)
+        param.name = re.sub("_ic", "_IC", param.name)
+        param.name = re.sub("_Concentration", "_IC", param.name)
 
         # Set up as dictionary for easy access
         params[param.name] = param

@@ -51,26 +51,26 @@ class StandardExtract(Extract):
         # transcription only system or a pure buffer with no cellular
         # machinery).
         #
-        RNAP_ic = self.eval_parameter('RNAP_ic')
-        if RNAP_ic != None:
-            mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_ic * conc)
+        RNAP_IC = self.eval_parameter('RNAP_IC')
+        if RNAP_IC != None:
+            mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_IC * conc)
         else:
             warn("Extract missing species RNAP")
         
-        Ribo_ic = self.eval_parameter('Ribo_ic')
-        if Ribo_ic != None:
-            mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_ic * conc)
+        Ribo_IC = self.eval_parameter('Ribo_IC')
+        if Ribo_IC != None:
+            mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_IC * conc)
         else:
             warn("Extract missing species Ribo")
 
-        RecBCD_ic = self.eval_parameter('RecBCD_ic')
-        if RecBCD_ic != None:
+        RecBCD_IC = self.eval_parameter('RecBCD_IC')
+        if RecBCD_IC != None:
                  mixture.recbcd = add_species(mixture, None, 'RecBCD',
-                                              RecBCD_ic * conc)
+                                              RecBCD_IC * conc)
 
-        RNase_ic = self.eval_parameter('RNase_ic')
-        if RNase_ic != None:
-            mixture.rnase = add_species(mixture, None, 'RNase', RNase_ic * conc)
+        RNase_IC = self.eval_parameter('RNase_IC')
+        if RNase_IC != None:
+            mixture.rnase = add_species(mixture, None, 'RNase', RNase_IC * conc)
 
         #
         # Add in the (global) parameters that are present in the extract
@@ -85,20 +85,18 @@ class StandardExtract(Extract):
         #
         parameter_names = [
             # DNA degradation parameters
-            'DNA_RecBCD_Forward', 'DNA_RecBCD_Reverse', 
-            'DNA_RecBCD_complex_deg',
+            'DNA_RecBCD_F', 'DNA_RecBCD_R', 'DNA_RecBCD_complex_deg',
             'GamS_RecBCD_F', 'GamS_RecBCD_R',
 
             # Protein degradation parameters
-            'Protein_ClpXP_Forward', 'Protein_ClpXP_Reverse',
-            'Protein_ClpXP_complex_deg',
+            'Protein_ClpXP_F', 'Protein_ClpXP_R', 'Protein_ClpXP_complex_deg',
 
             # RNAP binding to housekeeping promoter (if present)
             'RNAP_S70_F', 'RNAP_S70_R',
 
             # Translational resource utilization
-            'TL_AA_Forward', 'TL_AA_Reverse',
-            'TL_AGTP_Forward', 'TL_AGTP_Reverse',
+            'TL_AA_F', 'TL_AA_R',
+            'TL_AGTP_F', 'TL_AGTP_R',
 
             # Translational binding rates
             'Ribosome_Binding_F', 'Ribosome_Binding_R',
@@ -107,7 +105,7 @@ class StandardExtract(Extract):
             'RNA_deg', 'RNase_F', 'RNase_R',
 
             # Unknown
-            'NTP_Forward_1', 'NTP_Reverse_1', 'NTP_Forward_2', 'NTP_Reverse_2',
+            'NTP_F_1', 'NTP_R_1', 'NTP_F_2', 'NTP_R_2',
             'RNAPbound_termination_rate', 'Ribobound_termination_rate',
 
             # ATP degradation rates

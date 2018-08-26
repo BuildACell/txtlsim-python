@@ -228,8 +228,8 @@ class Promoter(DNA):
 
     # Default parameters used to describe a promoter
     default_parameters = {
-        'RNAPbound_Forward' : 20,       # Default for ptet
-        'RNAPbound_Reverse' : 400       # Default for ptet
+        'RNAPbound_F' : 20,       # Default for ptet
+        'RNAPbound_R' : 400       # Default for ptet
     }
     
     def __init__(
@@ -286,8 +286,8 @@ class RepressedPromoter(Promoter):
     
     # Default parameters used to describe a repressed promoter
     default_parameters = {
-        'RNAPbound_Forward' : 20,       # Default for ptet
-        'RNAPbound_Reverse' : 400,      # Default for ptet
+        'RNAPbound_F'        : 20,      # Default for ptet
+        'RNAPbound_R'        : 400,     # Default for ptet
         'DNAsequestration_F' : 2.5e-1,  # Default for ptet
         'DNAsequestration_R' : 1.11e-4, # Default for ptet
     }
@@ -421,8 +421,8 @@ class CDS(DNA):
     
     # Default parameters used to describe a repressed promoter
     default_parameter_values = {
-        'Dimerization_Forward' : 1,             # Default for TetR
-        'Dimerization_Reverse' : 1,             # Default for ptet
+        'Dimerization_F' : 1,                   # Default for TetR
+        'Dimerization_R' : 1,                   # Default for ptet
         'Protein_Maturation' : log(2)/(5*60)    # 5 minutes (GFP)
     }
     
@@ -462,8 +462,8 @@ class CDS(DNA):
         if self.dimerize:
             #! Move to mechanism function?
             add_reaction(mixture, [self.protein, self.protein], [self.dimer],
-                         kf = parameters['Dimerization_Forward'],
-                         kr = parameters['Dimerization_Reverse'])
+                         kf = parameters['Dimerization_F'],
+                         kr = parameters['Dimerization_R'])
 
         # Allow override of protein maturation time
         if self.maturation_time != None:
