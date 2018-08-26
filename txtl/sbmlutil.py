@@ -120,7 +120,7 @@ def find_parameter(mixture, id):
 
 # Helper function to add a reaction to a model
 def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
-                 parameters={}, debug=False, ):
+                 parameters={}, debug=False):
     """Add a reaction to a model
 
     The `add_reaction` function is used to add a reaction to a model.

@@ -286,10 +286,10 @@ class RepressedPromoter(Promoter):
     
     # Default parameters used to describe a repressed promoter
     default_parameters = {
-        'RNAPbound_F'        : 20,      # Default for ptet
-        'RNAPbound_R'        : 400,     # Default for ptet
-        'DNAsequestration_F' : 2.5e-1,  # Default for ptet
-        'DNAsequestration_R' : 1.11e-4, # Default for ptet
+        'RNAPbound_F'         : 20,      # Default for ptet
+        'RNAPbound_R'         : 400,     # Default for ptet
+        'DNA_Sequestration_F' : 2.5e-1,  # Default for ptet
+        'DNA_Sequestration_R' : 1.11e-4, # Default for ptet
     }
     
     def __init__(
@@ -335,8 +335,8 @@ class RepressedPromoter(Promoter):
         if tf_species == None:
             raise NameError("RepressedPromoter: %s not found" % self.tfname)
         add_reaction(mixture, [tf_species, assy.dna], [self.tf_bound],
-                     kf = params['DNAsequestration_F'],
-                     kr = params['DNAsequestration_R'])
+                     kf = params['DNA_Sequestration_F'],
+                     kr = params['DNA_Sequestration_R'])
 
         # mechanisms = get_mechanisms(mixture, assy, self.mechanisms)
         # mechanisms['process'].update_reactions(mixture, assy)
@@ -422,7 +422,7 @@ class CDS(DNA):
     # Default parameters used to describe a repressed promoter
     default_parameter_values = {
         'Dimerization_F' : 1,                   # Default for TetR
-        'Dimerization_R' : 1,                   # Default for ptet
+        'Dimerization_R' : 1,                   # Default for TetR
         'Protein_Maturation' : log(2)/(5*60)    # 5 minutes (GFP)
     }
     
