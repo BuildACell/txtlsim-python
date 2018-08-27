@@ -42,11 +42,11 @@ well1 = txtl.combine_tubes([tube1, tube2, tube3])
 
 # Run a simulation
 #! TODO: implement
-# simData = txtl.runsim(well1, 8 * txtl.hours)
+simdata = txtl.bioscrape.runsim(well1, 8 * txtl.hours)
 
 # plot the result
 #! TODO: implement
-# txtl.plot(simData, well1)
+txtl.plot(simdata, well1, ['Protein_deGFP', 'Protein_tetR'])
 
 # Create an SBML file containing the model
 txtl.write_sbml(well1, 'geneexpr.xml')

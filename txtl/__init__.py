@@ -13,6 +13,7 @@ from .dna import *
 
 # Additional functions
 from .sbmlutil import *
+from .bioscrape import runsim, plot
 
 # Some constants used through the library
 minutes = 60                    # number of seconds in a minute
