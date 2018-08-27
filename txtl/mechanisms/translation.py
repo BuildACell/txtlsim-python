@@ -20,7 +20,8 @@ class basic(Mechanism):
         add_reaction(mixture,
                      [mixture.ribo, assy.rna], [assy.ribo_bound], 
                      kf = parameters['Ribosome_Binding_F'],
-                     kr = parameters['Ribosome_Binding_R'])
+                     kr = parameters['Ribosome_Binding_R'],
+                     prefix="tlb_")
 
         # Figure out the translation rate based on length of the protein
         tlrate = eval_parameter(
@@ -34,4 +35,4 @@ class basic(Mechanism):
         # Create reaction that produces protein
         add_reaction(mixture, [assy.ribo_bound],
                      [mixture.ribo, assy.rna, assy.protein],
-                     kf = tlparam)
+                     kf = tlparam, prefix="tlb_")

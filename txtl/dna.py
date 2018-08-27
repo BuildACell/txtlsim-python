@@ -336,7 +336,8 @@ class RepressedPromoter(Promoter):
             raise NameError("RepressedPromoter: %s not found" % self.tfname)
         add_reaction(mixture, [tf_species, assy.dna], [self.tf_bound],
                      kf = params['DNA_Sequestration_F'],
-                     kr = params['DNA_Sequestration_R'])
+                     kr = params['DNA_Sequestration_R'],
+                     prefix = "repr_")
 
         # mechanisms = get_mechanisms(mixture, assy, self.mechanisms)
         # mechanisms['process'].update_reactions(mixture, assy)
@@ -463,7 +464,8 @@ class CDS(DNA):
             #! Move to mechanism function?
             add_reaction(mixture, [self.protein, self.protein], [self.dimer],
                          kf = parameters['Dimerization_F'],
-                         kr = parameters['Dimerization_R'])
+                         kr = parameters['Dimerization_R'],
+                         prefix="cds_")
 
         # Allow override of protein maturation time
         if self.maturation_time != None:
@@ -534,16 +536,16 @@ def assemble_dna(
         mechanisms = {},        # custom mechanisms 
         config_file = None,     # parameter configuration information
         parameters = {},        #   (overrides element defaults)
-        name = None,            # component-specific arguments
+        assy_name = None,       # component-specific arguments
         **keywords              # parameter keywords (passed to elements)
 ):
     # Create a new sequence of DNA
-    sequence = DNAassembly(
-        name, mechanisms=mechanisms, config_file=config_file,
+    assy = DNAassembly(
+        assy_name, mechanisms=mechanisms, config_file=config_file,
         parameters=parameters, **keywords)
 
     # Initialize the name string if nothing was given
-    if name == None: sequence.name = ""
+    if assy_name == None: assy.name = ""
 
     # Parse and store the promoter sequence
     if isinstance(prom, str):
@@ -551,10 +553,10 @@ def assemble_dna(
         prom = load_model("Prom", name, length) # Load from library
         
     if isinstance(prom, Promoter):
-        sequence.promoter = prom
-        update_existing(prom.parameters, sequence.parameters)
-        sequence.dnalength += prom.length
-        if name == None: sequence.name += prom.name
+        assy.promoter = prom
+        update_existing(prom.parameters, assy.parameters)
+        assy.dnalength += prom.length
+        if assy_name == None: assy.name += prom.name
     else:
         ValueError("invalid promoter specification")
 
@@ -564,11 +566,11 @@ def assemble_dna(
         utr5 = load_model("UTR5", name, length) # Load from library
 
     if isinstance(utr5, UTR5):
-        sequence.utr5 = utr5
-        update_existing(utr5.parameters, sequence.parameters)
-        sequence.dnalength += utr5.length
-        sequence.rnalength += utr5.length
-        if name == None: sequence.name += "--" + utr5.name
+        assy.utr5 = utr5
+        update_existing(utr5.parameters, assy.parameters)
+        assy.dnalength += utr5.length
+        assy.rnalength += utr5.length
+        if assy_name == None: assy.name += "--" + utr5.name
     else:
         ValueError("invalid UTR5 specification")
 
@@ -578,12 +580,12 @@ def assemble_dna(
         cds = load_model("CDS", name, length)  # Load from library
 
     if isinstance(cds, CDS):
-        sequence.cds = cds
-        update_existing(cds.parameters, sequence.parameters)
-        sequence.dnalength += cds.length
-        sequence.rnalength += cds.length
-        sequence.peplength += cds.length
-        if name == None: sequence.name += "--" + cds.name
+        assy.cds = cds
+        update_existing(cds.parameters, assy.parameters)
+        assy.dnalength += cds.length
+        assy.rnalength += cds.length
+        assy.peplength += cds.length
+        if assy_name == None: assy.name += "--" + cds.name
     else:
         ValueError("invalid CDS specification")
 
@@ -593,12 +595,12 @@ def assemble_dna(
         ctag = load_model("Ctag", name, length) # Load from library
 
     if isinstance(ctag, Ctag):
-        sequence.ctag = ctag
-        update_existing(ctag.parameters, sequence.parameters)
-        sequence.dnalength += ctag.length
-        sequence.rnalength += ctag.length
-        sequence.peplength += ctag.length
-        if name == None: sequence.name += "--" + ctag.name
+        assy.ctag = ctag
+        update_existing(ctag.parameters, assy.parameters)
+        assy.dnalength += ctag.length
+        assy.rnalength += ctag.length
+        assy.peplength += ctag.length
+        if assy_name == None: assy.name += "--" + ctag.name
     else:
         ValueError("invalid Ctag specification")
 
@@ -608,15 +610,15 @@ def assemble_dna(
         utr3 = load_model("UTR3", utr3, length) # Load from library
         
     if isinstance(utr3, UTR3):
-        sequence.utr3 = utr3
-        update_existing(utr3.parameters, sequence.parameters)
-        sequence.dnalength += utr3.length
-        sequence.rnalength += utr3.length
-        if name == None: sequence.name += "--" + utr3.name
+        assy.utr3 = utr3
+        update_existing(utr3.parameters, assy.parameters)
+        assy.dnalength += utr3.length
+        assy.rnalength += utr3.length
+        if assy_name == None: assy.name += "--" + utr3.name
     else:
         ValueError("invalid UTR3 specification")
 
-    return sequence
+    return assy
 
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
 def parse_DNA_string(spec):

@@ -23,7 +23,7 @@ class basic(Mechanism):
         
         # Create reaction that binds RNAP to DNA
         add_reaction(mixture, [mixture.rnap, assy.dna], [assy.rnap_bound],
-                     kf, kr)
+                     kf, kr, prefix="txb_")
 
         # Figure out the transcription rate based on length of the protein
         txrate = eval_parameter(
@@ -37,4 +37,4 @@ class basic(Mechanism):
         # Create reaction that produces mRNA
         add_reaction(mixture, [assy.rnap_bound],
                      [mixture.rnap, assy.rna, assy.dna],
-                     kf=txparam)
+                     kf=txparam, prefix="txb_")

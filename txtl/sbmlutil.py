@@ -120,7 +120,7 @@ def find_parameter(mixture, id):
 
 # Helper function to add a reaction to a model
 def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
-                 parameters={}, debug=False):
+                 parameters={}, prefix="r", debug=False):
     """Add a reaction to a model
 
     The `add_reaction` function is used to add a reaction to a model.
@@ -151,7 +151,7 @@ def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
 
     # Store the reaction id
     global reaction_id
-    reaction.setId("r%d" % (reaction_id));
+    reaction.setId("%s%d" % (prefix, reaction_id));
     reaction_id += 1
 
     if debug: print("Creating reaction: ",
@@ -223,7 +223,8 @@ def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
 
     # If the reverse rate is given, switch things around create reverse raaction
     if (kr != None):
-        revreaction = add_reaction(mixture, products, reactants, kr, None)
+        revreaction = add_reaction(mixture, products, reactants, kr, None,
+                                   prefix=prefix)
         return (reaction, revreaction)
 
     return reaction
