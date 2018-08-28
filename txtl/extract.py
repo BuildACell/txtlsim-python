@@ -103,12 +103,14 @@ class StandardExtract(Extract):
             mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_IC * conc)
         else:
             warn("Extract missing initial condition for species RNAP")
+            mixture.rnap = add_species(mixture, None, 'RNAP', 0)
         
         Ribo_IC = self.eval_parameter('Ribo_IC')
         if Ribo_IC != None:
             mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_IC * conc)
         else:
             warn("Extract missing initial condition for species Ribo")
+            mixture.ribo = add_species(mixture, None, 'Ribo', 0)
 
         RecBCD_IC = self.eval_parameter('RecBCD_IC')
         if RecBCD_IC != None:
