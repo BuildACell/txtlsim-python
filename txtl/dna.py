@@ -623,10 +623,10 @@ def assemble_dna(
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
 def parse_DNA_string(spec):
     # First check to see if we have a name(length) specification
-    m = re.search("^(\w+)\((\d+)\)$", spec)
+    m = re.search(r'^(\w+)\((\d+)\)$', spec)
     if m == None:
         # If not, see if we just find a name
-        m = re.search("^(\w+)$", spec)
+        m = re.search(r'^(\w+)$', spec)
         if m != None:
             name = m.group(1)
             length = None
