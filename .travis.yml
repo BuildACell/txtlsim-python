@@ -14,10 +14,8 @@ before_install:
   - hash -r
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
-  - conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage
+  - conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage nose coveralls
   - source activate test-environment
-  # coveralls not in conda repos => install via pip instead
-  - pip install coveralls
 
 # Install packages
 install:
