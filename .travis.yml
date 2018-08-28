@@ -3,12 +3,12 @@
 
 language: python
 python:
- - "3.6"
+  - "3.6"
 
 # install required system libraries
 before_install:
   # use miniconda to install libsbml, to avoid lengthy build from source
-  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
