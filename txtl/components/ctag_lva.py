@@ -13,6 +13,7 @@ from ..dna import DegradationTag
 
 class ctag_lva(DegradationTag):
     "LVA degradation tag"
+    #! TODO: implement
 
 # Define a shorthand version for convenience
 lva = ctag_lva

@@ -41,37 +41,7 @@ class StandardExtract(Extract):
         'protein_degradation'   : degradation.protein_basic()
     }
 
-    def update_species(self, mixture, conc, mechanisms={}):
-        #
-        # Add in the species that are present in the extract
-        #
-        # An extract should contain some combination of
-        # transcriptional and translational machinery, although it is
-        # possible to have one or none of these (eg, for a
-        # transcription only system or a pure buffer with no cellular
-        # machinery).
-        #
-        RNAP_IC = self.eval_parameter('RNAP_IC')
-        if RNAP_IC != None:
-            mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_IC * conc)
-        else:
-            warn("Extract missing species RNAP")
-        
-        Ribo_IC = self.eval_parameter('Ribo_IC')
-        if Ribo_IC != None:
-            mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_IC * conc)
-        else:
-            warn("Extract missing species Ribo")
-
-        RecBCD_IC = self.eval_parameter('RecBCD_IC')
-        if RecBCD_IC != None:
-                 mixture.recbcd = add_species(mixture, None, 'RecBCD',
-                                              RecBCD_IC * conc)
-
-        RNase_IC = self.eval_parameter('RNase_IC')
-        if RNase_IC != None:
-            mixture.rnase = add_species(mixture, None, 'RNase', RNase_IC * conc)
-
+    def update_parameters(self, mixture):
         #
         # Add in the (global) parameters that are present in the extract
         #
@@ -79,9 +49,6 @@ class StandardExtract(Extract):
         # used by all other reactions in the system.  These are added
         # at the time of species creation to insure that they are
         # available when reactions are created within components.
-        #
-        # TODO: Think about whether this really needs to happen in
-        # update_species.  (I think not.)
         #
         parameter_names = [
             # DNA degradation parameters
@@ -118,6 +85,37 @@ class StandardExtract(Extract):
             # Create the parameter in the model
             if value != None:
                 add_parameter(mixture, name, value)
+
+    def update_species(self, mixture, conc, mechanisms={}):
+        #
+        # Add in the species that are present in the extract
+        #
+        # An extract should contain some combination of
+        # transcriptional and translational machinery, although it is
+        # possible to have one or none of these (eg, for a
+        # transcription only system or a pure buffer with no cellular
+        # machinery).
+        #
+        RNAP_IC = self.eval_parameter('RNAP_IC')
+        if RNAP_IC != None:
+            mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_IC * conc)
+        else:
+            warn("Extract missing species RNAP")
+        
+        Ribo_IC = self.eval_parameter('Ribo_IC')
+        if Ribo_IC != None:
+            mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_IC * conc)
+        else:
+            warn("Extract missing species Ribo")
+
+        RecBCD_IC = self.eval_parameter('RecBCD_IC')
+        if RecBCD_IC != None:
+                 mixture.recbcd = add_species(mixture, None, 'RecBCD',
+                                              RecBCD_IC * conc)
+
+        RNase_IC = self.eval_parameter('RNase_IC')
+        if RNase_IC != None:
+            mixture.rnase = add_species(mixture, None, 'RNase', RNase_IC * conc)
 
     def update_reactions(self, mixture):
         #! TODO: add reactions that are instantiated by extract

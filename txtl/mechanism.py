@@ -46,5 +46,5 @@ def get_mechanisms(mixture, component, custom={}):
     mechanisms.update(component.default_mechanisms) # component defaults
     mechanisms.update(mixture.custom_mechanisms)    # customized extract
     mechanisms.update(component.custom_mechanisms)  # customized component 
-    mechanisms.update(custom)                       # additional custom
+    mechanisms.update(custom)                       # additional customization
     return mechanisms

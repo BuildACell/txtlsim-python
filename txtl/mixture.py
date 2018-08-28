@@ -90,6 +90,10 @@ class Mixture():
             concentration = self.concentrations[i]
             component = self.components[i]
 
+            # Create all (global) parameters for this component
+            #! TODO: need to document this better; see extract.py
+            component.update_parameters(self)
+
             # Create all of the species for this component
             component.update_species(self, concentration)
 

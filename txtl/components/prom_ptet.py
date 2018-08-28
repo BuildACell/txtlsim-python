@@ -11,12 +11,12 @@ from ..dna import RepressedPromoter
 class prom_ptet(RepressedPromoter):
     "ptet promoter"
     def __init__(
-        self, name='ptet', 
+        self, name='ptet', length=50,
         mechanisms={}, config_file='prom_ptet.csv', parameters={},
         rnapname="RNAP", **keywords
     ):
         RepressedPromoter.__init__(
-            self, name=name, repressor='tetR', length=50,
+            self, name=name, repressor='tetR', length=length,
             mechanisms=mechanisms, config_file=config_file,
             parameters=parameters, rnapname=rnapname, dimer=True, **keywords)
 
