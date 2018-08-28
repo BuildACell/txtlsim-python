@@ -1,0 +1,31 @@
+# .travis.yml - Travis CI setup
+# RMM, 28 Aug 2018
+
+language: python
+python:
+ - "3.6"
+
+# install required system libraries
+before_install:
+  # use miniconda to install libsbml, to avoid lengthy build from source
+  wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda create -q -n test-environment python="$TRAVIS_PYTHON_VERSION" pip coverage
+  - source activate test-environment
+  # coveralls not in conda repos => install via pip instead
+  - pip install coveralls
+
+# Install packages
+install:
+  conda install -c SBMLTeam python-libsbml
+
+# command to run tests
+script:
+  - coverage run setup.py test
+
+after_success:
+  - coveralls
