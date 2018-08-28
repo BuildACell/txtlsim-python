@@ -8,6 +8,7 @@
 # the python version.
 
 import txtl
+import txtl.bioscrape
 
 # Set up the standard TXTL tubes
 tube1 = txtl.extract('BL21_DE3')
@@ -46,7 +47,7 @@ simdata = txtl.bioscrape.runsim(well1, 8 * txtl.hours)
 
 # plot the result
 #! TODO: implement
-txtl.plot(simdata, well1, ['Protein_deGFP', 'Protein_tetR'])
+txtl.bioscrape.plot(simdata, well1, ['Protein_deGFP', 'Protein_tetR'])
 
 # Create an SBML file containing the model
 txtl.write_sbml(well1, 'geneexpr.xml')
