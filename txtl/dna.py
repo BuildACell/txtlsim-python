@@ -550,7 +550,7 @@ def assemble_dna(
     # Parse and store the promoter sequence
     if isinstance(prom, str):
         name, length = parse_DNA_string(prom)   # Get component name
-        prom = load_model("Prom", name, length) # Load from library
+        prom = load_model("prom", name, length) # Load from library
         
     if isinstance(prom, Promoter):
         assy.promoter = prom
@@ -592,7 +592,7 @@ def assemble_dna(
     # Parse and store the C-terminus tag
     if isinstance(ctag, str):
         name, length = parse_DNA_string(ctag)   # Get component name
-        ctag = load_model("Ctag", name, length) # Load from library
+        ctag = load_model("ctag", name, length) # Load from library
 
     if isinstance(ctag, Ctag):
         assy.ctag = ctag

@@ -18,7 +18,7 @@ def load_model(prefix, name, length):
         module = import_module("txtl.components.%s_%s" %
                                (prefix.lower(), name.lower()))
         model = eval("module.%s_%s('%s', %d)" %
-                     (prefix, name.lower(), name, length))
+                     (prefix.lower(), name.lower(), name, length))
     except ModuleNotFoundError as error:
         print(error)
         print("couldn't find component %s_%s" % (prefix, name))

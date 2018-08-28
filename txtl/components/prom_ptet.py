@@ -8,7 +8,17 @@
 
 from ..dna import RepressedPromoter
 
-class Prom_ptet(RepressedPromoter):
+class prom_ptet(RepressedPromoter):
     "ptet promoter"
-    def __init__(self, name, length):
-        RepressedPromoter.__init__(self, name, 'tetR', dimer=True)
+    def __init__(
+        self, name='ptet', 
+        mechanisms={}, config_file='prom_ptet.csv', parameters={},
+        rnapname="RNAP", **keywords
+    ):
+        RepressedPromoter.__init__(
+            self, name=name, repressor='tetR', length=50,
+            mechanisms=mechanisms, config_file=config_file,
+            parameters=parameters, rnapname=rnapname, dimer=True, **keywords)
+
+# Define a shorthand version for convenience
+ptet = prom_ptet

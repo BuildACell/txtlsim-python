@@ -11,5 +11,9 @@
 
 from ..dna import ConstitutiveRBS
 
-class UTR5_bcd2(ConstitutiveRBS):
+class utr5_bcd2(ConstitutiveRBS):
     "BCD2 RBS"
+
+# Define a shorthand version for convenience
+bcd2 = utr5_bcd2
+

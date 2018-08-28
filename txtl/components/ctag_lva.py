@@ -11,5 +11,10 @@
 
 from ..dna import DegradationTag
 
-class Ctag_lva(DegradationTag):
+class ctag_lva(DegradationTag):
     "LVA degradation tag"
+
+# Define a shorthand version for convenience
+lva = ctag_lva
+
+    
