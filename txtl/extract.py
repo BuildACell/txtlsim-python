@@ -4,6 +4,8 @@
 # Copyright (c) 2018, Build-A-Cell. All rights reserved.
 # See LICENSE file in the project root directory for details.
 
+from warnings import warn
+
 from .mixture import Mixture
 from .component import Component
 from .sbmlutil import add_species, add_reaction, add_parameter
@@ -100,13 +102,13 @@ class StandardExtract(Extract):
         if RNAP_IC != None:
             mixture.rnap = add_species(mixture, None, 'RNAP', RNAP_IC * conc)
         else:
-            warn("Extract missing species RNAP")
+            warn("Extract missing initial condition for species RNAP")
         
         Ribo_IC = self.eval_parameter('Ribo_IC')
         if Ribo_IC != None:
             mixture.ribo = add_species(mixture, None, 'Ribo', Ribo_IC * conc)
         else:
-            warn("Extract missing species Ribo")
+            warn("Extract missing initial condition for species Ribo")
 
         RecBCD_IC = self.eval_parameter('RecBCD_IC')
         if RecBCD_IC != None:

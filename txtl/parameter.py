@@ -143,7 +143,8 @@ def load_config(filename, extension=".csv", debug=False):
         # Set up as dictionary for easy access
         params[param.name] = param
 
-    return params
+    csvfile.close()             # Close the file now that we are done
+    return params               # Return the parameters we read
 
 # Process parameter input
 def get_parameters(config_file, custom, default={}, **keywords):
