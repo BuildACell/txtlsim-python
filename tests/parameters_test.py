@@ -32,5 +32,16 @@ class TestParameters(unittest.TestCase):
         bcd2 = txtl.ConstitutiveRBS('BCD2',
                                     parameters = {Ribosome_Binding_F:10})
 
+    def test_parameter_values(self):
+        lacI = txtl.ProteinCDS('LacI', dimer=True,
+                               parameters={'Dimerization_F' : 1})
+        self.assertIsInstance(lacI.parameters['Dimerization_F'],
+                              txtl.Parameter)
+
+        name, length = txtl.parse_DNA_string("tetR(1200)")
+        tetR = txtl.load_model("CDS", name, length)
+        self.assertIsInstance(tetR.parameters['Dimerization_F'],
+                              txtl.Parameter)
+
 if __name__ == "__main__":
     unittest.main()

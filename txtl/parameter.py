@@ -159,12 +159,14 @@ def get_parameters(config_file, custom, default={}, **keywords):
             warn("get_parameters: couldn't find file %s" % config_file)
 
     # Override any parameters given as a parameter dictionary
-    if custom != None: parameters.update(custom)
+    if custom != None:
+        for key, value in custom.items():
+            parameters[key] = _to_parameter(key, value)
 
     # Finally, check to see if any of the keywords are parameter names
     for key, value in keywords.items():
         if key in parameters.keys():
-            parameters[key] = value
+            parameters[key] = _to_parameter(key, value)
 
     # All done!
     return parameters
@@ -184,7 +186,7 @@ def update_missing(existing_dict, default_dict):
     """
     for key, value in default_dict.items():
         if key not in existing_dict.keys():
-            existing_dict[key] = value
+            existing_dict[key] = _to_parameter(key, value)
 
 # Update any existing parameter values in a parameter dictionary
 def update_existing(existing_dict, custom_dict):
@@ -199,7 +201,7 @@ def update_existing(existing_dict, custom_dict):
     """
     for key, value in custom_dict.items():
         if key in existing_dict.keys():
-            existing_dict[key] = value
+            existing_dict[key] = _to_parameter(key, value)
 
 def eval_parameter(component, name, assignments={}):
     parameters = component.parameters
@@ -215,3 +217,13 @@ def eval_parameter(component, name, assignments={}):
     # Evaluate the expression 
     return float(eval(param.value, assignments))
 
+# Convert a value input to a parameter object
+def _to_parameter(key, value):
+    if isinstance(value, Parameter):
+        return value
+    elif isinstance(value, (float, int)):
+        return Parameter(key, 'Numeric', value)
+    elif isinstance(value, str):
+        return Parameter(key, 'Global', value)
+    else:
+        TypeError('Unknown parameter type')
