@@ -48,7 +48,7 @@ def add_species(mixture, type, name, ic=None, debug=False):
     model = mixture.model   # Get the model where we will store results
     
     # Construct the species name
-    prefix = type + " " if type != None else ""
+    prefix = type + " " if type is not None else ""
     species_name = prefix + name
     
     # Construct the species ID
@@ -58,10 +58,9 @@ def add_species(mixture, type, name, ic=None, debug=False):
     
     # Check to see if this species is already present
     species = find_species(model, species_id)
-    if species == None:
+    if species is None:
         if debug: print("Adding species %s" % species_name)
         species = model.createSpecies()
-        prefix = type + " " if type != None else ""
         species.setName(species_name)
         species.setId(species_id)
         species.setCompartment(mixture.compartment.getId())
@@ -92,13 +91,13 @@ def find_species(mixture, species_name):
     
     return model.getSpecies(species_id)
 
-# Helper function to add a pameter to the model
+# Helper function to add a parameter to the model
 def add_parameter(mixture, name, value=0, debug=False):
     model = mixture.model   # Get the model where we will store results
 
     # Check to see if this parameter is already present
     parameter = find_parameter(mixture, name)
-    if parameter == None:
+    if parameter is None:
         if debug: print("Adding parameter %s" % name)
         parameter = model.createParameter()
         parameter.setId(name)
@@ -221,10 +220,10 @@ def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
         param.setValue(float(kf))
     ratelaw.setFormula(ratestring);
 
-    # If the reverse rate is given, switch things around create reverse raaction
-    if (kr != None):
+    # If the reverse rate is given, switch things around create reverse reaction
+    if kr is not None:
         revreaction = add_reaction(mixture, products, reactants, kr, None,
                                    prefix=prefix)
-        return (reaction, revreaction)
+        return reaction, revreaction
 
     return reaction
