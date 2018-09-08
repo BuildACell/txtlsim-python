@@ -82,14 +82,11 @@ class Mixture():
         if (config_file != None):
             self.parameters.update(load_config(config_file))
 
-    def write_sbml(self, filename):
-        "Generate an SBML file for the current mixture (model)"
-        
+    def _update_sbml_model(self):
+        """Updating the internal SBML representation"""
         # Update all species in the mixture to make sure everything exists
-        for i in range(len(self.components)):
-            concentration = self.concentrations[i]
-            component = self.components[i]
-
+        assert (len(self.concentrations) == len(self.components))
+        for component, concentration in zip(self.components, self.concentrations):
             # Create all of the species for this component
             component.update_species(self, concentration)
 
@@ -97,11 +94,23 @@ class Mixture():
         for component in self.components:
             component.update_reactions(self)
 
+    def print_report(self):
+        self._update_sbml_model()
+        # Now go through and add all of the reactions that are required
+        for component in self.components:
+            print(component)
+            for mechanism_name, mechanism_implementation in component.default_mechanisms.items():
+                print('\t' + mechanism_name + ": " + str(mechanism_implementation))
+
+    def write_sbml(self, filename):
+        "Generate an SBML file for the current mixture (model)"
+        self._update_sbml_model()
+
         # Write the model to a file
         libsbml.writeSBMLToFile(self._SBMLdoc, filename)
 
     def __str__(self):
-        "Returning the name of the mixture"
+        """Returning the name of the mixture"""
         return self.name
 
 #

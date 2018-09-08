@@ -17,8 +17,8 @@ tube2 = txtl.buffer('stdbuffer')
 tube3 = txtl.newtube('geneexpr')
 
 # Define a DNA strand using strings (ala MATLAB)
-gene1 = txtl.assemble_dna('ptet(50)', 'BCD2(20)', 'tetR(1200)')
-txtl.add_dna(tube3, gene1, 1, 'plasmid')
+gene1 = txtl.assemble_dna(prom='ptet(50)', utr5='BCD2(20)', cds='tetR(1200)')
+txtl.add_dna(mixture=tube3, dna=gene1, conc=1, type='plasmid')
 
 #
 # Assemble a DNA strand using objects (semi-pythonic)
@@ -39,7 +39,7 @@ txtl.add_dna(tube3, gene2, 1, 'plasmid')
 
 # Mix the contents of the individual tubes
 well1 = txtl.combine_tubes([tube1, tube2, tube3])
-
+pass
 # Run a simulation
 #! TODO: implement
 simdata = txtl.bioscrape.runsim(well1, 8 * txtl.hours)
@@ -50,3 +50,6 @@ txtl.plot(simdata, well1, ['Protein_deGFP', 'Protein_tetR'])
 
 # Create an SBML file containing the model
 txtl.write_sbml(well1, 'geneexpr.xml')
+
+# print out a basic report about the content of the well
+well1.print_report()

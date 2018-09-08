@@ -14,6 +14,10 @@ from ..parameter import Parameter, eval_parameter
 # Convert DNA to RNA
 class basic(Mechanism):
     "Basic transcription mechanism"
+
+    def __init__(self):
+        self.name = 'Basic Transcription'
+
     def update_reactions(self, mixture, assy, debug=False):
         parameters = assy.promoter.parameters   # get parameter values
         

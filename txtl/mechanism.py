@@ -35,9 +35,14 @@ class Mechanism:
     derived from this class.
 
     """
-    def __init__(self): return None
+    def __init__(self,name=''):
+        self.name = name
+
     def update_species(self, mixture, component, conc): return None
     def update_reactions(self, mixture, component): return None
+
+    def __str__(self):
+        return self.name
 
 # Utility function to retrieve mechanism list
 def get_mechanisms(mixture, component, custom={}):

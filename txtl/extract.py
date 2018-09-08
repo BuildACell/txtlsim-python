@@ -33,7 +33,7 @@ class Extract(Component):
         self.parameters = get_parameters(self.config_file, parameters)
 
 class StandardExtract(Extract):
-    mechanisms = {
+    default_mechanisms = {
         'transcription'         : transcription.basic(),
         'translation'           : translation.basic(),
         'DNA_degradation'       : degradation.dna_basic(),
@@ -123,6 +123,8 @@ class StandardExtract(Extract):
         #! TODO: add reactions that are instantiated by extract
         # mechanism['RNA_degradation'].update_reactions(mixture, mechanisms)
         None
+    def __str__(self):
+        return "StandardExtract with %d mechanisms" % len(self.default_mechanisms)
 
 # Create a mixture containing extract
 def create_extract(name, type=StandardExtract, mechanisms={}):
@@ -148,7 +150,7 @@ def create_extract(name, type=StandardExtract, mechanisms={}):
     mixture.concentrations = [10.0/(10.0/3.0)]
 
     # Store default mechanisms and custom mechanisms
-    mixture.default_mechanisms = extract.mechanisms
+    mixture.default_mechanisms = extract.default_mechanisms
     mixture.custom_mechanisms = mechanisms
 
     # Store the parameters in the mixture so that components can access them
