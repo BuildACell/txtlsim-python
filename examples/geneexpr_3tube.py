@@ -39,7 +39,7 @@ txtl.add_dna(tube3, gene2, 1, 'plasmid')
 
 # Mix the contents of the individual tubes
 well1 = txtl.combine_tubes([tube1, tube2, tube3])
-pass
+
 # Run a simulation
 #! TODO: implement
 simdata = txtl.bioscrape.runsim(well1, 8 * txtl.hours)
