@@ -123,8 +123,11 @@ def load_config(filename, extension=".csv", debug=False):
     csvreader = csv.reader(csvfile)
     params = {}
     for row in csvreader:
+        # Get rid of extraneous spaces
+        for i in range(len(row)): row[i] = row[i].strip()
+        
         # Skip blank lines (and malformed lines)
-        if len(row) < 3 or row[0].strip() == "": continue
+        if len(row) < 3 or row[0] == "": continue
         
         # Create a new parameter object to keep track of this row
         #! TODO: this should be done in a better (and more pythonic) way
@@ -135,15 +138,16 @@ def load_config(filename, extension=".csv", debug=False):
             param = Parameter(row[0], row[1], row[2], "")
 
         # Name simplification for backward compatibility with MATLAB code
-        param.name = re.sub("_Forward", "_F", param.name)
-        param.name = re.sub("_Reverse", "_R", param.name)
-        param.name = re.sub("_ic", "_IC", param.name)
-        param.name = re.sub("_Concentration", "_IC", param.name)
+        param.name = re.sub("_Forward$", "_F", param.name)
+        param.name = re.sub("_Reverse$", "_R", param.name)
+        param.name = re.sub("_ic$", "_IC", param.name)
+        param.name = re.sub("_Concentration$", "_IC", param.name)
 
         # Set up as dictionary for easy access
         params[param.name] = param
 
-    return params
+    csvfile.close()             # Close the file now that we are done
+    return params               # Return the parameters we read
 
 # Process parameter input
 def get_parameters(config_file, custom, default={}, **keywords):

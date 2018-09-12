@@ -13,7 +13,9 @@ from ..dna import ConstitutiveRBS
 
 class utr5_bcd2(ConstitutiveRBS):
     "BCD2 RBS"
-    #! TODO: implement
+    def __init__(self, name='BCD2', *args, **kwargs):
+        ConstitutiveRBS.__init__(
+            self, name=name, *args, **kwargs, dimerize=True)
 
 # Define a shorthand version for convenience
 bcd2 = utr5_bcd2
