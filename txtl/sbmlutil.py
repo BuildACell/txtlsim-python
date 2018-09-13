@@ -52,9 +52,7 @@ def add_species(mixture, type, name, ic=None, debug=False):
     species_name = prefix + name
     
     # Construct the species ID
-    species_id = re.sub(" ", "_", species_name)
-    species_id = re.sub("--", "_", species_id)
-    species_id = re.sub(":", "_", species_id)
+    species_id = _id_from_name(species_name)
     
     # Check to see if this species is already present
     species = find_species(model, species_id)
@@ -66,14 +64,14 @@ def add_species(mixture, type, name, ic=None, debug=False):
         species.setCompartment(mixture.compartment.getId())
         species.setConstant(False)
         species.setBoundaryCondition(False)
-        species.setHasOnlySubstanceUnits(False) #! TODO: confirm this is OK
+        species.setHasOnlySubstanceUnits(False)
 
     else:
         if debug: print("add_species: %s already exists", species.getId())
         
     # Set the initial concentration (if specified)
     #! TODO: Decide whether to warn if species is already present
-    #! TODO: add initial concentrations if reaction is present
+    #! TODO: add initial concentrations if species is already present
     if ic != None:
         if debug: print("    %s IC = %s" % (species_name, ic))
         species.setInitialConcentration(float(ic))
@@ -85,10 +83,9 @@ def find_species(mixture, species_name):
     model = mixture.model   # Get the model where we will store results
     
     # Construct the species ID (no-op if already a species ID)
-    species_id = re.sub(" ", "_", species_name)
-    species_id = re.sub("--", "_", species_id)
-    species_id = re.sub(":", "_", species_id)
-    
+    species_id = _id_from_name(species_name)
+
+    #! TODO: Add error checking
     return model.getSpecies(species_id)
 
 # Helper function to add a parameter to the model
@@ -96,11 +93,11 @@ def add_parameter(mixture, name, value=0, debug=False):
     model = mixture.model   # Get the model where we will store results
 
     # Check to see if this parameter is already present
-    parameter = find_parameter(mixture, name)
+    parameter = find_parameter(mixture, name)   #! TODO: add error checking
     if parameter is None:
         if debug: print("Adding parameter %s" % name)
         parameter = model.createParameter()
-        parameter.setId(name)
+        parameter.setId(name)                   #! TODO: add error checking
 
     else:
         if debug: print("add_parameter: %s already exists", parameter.getId())
@@ -113,11 +110,11 @@ def add_parameter(mixture, name, value=0, debug=False):
 
 # Look for a parameter in the current model
 def find_parameter(mixture, id):
-    model = mixture.model   # Get the model where we will store results
-    
-    return model.getParameter(id)
+    model = mixture.model               # Get model where parameters are stored
+    return model.getParameter(id)       #! TODO: add error checking
 
 # Helper function to add a reaction to a model
+#! Add stochiometry argument to allow non-unitary stochiometries
 def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
                  parameters={}, prefix="r", debug=False):
     """Add a reaction to a model
@@ -187,14 +184,14 @@ def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
     ratestring = kfname
     for species in reactants:
         reactant = reaction.createReactant()
-        reactant.setSpecies(species.getId())
+        reactant.setSpecies(species.getId())    #! TODO: add error checking
         reactant.setConstant(True)
         ratestring += " * " + species.getId()
 
     # Create the products
     for species in products:
         product = reaction.createProduct()
-        product.setSpecies(species.getId())
+        product.setSpecies(species.getId())     #! TODO: add error checking
         product.setConstant(True)
 
     # Create a kinetic law for the reaction
@@ -227,3 +224,11 @@ def add_reaction(mixture, reactants, products, kf, kr=None, id=None,
         return reaction, revreaction
 
     return reaction
+
+# Utility function to convert name to id
+def _id_from_name(name):
+    "Convert name to a id (remove spaces and other characters)"
+    id = re.sub(" ", "_", name)
+    id = re.sub("--", "_", id)
+    id = re.sub(":", "_", id)
+    return id

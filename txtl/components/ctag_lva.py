@@ -11,5 +11,13 @@
 
 from ..dna import DegradationTag
 
-class Ctag_lva(DegradationTag):
+class ctag_lva(DegradationTag):
     "LVA degradation tag"
+    def __init__(self, name='lva', protease="ClpXP", *args, **kwargs):
+        DegradationTag.__init__(
+            self, name=name, protease=protease, *args, **kwargs, dimerize=True)
+
+# Define a shorthand version for convenience
+lva = ctag_lva
+
+    

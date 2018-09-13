@@ -559,7 +559,7 @@ def assemble_dna(
     # Parse and store the promoter sequence
     if isinstance(prom, str):
         name, length = parse_DNA_string(prom)   # Get component name
-        prom = load_model("Prom", name, length) # Load from library
+        prom = load_model("prom", name, length) # Load from library
         
     if isinstance(prom, Promoter):
         assy.promoter = prom
@@ -601,7 +601,7 @@ def assemble_dna(
     # Parse and store the C-terminus tag
     if isinstance(ctag, str):
         name, length = parse_DNA_string(ctag)   # Get component name
-        ctag = load_model("Ctag", name, length) # Load from library
+        ctag = load_model("ctag", name, length) # Load from library
 
     if isinstance(ctag, Ctag):
         assy.ctag = ctag
@@ -632,10 +632,10 @@ def assemble_dna(
 # Parse a DNA string (from the old MATLAB TX-TL modeling library)
 def parse_DNA_string(spec):
     # First check to see if we have a name(length) specification
-    m = re.search("^(\w+)\((\d+)\)$", spec)
+    m = re.search(r'^(\w+)\((\d+)\)$', spec)
     if m == None:
         # If not, see if we just find a name
-        m = re.search("^(\w+)$", spec)
+        m = re.search(r'^(\w+)$', spec)
         if m != None:
             name = m.group(1)
             length = None

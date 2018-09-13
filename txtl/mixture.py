@@ -87,8 +87,14 @@ class Mixture():
         # Update all species in the mixture to make sure everything exists
         assert (len(self.concentrations) == len(self.components))
         for component, concentration in zip(self.components, self.concentrations):
+            # Create all (global) parameters for this component
+            # ! TODO: need to document this better; see extract.py
+            component.update_parameters(self)
+
             # Create all of the species for this component
             component.update_species(self, concentration)
+
+
 
         # Now go through and add all of the reactions that are required
         for component in self.components:

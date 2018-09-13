@@ -39,7 +39,7 @@ myRXN.mechanisms += = [ML.integrases, ML.sigma70_transcription,
 # CRN = myRXN.compile_crn() 
 
 # Returns SBML text and possibly also saves an SBML file
-SBML = myRXN.write_sbml(myRXN, 'integrase.sbml')
+SBML = myRXN.write_sbml('integrase.sbml')
 
 # Not necessary, but might be nice to have automatic integration with BioSCRAPE
 # ResultsODE = myRXN.simulate_with_bioscrape_ode(time = 10) 

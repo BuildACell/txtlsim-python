@@ -123,8 +123,11 @@ def load_config(filename, extension=".csv", debug=False):
     csvreader = csv.reader(csvfile)
     params = {}
     for row in csvreader:
+        # Get rid of extraneous spaces
+        for i in range(len(row)): row[i] = row[i].strip()
+        
         # Skip blank lines (and malformed lines)
-        if len(row) < 3 or row[0].strip() == "": continue
+        if len(row) < 3 or row[0] == "": continue
         
         # Create a new parameter object to keep track of this row
         #! TODO: this should be done in a better (and more pythonic) way
@@ -135,15 +138,16 @@ def load_config(filename, extension=".csv", debug=False):
             param = Parameter(row[0], row[1], row[2], "")
 
         # Name simplification for backward compatibility with MATLAB code
-        param.name = re.sub("_Forward", "_F", param.name)
-        param.name = re.sub("_Reverse", "_R", param.name)
-        param.name = re.sub("_ic", "_IC", param.name)
-        param.name = re.sub("_Concentration", "_IC", param.name)
+        param.name = re.sub("_Forward$", "_F", param.name)
+        param.name = re.sub("_Reverse$", "_R", param.name)
+        param.name = re.sub("_ic$", "_IC", param.name)
+        param.name = re.sub("_Concentration$", "_IC", param.name)
 
         # Set up as dictionary for easy access
         params[param.name] = param
 
-    return params
+    csvfile.close()             # Close the file now that we are done
+    return params               # Return the parameters we read
 
 # Process parameter input
 def get_parameters(config_file, custom, default={}, **keywords):
@@ -159,12 +163,14 @@ def get_parameters(config_file, custom, default={}, **keywords):
             warn("get_parameters: couldn't find file %s" % config_file)
 
     # Override any parameters given as a parameter dictionary
-    if custom != None: parameters.update(custom)
+    if custom != None:
+        for key, value in custom.items():
+            parameters[key] = _to_parameter(key, value)
 
     # Finally, check to see if any of the keywords are parameter names
     for key, value in keywords.items():
         if key in parameters.keys():
-            parameters[key] = value
+            parameters[key] = _to_parameter(key, value)
 
     # All done!
     return parameters
@@ -184,7 +190,7 @@ def update_missing(existing_dict, default_dict):
     """
     for key, value in default_dict.items():
         if key not in existing_dict.keys():
-            existing_dict[key] = value
+            existing_dict[key] = _to_parameter(key, value)
 
 # Update any existing parameter values in a parameter dictionary
 def update_existing(existing_dict, custom_dict):
@@ -199,7 +205,7 @@ def update_existing(existing_dict, custom_dict):
     """
     for key, value in custom_dict.items():
         if key in existing_dict.keys():
-            existing_dict[key] = value
+            existing_dict[key] = _to_parameter(key, value)
 
 def eval_parameter(component, name, assignments={}):
     parameters = component.parameters
@@ -215,3 +221,13 @@ def eval_parameter(component, name, assignments={}):
     # Evaluate the expression 
     return float(eval(param.value, assignments))
 
+# Convert a value input to a parameter object
+def _to_parameter(key, value):
+    if isinstance(value, Parameter):
+        return value
+    elif isinstance(value, (float, int)):
+        return Parameter(key, 'Numeric', value)
+    elif isinstance(value, str):
+        return Parameter(key, 'Global', value)
+    else:
+        TypeError('Unknown parameter type')

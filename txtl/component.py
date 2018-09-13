@@ -105,6 +105,10 @@ class Component:
         # Alternative setup for setting parameter values
         #
 
+    # Define update_parameters to do nothing (overriden by extracts)
+    def update_parameters(self, mixture):
+        "Update (or create) (global) parameters in the model"
+
     #! TODO: think about argument order
     def update_species(self, mixture, concentration):
         """Update (or create) the set of species associated with this
