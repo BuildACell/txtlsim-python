@@ -63,7 +63,7 @@ class Mixture():
         document, model, compartment = create_sbml_model()
 
         # Initialize instance variables
-        self.name = name;               # Save the name of the mixture
+        self.name = name                # Save the name of the mixture
         self._SBMLdoc = document        # SBML document container
         self.model = model              # SBML model object
         self.compartment = compartment  # SBML compartment
@@ -82,27 +82,42 @@ class Mixture():
         if (config_file != None):
             self.parameters.update(load_config(config_file))
 
-    def write_sbml(self, filename):
-        "Generate an SBML file for the current mixture (model)"
-        
+    def _update_sbml_model(self):
+        """Updating the internal SBML representation"""
         # Update all species in the mixture to make sure everything exists
-        for i in range(len(self.components)):
-            concentration = self.concentrations[i]
-            component = self.components[i]
-
+        assert (len(self.concentrations) == len(self.components))
+        for component, concentration in zip(self.components, self.concentrations):
             # Create all (global) parameters for this component
-            #! TODO: need to document this better; see extract.py
+            # ! TODO: need to document this better; see extract.py
             component.update_parameters(self)
 
             # Create all of the species for this component
             component.update_species(self, concentration)
 
+
+
         # Now go through and add all of the reactions that are required
         for component in self.components:
             component.update_reactions(self)
 
+    def print_report(self):
+        self._update_sbml_model()
+        # Now go through and add all of the reactions that are required
+        for component in self.components:
+            print(component)
+            for mechanism_name, mechanism_implementation in component.default_mechanisms.items():
+                print('\t' + mechanism_name + ": " + str(mechanism_implementation))
+
+    def write_sbml(self, filename):
+        "Generate an SBML file for the current mixture (model)"
+        self._update_sbml_model()
+
         # Write the model to a file
         libsbml.writeSBMLToFile(self._SBMLdoc, filename)
+
+    def __str__(self):
+        """Returning the name of the mixture"""
+        return self.name
 
 #
 # Functions for interacting with mixtures
@@ -132,34 +147,37 @@ def add_dna(mixture, dna, conc, type=None):
 # Combine the components of two more more mixtures
 def combine_mixtures(mixtures, volumes=None, name=None):
     # Create a name if we were sent done
-    #! TODO: concatenate names of mixtures
     
     # Create a mixture for the results
+    if name is None:
+        name = 'Mix_of'
+
     outmixture = Mixture(name)
 
     # Keep track of the total amount of mixture we are creating (for scaling)
     # If no volumes are given, assume equal volumes of 1 unit each
-    total_volume = sum(volumes) if volumes != None else len(mixtures)
+    total_volume = sum(volumes) if volumes is not None else len(mixtures)
 
     # Add the components (and concentrations) of inputs to the output
-    for i in range(len(mixtures)):
+    for i, mixture in enumerate(mixtures):
         # Combine the mechanisms
         #! TODO: issue a warning if there are conflicting mechanisms
-        outmixture.default_mechanisms.update(mixtures[i].default_mechanisms)
-        outmixture.custom_mechanisms.update(mixtures[i].custom_mechanisms)
-
+        outmixture.default_mechanisms.update(mixture.default_mechanisms)
+        outmixture.custom_mechanisms.update(mixture.custom_mechanisms)
+        outmixture.name += '_' + str(mixture) # getting the name of a mixture
         # Components of new mixture are concatenation of mixture components
-        outmixture.components += mixtures[i].components
+        outmixture.components += mixture.components
 
         # Concentrations are scaled by the volume
-        scale = volume[i]/total_volume if volumes != None else 1/total_volume
-        for j in range(len(mixtures[i].concentrations)):
-            outmixture.concentrations += [mixtures[i].concentrations[j] * scale]
+        scale = volumes[i]/total_volume if volumes is not None else 1/total_volume
+        for concentration in mixture.concentrations:
+            outmixture.concentrations += [concentration * scale]
 
         # Combine parameter dictionaries from each mixture
         #! TODO: issue a warning if there are conflicting parameters
         outmixture.parameters.update(mixtures[i].parameters)
 
+    assert len(outmixture.concentrations) == len(outmixture.components)
     return outmixture
 
 # Write out the SBML description of the contexts of a mixture

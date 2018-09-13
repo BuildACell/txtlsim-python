@@ -140,6 +140,9 @@ class DNAassembly(Component):
         for dna in [self.promoter, self.utr5, self.cds, self.ctag, self.utr3]:
             if dna != None:
                 dna.update_reactions(mixture)
+
+    def __str__(self):
+        return 'DNA Assembly: ' + self.name
             
 #
 # DNA component
@@ -212,6 +215,9 @@ class DNA(Component):
     def update_reactions(self, mixture):
         return None
 
+    def __str__(self):
+        return self.name
+
 #
 # Promoter subclasses
 #
@@ -250,6 +256,9 @@ class Promoter(DNA):
 
         # Fill in any missing parameter values with defaults
         update_missing(self.parameters, Promoter.default_parameters)
+
+    def __str__(self):
+        return self.prefix + self.name
 
     def update_species(self, mixture, conc, parameters={}):
         assy = self.assy        # Get the DNA assembly we are part of

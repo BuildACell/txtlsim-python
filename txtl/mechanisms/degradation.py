@@ -12,10 +12,16 @@ from ..sbmlutil import add_species, add_reaction
 
 class dna_basic(Mechanism):
     "Basic DNA degradation"
+    def __init__(self):
+        self.name = 'Basic DNA degradation'
+
     #! TODO: not implemented
 
 class rna_basic(Mechanism):
     "Basic RNA degradation"
+    def __init__(self):
+        self.name = 'Basic RNA degradation'
+
     def update_reactions(self, mixture, assy):
         parameters = mixture.parameters         # get parameter values
         add_reaction(mixture, [assy.rna], [], kf=parameters['RNA_deg'],
@@ -23,6 +29,8 @@ class rna_basic(Mechanism):
 
 class protein_basic(Mechanism):
     "Basic protein degradation"
+    def __init__(self):
+        self.name = 'Basic protein degradation'
     #! TODO: not implemented
 
     

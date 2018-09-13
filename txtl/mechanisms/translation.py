@@ -13,6 +13,9 @@ from ..parameter import Parameter, eval_parameter
 
 class basic(Mechanism):
     "Basic translation mechanism"
+    def __init__(self):
+        self.name = 'Basic Translation'
+
     def update_reactions(self, mixture, assy, debug=False):
         parameters = assy.utr5.parameters       # get parameter values
 

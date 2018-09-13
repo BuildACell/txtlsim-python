@@ -12,6 +12,9 @@ from ..sbmlutil import add_species, add_reaction
 
 class protein_basic(Mechanism):
     "Basic protein maturation"
+    def __init__(self):
+        self.name = 'Basic protein maturation'
+
     def update_reactions(self, mixture, assy, debug=False):
         #! TODO: See if this protein is subject to maturation
         #! TODO: Create maturation reaction
